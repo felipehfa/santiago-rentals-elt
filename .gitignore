@@ -1,0 +1,6 @@
+.env
+landing/
+__pycache__/
+*.pyc
+logs/
+datos_externos/

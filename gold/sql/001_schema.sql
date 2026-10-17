@@ -1,0 +1,132 @@
+-- Capa Gold: historial (SCD2) y dataset de entrenamiento. Gold SOLO lee de Silver (nunca de Bronce) y se
+-- reconstruye completa en cada corrida. Idempotente: se re-aplica entero con gold/construir_gold.py.
+
+CREATE SCHEMA IF NOT EXISTS gold;
+
+-- ---------------------------------------------------------------------------------------------------------
+-- SCD2 de estado de publicación. Un intervalo por cada estado consecutivo; valid_from es el instante en que
+-- se OBSERVÓ por primera vez ese estado (no la hora de ejecución del pipeline), y valid_to es el valid_from
+-- del estado siguiente. El intervalo vigente tiene valid_to NULL e is_current = true.
+-- ---------------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS gold.dim_estado_aviso_scd2 (
+    id_aviso            TEXT NOT NULL,
+    valid_from          TIMESTAMPTZ NOT NULL,
+    valid_to            TIMESTAMPTZ,
+    is_current          BOOLEAN NOT NULL,
+    estado_publicacion  TEXT NOT NULL,             -- activo | pausado | finalizado | otro
+    estado_texto        TEXT,                      -- texto crudo del sitio ('Publicación finalizada')
+    ultima_confirmacion TIMESTAMPTZ,               -- solo en el intervalo vigente: última visita exitosa
+    PRIMARY KEY (id_aviso, valid_from)
+);
+
+-- ---------------------------------------------------------------------------------------------------------
+-- SCD2 de precio, en la MONEDA ORIGINAL del aviso. Un aviso a 18 UF no cambia de precio cuando la UF sube:
+-- versionar el CLP generaría una "rebaja" falsa cada día. precio_clp_observado es el equivalente en pesos
+-- al inicio del intervalo, solo informativo.
+-- ---------------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS gold.dim_precio_aviso_scd2 (
+    id_aviso            TEXT NOT NULL,
+    valid_from          TIMESTAMPTZ NOT NULL,
+    valid_to            TIMESTAMPTZ,
+    is_current          BOOLEAN NOT NULL,
+    precio_valor        NUMERIC,
+    precio_moneda       TEXT,
+    precio_original     NUMERIC,                   -- precio anterior si el aviso tiene rebaja
+    tiene_rebaja        BOOLEAN NOT NULL,
+    precio_clp_observado NUMERIC,
+    ultima_confirmacion TIMESTAMPTZ,
+    PRIMARY KEY (id_aviso, valid_from)
+);
+
+-- ---------------------------------------------------------------------------------------------------------
+-- Dataset de entrenamiento: una fila por aviso. Incluye TODOS los avisos; los que no sirven para entrenar
+-- quedan con apto_entrenamiento = false y su motivo, para poder revisarlos y cambiar la regla sin perderlos.
+-- No contiene features que dependan del split de entrenamiento (nivel_barrio, precio_m2_sector, imputación
+-- de superficie): esas se calculan en el código del modelo ajustándolas solo con train, para no repetir la
+-- fuga de datos que tenía el proyecto de Concepción.
+-- ---------------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS gold.aviso_entrenamiento (
+    id_aviso                    TEXT PRIMARY KEY,
+    comuna                      TEXT NOT NULL,
+    barrio                      TEXT,
+
+    apto_entrenamiento          BOOLEAN NOT NULL,
+    motivo_exclusion            TEXT,               -- motivos separados por coma; NULL si es apto
+
+    -- ciclo de vida
+    estado_publicacion          TEXT,
+    fecha_publicacion_aprox     DATE,
+    fecha_publicacion_precision TEXT,
+    primera_vez_visto           TIMESTAMPTZ,
+    ultima_vez_visto            TIMESTAMPTZ,
+    dias_en_mercado             INTEGER,            -- desde la publicación hasta la última vez visto
+    n_cambios_estado            INTEGER,
+    n_cambios_precio            INTEGER,
+
+    -- target: costo mensual total, en pesos nominales y en UF (se elige al entrenar)
+    precio_valor                NUMERIC,
+    precio_moneda               TEXT,
+    tiene_rebaja                BOOLEAN,
+    fecha_precio                DATE,
+    precio_clp                  NUMERIC,
+    gastos_comunes              NUMERIC,
+    costo_total_clp             NUMERIC,
+    costo_total_uf              NUMERIC,
+    gastos_comunes_faltante     BOOLEAN,
+
+    -- características de la propiedad
+    dormitorios                 INTEGER,
+    banos                       INTEGER,
+    estacionamientos            INTEGER,
+    bodegas                     INTEGER,
+    tiene_bodega                BOOLEAN,
+    superficie_total_m2         NUMERIC,
+    superficie_util_m2          NUMERIC,
+    antiguedad_anos             INTEGER,
+    piso_unidad                 INTEGER,
+    deptos_por_piso             INTEGER,
+    amoblado                    BOOLEAN,
+    admite_mascotas             BOOLEAN,
+    condominio_cerrado          BOOLEAN,
+    estacionamiento_visitas     BOOLEAN,
+    piscina                     BOOLEAN,
+    quincho                     BOOLEAN,
+    conserjeria                 BOOLEAN,
+    ascensor                    BOOLEAN,
+
+    -- ubicación y entorno
+    latitud                     NUMERIC,
+    longitud                    NUMERIC,
+    cantidad_paraderos                 INTEGER, distancia_min_m_paraderos                 NUMERIC,
+    cantidad_estaciones_metro          INTEGER, distancia_min_m_estaciones_metro          NUMERIC,
+    cantidad_jardines_infantiles       INTEGER, distancia_min_m_jardines_infantiles       NUMERIC,
+    cantidad_colegios                  INTEGER, distancia_min_m_colegios                  NUMERIC,
+    cantidad_universidades             INTEGER, distancia_min_m_universidades             NUMERIC,
+    cantidad_plazas                    INTEGER, distancia_min_m_plazas                    NUMERIC,
+    cantidad_supermercados             INTEGER, distancia_min_m_supermercados             NUMERIC,
+    cantidad_farmacias                 INTEGER, distancia_min_m_farmacias                 NUMERIC,
+    cantidad_centros_comerciales       INTEGER, distancia_min_m_centros_comerciales       NUMERIC,
+    cantidad_hospitales                INTEGER, distancia_min_m_hospitales                NUMERIC,
+    cantidad_clinicas                  INTEGER, distancia_min_m_clinicas                  NUMERIC,
+
+    -- nivel socioeconómico del sector (IGVUST)
+    uv_rsh                      BIGINT,
+    rank_nac                    INTEGER,
+    c_ig_com                    INTEGER,
+    c_ig_reg                    INTEGER,
+    c_ig_nac                    INTEGER,
+    pob_rsh_uv                  NUMERIC,
+    hog_uv                      NUMERIC,
+    p_urbano                    NUMERIC,
+
+    construido_en               TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS aviso_entrenamiento_apto_idx ON gold.aviso_entrenamiento (apto_entrenamiento);
+CREATE INDEX IF NOT EXISTS aviso_entrenamiento_comuna_idx ON gold.aviso_entrenamiento (comuna);
+
+CREATE TABLE IF NOT EXISTS gold.construcciones (
+    id              BIGSERIAL PRIMARY KEY,
+    inicio          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    fin             TIMESTAMPTZ,
+    detalle         TEXT
+);
