@@ -35,6 +35,7 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
 | P-18 | 17-oct | Verificar que el índice socioeconómico (IGVUST) cubra la RM e incorporarlo | resuelto |
 | P-19 | 17-oct | El SCD2 no se podía validar porque aún no hay historia real | mitigado |
 | P-20 | 17-oct | El scraper de detalle recibió HTTP 429 y se abortó solo | abierto |
+| P-21 | 17-oct | Un aviso con gastos comunes de 95 millones pasó los flags de Silver | abierto |
 
 ---
 
@@ -276,7 +277,27 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
 - **Resolución:** la defensa funcionó como se diseñó: un 429 cuenta como bloqueo, aborta la tanda y no marca
   ningún aviso como eliminado ni fallido por error. Quedan sin visitar los avisos pendientes de la cola. Pendiente:
   esperar un tiempo y reanudar con menos ritmo (delays más largos o pausas periódicas).
+- **Actualización (17-oct, tras ~25 min de pausa):** se relanzó con los delays de siempre (3 a 7 s). Una tanda
+  de prueba de 40 y otra de 1.250 visitas terminaron sin ningún 429; una tercera de 1.000 seguía en curso. El
+  límite no reapareció con tandas de ~2,5 h separadas por pausas, pero sigue sin saberse si volvería en una
+  corrida continua de más de 3 horas. Se mantiene abierto.
 - **Estado:** abierto.
+
+---
+
+## P-21 · Un aviso con gastos comunes de 95 millones pasó los flags de Silver
+
+- **Síntoma:** al perfilar `gold.aviso_entrenamiento` para el modelo, `MLC-4551416062` (Santiago, 54 m2, 2
+  dormitorios) tenía `precio_clp` = 450.000 y `gastos_comunes` = 95.000.000, por lo que `costo_total_clp` era
+  95,45 millones. El siguiente costo más alto es de 8,5 millones. Estaba marcado como apto.
+- **Causa:** Silver solo valida el rango de `precio_clp` (`precio_sospechoso`); no hay validación análoga sobre
+  `gastos_comunes`, que casi seguro es un error de captura del aviso (probablemente un cero de más o un
+  valor ingresado en otro campo).
+- **Resolución:** en el modelo (`santiago-rentals-ml`) se aplica una cota provisional de
+  `costo_total_clp` <= 10.000.000 en `config.yaml`, que lo excluye. Falta lo correcto en el ELT: agregar una
+  bandera `gastos_comunes_sospechosos` en Silver (por ejemplo, sobre un múltiplo del precio de arriendo o un
+  máximo absoluto) y que Gold lo excluya de la aptitud.
+- **Estado:** abierto (mitigado en el modelo, sin corregir en Silver).
 
 ---
 
