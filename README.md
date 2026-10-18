@@ -5,7 +5,7 @@ Repo del **ELT** (scrapers, Bronce, Silver y Gold). El modelo vive en el repo he
 
 Captura de avisos de **arriendo de departamentos** de Portal Inmobiliario en la **Región Metropolitana**,
 con arquitectura medallón (Bronce → Silver → Gold). El objetivo final es dejar en Gold datos limpios para
-**entrenar un modelo** que estime el costo total mensual de un arriendo. Hoy existe solo la capa Bronce.
+**entrenar un modelo** que estime el costo total mensual de un arriendo. Existen las tres capas (Bronce, Silver y Gold); el estado de cada pieza está en la tabla de abajo.
 
 Los scrapers se ejecutan **de forma local** (no en GitHub Actions) y escriben a un proyecto Supabase
 propio. La razón: el sitio bloquea las IPs de datacenter, y en el proyecto de Concepción eso pasó
@@ -119,7 +119,7 @@ y se ordena por prioridad:
 | Prioridad | Motivo | Condición |
 |---|---|---|
 | 1 | `nuevo` | Nunca se visitó con éxito (más recientes primero) |
-| 2 | `desaparecido` | No apareció en la última corrida **completa de su comuna** |
+| 2 | `desaparecido` | No apareció en la última corrida **completa de su comuna** y su última visita exitosa es de hace más de 2 días |
 | 3 | `tarjeta_cambio` | Su tarjeta de la grilla cambió desde la última visita |
 | 4 | `rotacion` | Sin revisar hace más de 7 días |
 
@@ -236,11 +236,13 @@ terminar ocuparán unos 2 GB de HTML en `landing/` y ~70 MB en Supabase.
 9. **Sin API pública** de datos ni de predicción: Bronce, Silver y Gold son privados.
 
 Dónde ocurre cada cosa: **solo Bronce habla con el sitio**. La revisión de estado y precio de los avisos es
-`bronze/scraper_detalle.py` (primera visita y revisitas, el mismo script). Silver y Gold nunca hacen
-requests: leen lo que Bronce dejó.
+`bronze/scraper_detalle.py` (primera visita y revisitas, el mismo script). Silver y Gold nunca tocan
+el sitio: leen lo que Bronce dejó. La única llamada externa fuera de Bronce es la de Silver a `mindicador.cl`
+(UF y dólar).
 
 ## Documentación
 
+- `docs/arquitectura_elt.html`: diagrama interactivo de las etapas del ELT (fuente en `docs/arquitectura_elt.json`).
 - `docs/01_antecedentes_concepcion_y_databricks.md`: arquitectura, decisiones y problemas de los dos
   proyectos anteriores, con la referencia técnica de limpieza, features y modelo para Silver y Gold.
 - `docs/02_bitacora_problemas.md`: problemas de este proyecto y cómo se resolvieron. Se actualiza con
