@@ -17,12 +17,12 @@ inadvertido durante 17 días (ver `docs/01_antecedentes_concepcion_y_databricks.
 |---|---|
 | Landing (HTML crudo en disco) | Funcionando |
 | Bronce: grilla | Funcionando. Primera carga completa de las 23 comunas |
-| Bronce: detalle | Funcionando. Primera tanda en curso |
+| Bronce: detalle | Funcionando. Primera carga a medias: 4.538 de ~14.900 avisos con observación |
 | Silver: `silver.avisos` | Funcionando (14.947 filas; se reconstruye completa desde Bronce) |
 | Silver: `silver.aviso_observaciones` | Funcionando (una fila por cambio observado en el detalle; hoy 1 por aviso) |
 | Nivel socioeconómico (IGVUST) | Funcionando: 1.369 Unidades Vecinales de la RM en Bronce; los 1.194 avisos con coordenadas cayeron dentro de una |
 | Gold: SCD2 de estado y de precio | Funcionando; sin historia real todavía (1 intervalo por aviso). Probado con un historial simulado |
-| Gold: `gold.aviso_entrenamiento` | Funcionando: 14.947 avisos, 1.158 aptos |
+| Gold: `gold.aviso_entrenamiento` | Funcionando: 14.947 avisos, 4.405 aptos (el resto aún sin detalle, salvo ~200 excluidos por calidad) |
 | Modelo | No iniciado |
 | Orquestador y tarea programada de Windows | Pendientes |
 
@@ -32,10 +32,10 @@ Cifras al 17-oct-2026 (cambian con cada corrida):
 |---|---|
 | Avisos distintos vistos en la grilla | ~14.900 |
 | Comunas con cobertura completa | 23 de 23 (Santiago: 4.299 de 4.299) |
-| Visitas de detalle registradas | 804 (763 `ok`, 31 `proyecto`, 10 `no_encontrado`) |
-| Observaciones de detalle guardadas | 760 |
-| Tamaño del schema `bronze` en Supabase | ~21 MB |
-| HTML crudo en disco | ~170 MB |
+| Visitas de detalle registradas | 4.584 (4.541 `ok`, 31 `proyecto`, 11 `no_encontrado`, 1 `bloqueado`) |
+| Observaciones de detalle guardadas | 4.538 |
+| Tamaño del schema `bronze` en Supabase | ~34 MB |
+| HTML crudo en disco | ~660 MB |
 
 ## Arquitectura
 
@@ -165,7 +165,7 @@ pausado o finalizado se decide en Silver.
 santiago-rentals-elt/
 ├── config.py                  # comunas, URL base, headers, delays, ruta del landing
 ├── requirements.txt
-├── .env / .env.example        # BD_STRING (Session pooler de Supabase); .env no se versiona
+├── .env                       # BD_STRING (Session pooler de Supabase); no se versiona
 ├── common/db.py               # conexión a Supabase
 ├── bronze/
 │   ├── scraper_grilla.py
@@ -252,4 +252,4 @@ requests: leen lo que Bronce dejó.
 
 - `landing/` y `logs/` quedan fuera de git por el `.gitignore` de esta carpeta, pero ocupan espacio en disco
   y no deben ir a una carpeta sincronizada.
-- El `.env` con `BD_STRING` no se versiona; en el repo nuevo hay que volver a crearlo desde `.env.example`.
+- El `.env` con `BD_STRING` no se versiona; en el repo nuevo hay que volver a crearlo a mano (solo lleva `BD_STRING`, el connection string del Session pooler).
