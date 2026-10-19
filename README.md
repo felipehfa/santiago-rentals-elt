@@ -168,7 +168,7 @@ pausado o finalizado se decide en Silver.
 santiago-rentals-elt/
 ├── config.py                  # comunas, URL base, headers, delays, ruta del landing
 ├── requirements.txt
-├── .env                       # BD_STRING (Session pooler de Supabase); no se versiona
+├── .env                       # BD_STRING (dueño) y BD_STRING_SCRAPER (Session pooler de Supabase); no se versiona
 ├── common/db.py               # conexión a Supabase
 ├── bronze/
 │   ├── scraper_grilla.py
@@ -199,7 +199,7 @@ Quinta Normal, Conchalí, Cerrillos y Pedro Aguirre Cerda). Se amplían editando
 ## Cómo ejecutar
 
 Requisitos: Python con `requests`, `beautifulsoup4`, `lxml`, `psycopg2-binary` y `python-dotenv` (ver
-`requirements.txt`), y un `.env` con `BD_STRING` (connection string del **Session pooler** de Supabase,
+`requirements.txt`), y un `.env` con `BD_STRING` (rol dueño) y `BD_STRING_SCRAPER` (rol `scraper_local`), connection strings del **Session pooler** de Supabase,
 que funciona por IPv4).
 
 ```bash
@@ -226,8 +226,11 @@ terminar ocuparán unos 2 GB de HTML en `landing/` y ~70 MB en Supabase.
 
 1. Terminar la primera carga del detalle por tandas.
 2. Orquestador local (grilla y luego detalle) y tarea programada de Windows con reintento al reanudar.
-3. Roles de Postgres de mínimo privilegio (`scraper_local`, `ml_lectura`, `ml_scoring`): el SQL está en
-   `scripts/roles_minimo_privilegio.sql`, aún sin aplicar (hoy se usa el rol dueño del schema).
+3. **Roles de Postgres de mínimo privilegio (hechos el 18-oct-2026):** `scraper_local` (`SELECT`, `INSERT` y
+   `UPDATE` en `bronze`; sin crear, borrar ni vaciar tablas), `ml_lectura` (`SELECT` sobre
+   `gold.aviso_entrenamiento`) y `ml_scoring` (ese `SELECT` más `INSERT` en `gold.predicciones`). Se crearon en
+   Supabase y el SQL no se conserva en el repo. Los scrapers usan `BD_STRING_SCRAPER`; Silver, Gold y las
+   migraciones siguen con `BD_STRING` (rol dueño).
 4. **Silver y Gold** ya existen (ver el estado de arriba). Falta incluirlos en el orquestador y revisar los
    umbrales de las banderas de calidad y de aptitud, que son provisionales.
 5. **Validar los SCD2 con historia real**, cuando las revisitas acumulen varios días de cambios.
@@ -258,4 +261,4 @@ el sitio: leen lo que Bronce dejó. La única llamada externa fuera de Bronce es
 
 - `landing/` y `logs/` quedan fuera de git por el `.gitignore` de esta carpeta, pero ocupan espacio en disco
   y no deben ir a una carpeta sincronizada.
-- El `.env` con `BD_STRING` no se versiona; en el repo nuevo hay que volver a crearlo a mano (solo lleva `BD_STRING`, el connection string del Session pooler).
+- El `.env` con `BD_STRING` no se versiona; en el repo nuevo hay que volver a crearlo a mano (lleva `BD_STRING` y `BD_STRING_SCRAPER`, connection strings del Session pooler).

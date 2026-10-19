@@ -1,7 +1,7 @@
 """Conexión a Supabase. Las cadenas se leen de .env (local, fuera de git) o del entorno.
 
 BD_STRING es la del rol dueño (Silver, Gold, migraciones, cargas únicas). Los scrapers usan la de su rol de
-mínimo privilegio, BD_STRING_SCRAPER (ver scripts/roles_minimo_privilegio.sql); si no existe todavía, caen a
+mínimo privilegio (scraper_local), BD_STRING_SCRAPER; si no existe todavía, caen a
 BD_STRING con un aviso, para no frenar la transición.
 """
 import logging
