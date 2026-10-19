@@ -19,8 +19,9 @@ jobs:
             https://www.portalinmobiliario.com/arriendo/departamento/nunoa-metropolitana \
             https://www.portalinmobiliario.com/arriendo/departamento/providencia-metropolitana \
             https://www.portalinmobiliario.com/arriendo/departamento/macul-metropolitana; do
-            code=$(curl -s -o cuerpo.html -w '%{http_code}' --max-time 30 -H "User-Agent: $UA" \
+            code=$(curl -s -o cuerpo.html -w '%{http_code}' -D cab.txt --max-time 30 -H "User-Agent: $UA" \
               -H 'Accept-Language: es-CL,es;q=0.9' "$url" || true)
+            echo "::notice title=cabeceras::$(grep -i -E '^(location|server|via|x-amz-cf-pop|cf-ray)' cab.txt | tr -d '\r' | tr '\n' ' ')"
             bytes=$(wc -c < cuerpo.html)
             bloqueo=$(grep -c -i -E 'captcha|just a moment|cf-chl|access denied' cuerpo.html || true)
             echo "::notice title=sitio::$(basename "$url") http=$code bytes=$bytes marcas_de_bloqueo=$bloqueo"
