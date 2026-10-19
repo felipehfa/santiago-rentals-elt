@@ -17,12 +17,12 @@ inadvertido durante 17 días (ver `docs/01_antecedentes_concepcion_y_databricks.
 |---|---|
 | Landing (HTML crudo en disco) | Funcionando |
 | Bronce: grilla | Funcionando. Primera carga completa de las 23 comunas |
-| Bronce: detalle | Funcionando. Primera carga a medias: 10.871 de ~14.900 avisos con observación |
+| Bronce: detalle | Funcionando. Primera carga a medias: 13.035 de ~14.900 avisos con observación |
 | Silver: `silver.avisos` | Funcionando (14.947 filas; se reconstruye completa desde Bronce) |
 | Silver: `silver.aviso_observaciones` | Funcionando (una fila por cambio observado en el detalle; hoy 1 por aviso) |
 | Nivel socioeconómico (IGVUST) | Funcionando: 1.369 Unidades Vecinales de la RM en Bronce; los 1.194 avisos con coordenadas cayeron dentro de una |
 | Gold: SCD2 de estado y de precio | Funcionando; sin historia real todavía (1 intervalo por aviso). Probado con un historial simulado |
-| Gold: `gold.aviso_entrenamiento` | Funcionando: 14.947 avisos, 10.497 aptos (4.076 aún sin detalle; el resto, ~370, excluidos por calidad) |
+| Gold: `gold.aviso_entrenamiento` | Funcionando: 14.947 avisos, 12.597 aptos (1.912 aún sin detalle; el resto, ~440, excluidos por calidad). Incluye el título y la descripción del aviso, que usa el modelo |
 | Gold: `gold.predicciones` | Creada y vacía; la escribirá el scoring por lotes del modelo (rol `ml_scoring`, solo `INSERT`) |
 | Modelo | Funcionando en el repo `santiago-rentals-ml` |
 | Orquestador y tarea programada de Windows | Pendientes |

@@ -119,8 +119,15 @@ CREATE TABLE IF NOT EXISTS gold.aviso_entrenamiento (
     hog_uv                      NUMERIC,
     p_urbano                    NUMERIC,
 
+    -- texto del aviso: lo usa el modelo (palabras clave y un modelo de texto); no es una variable por sí mismo
+    titulo                      TEXT,
+    descripcion                 TEXT,
+
     construido_en               TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- Si la tabla ya existía, CREATE TABLE IF NOT EXISTS no suma las columnas nuevas; estas sentencias sí.
+ALTER TABLE gold.aviso_entrenamiento ADD COLUMN IF NOT EXISTS titulo TEXT;
+ALTER TABLE gold.aviso_entrenamiento ADD COLUMN IF NOT EXISTS descripcion TEXT;
 CREATE INDEX IF NOT EXISTS aviso_entrenamiento_apto_idx ON gold.aviso_entrenamiento (apto_entrenamiento);
 CREATE INDEX IF NOT EXISTS aviso_entrenamiento_comuna_idx ON gold.aviso_entrenamiento (comuna);
 
