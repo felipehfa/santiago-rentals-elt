@@ -1,0 +1,31 @@
+# Prueba puntual: ¿responde el portal a un runner de GitHub Actions? Hace 3 peticiones espaciadas con los mismos
+# encabezados del scraper y deja el resultado como anotaciones. No guarda nada ni usa secretos.
+name: prueba-runner
+on:
+  push:
+    branches: [prueba-actions]
+  workflow_dispatch:
+
+jobs:
+  sitio:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Peticiones al portal
+        shell: bash
+        run: |
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
+          malas=0
+          for url in \
+            https://www.portalinmobiliario.com/arriendo/departamento/nunoa-metropolitana \
+            https://www.portalinmobiliario.com/arriendo/departamento/providencia-metropolitana \
+            https://www.portalinmobiliario.com/arriendo/departamento/macul-metropolitana; do
+            code=$(curl -s -o cuerpo.html -w '%{http_code}' --max-time 30 -H "User-Agent: $UA" \
+              -H 'Accept-Language: es-CL,es;q=0.9' "$url" || true)
+            bytes=$(wc -c < cuerpo.html)
+            bloqueo=$(grep -c -i -E 'captcha|just a moment|cf-chl|access denied' cuerpo.html || true)
+            echo "::notice title=sitio::$(basename "$url") http=$code bytes=$bytes marcas_de_bloqueo=$bloqueo"
+            if [ "$code" != "200" ] || [ "$bloqueo" != "0" ]; then malas=$((malas+1)); fi
+            sleep 8
+          done
+          echo "::notice title=sitio::peticiones_malas=$malas"
+          [ "$malas" = "0" ]
