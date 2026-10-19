@@ -201,6 +201,7 @@ CREATE TABLE IF NOT EXISTS silver.avisos (
     conteo_imposible            BOOLEAN,        -- dormitorios > 6, baños > 5 o estacionamientos > 15
     superficie_util_sospechosa  BOOLEAN,
     precio_sospechoso           BOOLEAN,
+    precio_m2_atipico           BOOLEAN,        -- costo total por m2 útil muy lejos de lo normal en su comuna (z robusto > 5)
     gastos_comunes_faltante     BOOLEAN,
     moneda_sin_valor            BOOLEAN,        -- hay precio en UF o USD pero no se encontró el indicador
 
@@ -208,6 +209,7 @@ CREATE TABLE IF NOT EXISTS silver.avisos (
 );
 -- Si la tabla ya existía antes de agregar el nivel socioeconómico, CREATE TABLE IF NOT EXISTS no suma las
 -- columnas nuevas; estas sentencias sí (idempotentes).
+ALTER TABLE silver.avisos ADD COLUMN IF NOT EXISTS precio_m2_atipico BOOLEAN;
 ALTER TABLE silver.avisos ADD COLUMN IF NOT EXISTS uv_rsh BIGINT;
 ALTER TABLE silver.avisos ADD COLUMN IF NOT EXISTS rank_nac INTEGER;
 ALTER TABLE silver.avisos ADD COLUMN IF NOT EXISTS c_ig_com INTEGER;

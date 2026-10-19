@@ -35,7 +35,7 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
 | P-18 | 17-oct | Verificar que el índice socioeconómico (IGVUST) cubra la RM e incorporarlo | resuelto |
 | P-19 | 17-oct | El SCD2 no se podía validar porque aún no hay historia real | mitigado |
 | P-20 | 17-oct | El scraper de detalle recibió HTTP 429 y se abortó solo | abierto |
-| P-21 | 17-oct | Un aviso con gastos comunes de 95 millones pasó los flags de Silver | abierto |
+| P-21 | 17-oct | Un aviso con gastos comunes de 95 millones pasó los flags de Silver | resuelto (18-oct) |
 
 ---
 
@@ -297,7 +297,14 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
   `costo_total_clp` <= 10.000.000 en `config.yaml`, que lo excluye. Falta lo correcto en el ELT: agregar una
   bandera `gastos_comunes_sospechosos` en Silver (por ejemplo, sobre un múltiplo del precio de arriendo o un
   máximo absoluto) y que Gold lo excluya de la aptitud.
-- **Estado:** abierto (mitigado en el modelo, sin corregir en Silver).
+- **Resolución definitiva (18-oct):** el caso es parte de una familia más amplia: avisos con superficie o gastos
+  imposibles que los umbrales fijos no ven (12,0 m² no es "< 12"; 322 o 492 m² quedan bajo 500; también apareció
+  un aviso con gastos de 12.000 millones). Silver tiene una bandera nueva, `precio_m2_atipico`: costo total por
+  m² útil en logaritmo, comparado con la mediana de su comuna con MAD (z robusto > 5; comunas de menos de 30
+  avisos usan la región). Gold la suma como motivo de exclusión `precio_m2_atipico`. Marca 149 avisos, 31 de
+  ellos aptos hasta entonces; los 31 se revisaron a mano y eran todos errores de captura. El corte de 5 es
+  deliberadamente holgado (con 3,5 marcaba 110 aptos y rozaba precios legítimos).
+- **Estado:** resuelto. La cota de 10 millones en el modelo se mantiene como red de seguridad.
 
 ---
 

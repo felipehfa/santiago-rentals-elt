@@ -9,6 +9,7 @@
 --                fecha de publicación queda fuera: no se sabe qué tan viejo es su precio (criterio de Concepción)
 --   superficie   la bandera superficie_util_sospechosa viene de Silver (< 12 o > 500 m2)
 --   precio       la bandera precio_sospechoso viene de Silver (> 8.000.000 o < 100.000 CLP)
+--   precio_m2    la bandera precio_m2_atipico viene de Silver (costo por m2 con z robusto > 5 en su comuna)
 
 TRUNCATE gold.aviso_entrenamiento;
 
@@ -52,7 +53,8 @@ motivos AS (
                CASE WHEN a.coordenada_fuera_de_region THEN 'coordenada_fuera_de_region' END,
                CASE WHEN a.conteo_imposible THEN 'conteo_imposible' END,
                CASE WHEN a.superficie_util_sospechosa THEN 'superficie_sospechosa' END,
-               CASE WHEN a.precio_sospechoso THEN 'precio_sospechoso' END
+               CASE WHEN a.precio_sospechoso THEN 'precio_sospechoso' END,
+               CASE WHEN a.precio_m2_atipico THEN 'precio_m2_atipico' END
            ], NULL) AS lista_motivos
     FROM silver.avisos a
 )

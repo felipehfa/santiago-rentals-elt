@@ -17,16 +17,17 @@ inadvertido durante 17 días (ver `docs/01_antecedentes_concepcion_y_databricks.
 |---|---|
 | Landing (HTML crudo en disco) | Funcionando |
 | Bronce: grilla | Funcionando. Primera carga completa de las 23 comunas |
-| Bronce: detalle | Funcionando. Primera carga a medias: 4.538 de ~14.900 avisos con observación |
+| Bronce: detalle | Funcionando. Primera carga a medias: 10.871 de ~14.900 avisos con observación |
 | Silver: `silver.avisos` | Funcionando (14.947 filas; se reconstruye completa desde Bronce) |
 | Silver: `silver.aviso_observaciones` | Funcionando (una fila por cambio observado en el detalle; hoy 1 por aviso) |
 | Nivel socioeconómico (IGVUST) | Funcionando: 1.369 Unidades Vecinales de la RM en Bronce; los 1.194 avisos con coordenadas cayeron dentro de una |
 | Gold: SCD2 de estado y de precio | Funcionando; sin historia real todavía (1 intervalo por aviso). Probado con un historial simulado |
-| Gold: `gold.aviso_entrenamiento` | Funcionando: 14.947 avisos, 4.405 aptos (el resto aún sin detalle, salvo ~200 excluidos por calidad) |
-| Modelo | No iniciado |
+| Gold: `gold.aviso_entrenamiento` | Funcionando: 14.947 avisos, 10.497 aptos (4.076 aún sin detalle; el resto, ~370, excluidos por calidad) |
+| Gold: `gold.predicciones` | Creada y vacía; la escribirá el scoring por lotes del modelo (rol `ml_scoring`, solo `INSERT`) |
+| Modelo | Funcionando en el repo `santiago-rentals-ml` |
 | Orquestador y tarea programada de Windows | Pendientes |
 
-Cifras al 17-oct-2026 (cambian con cada corrida):
+Cifras al 18-oct-2026 (cambian con cada corrida):
 
 | Dato | Valor |
 |---|---|
@@ -60,12 +61,14 @@ Portal Inmobiliario
 └─────────────────────────────────────────────────────────────────────────────┘
             │
             ▼   silver/construir_silver.py  (solo lee Bronce; nunca toca el sitio)
-        Silver: tipado, normalización de monedas, banderas de calidad, Unidad Vecinal de cada aviso
+        Silver: tipado, normalización de monedas, banderas de calidad (superficie, precio, costo por m2
+                atípico en su comuna), Unidad Vecinal de cada aviso
                 silver.avisos (estado actual) · silver.aviso_observaciones (historia tipada)
                 silver.indicadores_diarios (UF y dólar) · silver.aviso_uv
             ▼   gold/construir_gold.py  (solo lee Silver)
         Gold: gold.dim_estado_aviso_scd2 · gold.dim_precio_aviso_scd2 · gold.aviso_entrenamiento
-            ▼   (aún no existe)
+              gold.predicciones (no se reconstruye: solo recibe filas del modelo)
+            ▼   santiago-rentals-ml
         Modelo de ML
 ```
 
@@ -223,7 +226,8 @@ terminar ocuparán unos 2 GB de HTML en `landing/` y ~70 MB en Supabase.
 
 1. Terminar la primera carga del detalle por tandas.
 2. Orquestador local (grilla y luego detalle) y tarea programada de Windows con reintento al reanudar.
-3. Rol de Postgres `scraper_local` con permisos mínimos (hoy se usa el rol dueño del schema).
+3. Roles de Postgres de mínimo privilegio (`scraper_local`, `ml_lectura`, `ml_scoring`): el SQL está en
+   `scripts/roles_minimo_privilegio.sql`, aún sin aplicar (hoy se usa el rol dueño del schema).
 4. **Silver y Gold** ya existen (ver el estado de arriba). Falta incluirlos en el orquestador y revisar los
    umbrales de las banderas de calidad y de aptitud, que son provisionales.
 5. **Validar los SCD2 con historia real**, cuando las revisitas acumulen varios días de cambios.
@@ -231,8 +235,8 @@ terminar ocuparán unos 2 GB de HTML en `landing/` y ~70 MB en Supabase.
    dependen del split (`nivel_barrio`, `precio_m2_sector`, imputación de superficie) se ajustan solo con
    train. Detalle en `docs/01_decisiones.md` de ese repo.
 7. **Repos separados (hecho el 2026-10-17):** este repo (ELT) corre local; el de modelo corre en GitHub Actions.
-8. **Tabla `gold.predicciones`** (aviso, versión del modelo, precio estimado, fecha) con el rol de Postgres
-   que solo puede insertar en ella, para el scoring por lotes del modelo.
+8. **Scoring por lotes** del modelo sobre `gold.predicciones` (ya creada: aviso, versión del modelo,
+   costo estimado, fecha), con el rol `ml_scoring` que solo puede insertar en ella.
 9. **Sin API pública** de datos ni de predicción: Bronce, Silver y Gold son privados.
 
 Dónde ocurre cada cosa: **solo Bronce habla con el sitio**. La revisión de estado y precio de los avisos es

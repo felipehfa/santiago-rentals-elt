@@ -118,10 +118,11 @@ def resumen(con) -> None:
         log.info("estados: %s", cur.fetchall())
         cur.execute("""SELECT count(*) FILTER (WHERE coordenada_fuera_de_region), count(*) FILTER (WHERE conteo_imposible),
                               count(*) FILTER (WHERE superficie_util_sospechosa), count(*) FILTER (WHERE precio_sospechoso),
-                              count(*) FILTER (WHERE gastos_comunes_faltante), count(*) FILTER (WHERE sin_coordenadas)
+                              count(*) FILTER (WHERE gastos_comunes_faltante), count(*) FILTER (WHERE sin_coordenadas),
+                              count(*) FILTER (WHERE precio_m2_atipico)
                        FROM silver.avisos""")
         log.info("banderas (coord. fuera de región, conteo imposible, superficie sospechosa, precio sospechoso, "
-                 "gastos faltantes, sin coordenadas): %s", cur.fetchone())
+                 "gastos faltantes, sin coordenadas, precio por m2 atípico): %s", cur.fetchone())
 
 
 def main() -> int:

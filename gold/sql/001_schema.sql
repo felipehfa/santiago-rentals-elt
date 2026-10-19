@@ -130,3 +130,20 @@ CREATE TABLE IF NOT EXISTS gold.construcciones (
     fin             TIMESTAMPTZ,
     detalle         TEXT
 );
+
+-- ---------------------------------------------------------------------------------------------------------
+-- Predicciones del modelo. A diferencia del resto de Gold NO se reconstruye: las corridas de construir_gold
+-- no la vacían (010 y 020 no la tocan). Solo se agregan filas, una por aviso y por corrida de scoring, con la
+-- versión del modelo que predijo; así queda el historial para medir la degradación contra precios reales.
+-- Solo la escribe el rol ml_scoring (INSERT).
+-- ---------------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS gold.predicciones (
+    id_prediccion               BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_aviso                    TEXT NOT NULL,
+    predicho_en                 TIMESTAMPTZ NOT NULL DEFAULT now(),
+    modelo_nombre               TEXT NOT NULL,
+    modelo_version              INTEGER NOT NULL,
+    huella_datos                TEXT,
+    costo_total_predicho_clp    NUMERIC NOT NULL
+);
+CREATE INDEX IF NOT EXISTS predicciones_aviso_idx ON gold.predicciones (id_aviso, predicho_en);

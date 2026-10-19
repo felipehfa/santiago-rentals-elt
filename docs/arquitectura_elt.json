@@ -48,7 +48,7 @@
           "silver",
           "mindicador"
         ],
-        "note": "Se reconstruye en REPEATABLE READ. UF y dólar a la fecha del precio. Marca, entre otras, superficie <12 o >500 m² y precio <100 mil o >8 M."
+        "note": "Reconstruye en REPEATABLE READ; UF y dólar a la fecha del precio. Marca superficie <12 o >500 m², precio <100 mil o >8 M y m² atípico (z>5)."
       },
       {
         "id": "gold",
@@ -250,7 +250,7 @@
       "items": [
         "Se reconstruye entera desde Bronce",
         "UF y dólar a la fecha del precio",
-        "Marca anomalías de superficie y precio"
+        "Marca anomalías de superficie, precio y m²"
       ]
     },
     {
@@ -259,7 +259,7 @@
       "items": [
         "SCD2 de estado y de precio",
         "Apto: sin ningún motivo de exclusión",
-        "El modelo lee solo aviso_entrenamiento"
+        "predicciones: tabla fija, solo recibe filas"
       ]
     }
   ]

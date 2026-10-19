@@ -8,6 +8,7 @@
 --   superficie    útil < 12 o > 500 m2 (propio; el umbral de 30 m2 de Concepción NO se usa: en Santiago
 --                 el 28 % de los avisos tiene 30 m2 o menos)
 --   precio        precio_clp > 8.000.000 (Concepción) o < 100.000 (propio)
+--   precio_m2     costo total por m2 útil con z robusto (MAD) > 5 respecto de la mediana de su comuna (propio)
 --   POI           radio de 500 m (Concepción)
 
 TRUNCATE silver.avisos;
@@ -174,5 +175,40 @@ SELECT
     CASE WHEN k.tiene_detalle THEN
          (k.precio_moneda = 'CLF' AND k.valor_uf IS NULL) OR (k.precio_moneda = 'USD' AND k.valor_dolar IS NULL) END
 FROM calc k;
+
+-- precio_m2_atipico: segunda pasada, porque depende de la mediana de cada comuna. Mide el costo total por m2
+-- útil en logaritmo y lo compara con la mediana de su comuna usando MAD (desviación absoluta mediana), que no se
+-- deja arrastrar por los propios atípicos. z robusto = 0,6745 * |x - mediana| / MAD; se marca con z > 5, un corte
+-- deliberadamente holgado para no tocar propiedades caras legítimas (PROVISIONAL, revisar a mano una muestra).
+-- Comunas con menos de 30 avisos usan la mediana y el MAD de toda la región; el MAD tiene un piso de 0,05.
+-- Se calcula solo con avisos con detalle, superficie útil >= 12 m2, no proyectos y sin precio sospechoso.
+WITH base AS (
+    SELECT comuna, ln(costo_total_clp / superficie_util_m2) AS lm
+    FROM silver.avisos
+    WHERE tiene_detalle AND NOT es_proyecto AND costo_total_clp > 0 AND superficie_util_m2 >= 12
+      AND NOT COALESCE(superficie_util_sospechosa, false) AND NOT COALESCE(precio_sospechoso, false)
+),
+global_med AS (SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY lm) AS med FROM base),
+global_mad AS (
+    SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY abs(b.lm - g.med)) AS mad FROM base b, global_med g
+),
+comuna_med AS (
+    SELECT comuna, count(*) AS n, percentile_cont(0.5) WITHIN GROUP (ORDER BY lm) AS med FROM base GROUP BY comuna
+),
+comuna_mad AS (
+    SELECT b.comuna, percentile_cont(0.5) WITHIN GROUP (ORDER BY abs(b.lm - c.med)) AS mad
+    FROM base b JOIN comuna_med c USING (comuna) GROUP BY b.comuna
+),
+stats AS (
+    SELECT c.comuna,
+           CASE WHEN c.n >= 30 THEN c.med ELSE g.med END AS med,
+           GREATEST(CASE WHEN c.n >= 30 THEN m.mad ELSE gm.mad END, 0.05) AS mad
+    FROM comuna_med c JOIN comuna_mad m USING (comuna), global_med g, global_mad gm
+)
+UPDATE silver.avisos a
+SET precio_m2_atipico =
+    0.6745 * abs(ln(a.costo_total_clp / a.superficie_util_m2) - s.med) / s.mad > 5
+FROM stats s
+WHERE a.comuna = s.comuna AND a.tiene_detalle AND a.costo_total_clp > 0 AND a.superficie_util_m2 > 0;
 
 UPDATE silver.avisos SET construido_en = now();

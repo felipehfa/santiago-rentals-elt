@@ -393,7 +393,7 @@ def main() -> int:
     ap.add_argument("--sin-bd", action="store_true", help="solo guarda el landing, no escribe en Supabase")
     args = ap.parse_args()
 
-    con = None if args.sin_bd else conectar()
+    con = None if args.sin_bd else conectar("BD_STRING_SCRAPER")
     try:
         paginas, filas, estado = scrapear(con, args.comunas, args.tipos, args.max_paginas)
     finally:

@@ -467,7 +467,7 @@ def main() -> int:
     ap.add_argument("--limite", type=int, default=300, help="máximo de avisos a visitar en esta corrida")
     ap.add_argument("--motivos", nargs="+", default=["nuevo", "desaparecido", "tarjeta_cambio", "rotacion"])
     args = ap.parse_args()
-    con = conectar()
+    con = conectar("BD_STRING_SCRAPER")
     try:
         estado, _ = ejecutar(con, args.limite, args.motivos)
     finally:
