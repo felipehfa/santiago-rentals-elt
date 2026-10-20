@@ -34,7 +34,7 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
 | P-17 | 17-oct | Silver construida mientras Bronce sigue cambiando quedaba inconsistente | resuelto |
 | P-18 | 17-oct | Verificar que el índice socioeconómico (IGVUST) cubra la RM e incorporarlo | resuelto |
 | P-19 | 17-oct | El SCD2 no se podía validar porque aún no hay historia real | mitigado |
-| P-20 | 17-oct | El scraper de detalle recibió HTTP 429 y se abortó solo | abierto |
+| P-20 | 17-oct | El scraper de detalle recibió HTTP 429 y se abortó solo | mitigado (19-oct) |
 | P-21 | 17-oct | Un aviso con gastos comunes de 95 millones pasó los flags de Silver | resuelto (18-oct) |
 | P-22 | 19-oct | El scraper de detalle abortó al suspenderse el equipo (conexión a la base cortada) | resuelto (19-oct) |
 | P-23 | 19-oct | La grilla murió con `connection already closed` tras un error de red | resuelto (19-oct) |
@@ -284,7 +284,14 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
   de prueba de 40 y otra de 1.250 visitas terminaron sin ningún 429; una tercera de 1.000 seguía en curso. El
   límite no reapareció con tandas de ~2,5 h separadas por pausas, pero sigue sin saberse si volvería en una
   corrida continua de más de 3 horas. Se mantiene abierto.
-- **Estado:** abierto.
+- **Actualización (19-oct):** los bloqueos volvieron, cada vez antes (1.611, 588, 113, 640, 253 y 355 visitas), lo que
+  sugiere un contador acumulado por IP y no solo la velocidad. Se levantan solos en minutos u horas. Mitigación: el
+  detalle ya no aborta; espera 30 min, duplica las pausas (hasta x8) y reintenta, y registra cuántas visitas aguantó
+  entre bloqueos. Hay un presupuesto móvil de 24 h, y `bronze/orquestador.py` alterna detalle y grilla con esperas
+  crecientes (30, 60 y 120 min) y reanuda la grilla solo con las comunas que faltaban. Revisar cada aviso una vez por
+  semana exigiría ~1.800 visitas/día en las 12 comunas, más de lo que la IP ha aguantado: el umbral real se estima con
+  los "aguantes" registrados en `bronze.runs.detalle`.
+- **Estado:** mitigado; el umbral exacto sigue sin conocerse.
 
 ---
 

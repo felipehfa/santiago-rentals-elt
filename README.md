@@ -146,6 +146,12 @@ pausado o finalizado se decide en Silver.
 - Si la base corta la conexión (por ejemplo, al suspender el equipo), el scraper **reconecta y repite la
   operación** (`common/db.py::ConexionResiliente`, con esperas de 5 a 180 s) en vez de abortar. Si no logra
   reconectar, cierra la corrida como `error`. La grilla hace lo mismo con sus escrituras.
+- **Ante un 429 no aborta:** espera 30 minutos, duplica las pausas (hasta x8) y reintenta el mismo aviso. Anota
+  cuántas visitas aguantó entre bloqueos (en `bronze.runs.detalle` y en el log) para estimar el umbral real de la IP.
+  Solo aborta como `bloqueado` si 3 bloqueos seguidos no dejan avanzar ninguna visita.
+- **Presupuesto de visitas:** `--presupuesto-dia` (1.500 por defecto) limita las visitas de una ventana móvil de 24 h,
+  contando todas las corridas. La rotación recorre primero lo visitado hace más tiempo, así que con presupuesto
+  limitado el ciclo completo se reparte sin dejar avisos sin revisar.
 - **Solo las comunas de `config.COMUNAS_RM`:** la cola excluye avisos de otras comunas (`--comunas` cambia la lista).
 - **Log de avance:** además de la pantalla, cada corrida agrega sus líneas a `logs/detalle.log` (fuera de git).
   Cada 50 visitas escribe una línea `Avance: 150/1322 (11 %) | 8,3 visitas/min | observaciones nuevas 148 |
@@ -186,6 +192,7 @@ santiago-rentals-elt/
 ├── bronze/
 │   ├── scraper_grilla.py
 │   ├── scraper_detalle.py
+│   ├── orquestador.py         # alterna detalle y grilla; espera y reanuda ante un 429
 │   └── sql/                   # 001_schema, 002_detalle, 003_cobertura
 ├── scripts/
 │   ├── aplicar_ddl.py         # aplica los .sql en orden (idempotente)
@@ -213,6 +220,15 @@ quedaron fuera el 2026-10-19; sus avisos ya cargados siguen en Bronce. Se cambia
 
 ## Cómo ejecutar
 
+**Todo el ciclo, sin intervención:** `python bronze/orquestador.py` alterna detalle y grilla (detalle, grilla, detalle…),
+con un presupuesto de 2.000 visitas de detalle por 24 h (`--presupuesto-dia`).
+La grilla corre como máximo cada 6 horas (`--grilla-cada-horas`). Si el detalle termina bloqueado, espera 30, 60 y luego
+120 minutos y lo relanza; si la grilla es bloqueada, espera igual y reanuda solo con las comunas que faltaban. Si se agota
+el presupuesto de 24 h, espera a que se libere. Las pausas entre peticiones son de 6 a 12 s (`--pausa-min/--pausa-max`).
+Su registro es `logs/orquestador.log`; para detenerlo con calma se crea el archivo `logs/orquestador.stop`.
+
+Cada scraper por separado:
+
 Requisitos: Python con `requests`, `beautifulsoup4`, `lxml`, `psycopg2-binary` y `python-dotenv` (ver
 `requirements.txt`), y un `.env` con `BD_STRING` (rol dueño) y `BD_STRING_SCRAPER` (rol `scraper_local`), connection strings del **Session pooler** de Supabase,
 que funciona por IPv4).
@@ -227,6 +243,7 @@ python bronze/scraper_grilla.py --sin-bd                   # solo landing, sin e
 python bronze/scraper_detalle.py --limite 300              # visita hasta 300 avisos de la cola
 python bronze/scraper_detalle.py --limite 20 --motivos nuevo
 python bronze/scraper_detalle.py --comunas nunoa-metropolitana   # solo esas comunas (por defecto, config.COMUNAS_RM)
+python bronze/scraper_detalle.py --limite 20000 --presupuesto-dia 1200   # el presupuesto manda sobre el límite
 
 python bronze/cargar_igvust.py                             # una vez (o al actualizar el shapefile)
 python silver/construir_silver.py                          # reconstruye Silver desde Bronce
@@ -247,8 +264,8 @@ terminar ocuparán unos 2 GB de HTML en `landing/` y ~70 MB en Supabase.
    `gold.aviso_entrenamiento`) y `ml_scoring` (ese `SELECT` más `INSERT` en `gold.predicciones`). Se crearon en
    Supabase y el SQL no se conserva en el repo. Los scrapers usan `BD_STRING_SCRAPER`; Silver, Gold y las
    migraciones siguen con `BD_STRING` (rol dueño).
-4. **Silver y Gold** ya existen (ver el estado de arriba). Falta incluirlos en el orquestador y revisar los
-   umbrales de las banderas de calidad y de aptitud, que son provisionales.
+4. **Silver y Gold** ya existen (ver el estado de arriba). El orquestador (`bronze/orquestador.py`) solo encadena
+   detalle y grilla; falta incluir Silver y Gold y revisar los umbrales de las banderas de calidad y de aptitud, que son provisionales.
 5. **Validar los SCD2 con historia real**, cuando las revisitas acumulen varios días de cambios.
 6. **Modelo:** vive en el repo `santiago-rentals-ml`. Target decidido: `costo_total_clp`. Las variables que
    dependen del split (`nivel_barrio`, `precio_m2_sector`, imputación de superficie) se ajustan solo con

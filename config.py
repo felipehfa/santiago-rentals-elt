@@ -1,5 +1,6 @@
 """Configuración compartida del scraper. Las comunas viven acá, no en el código de los scrapers,
 para poder ampliar la cobertura sin tocar lógica."""
+import os
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent
@@ -20,8 +21,9 @@ COMUNAS_RM = [
     "huechuraba-metropolitana", "quinta-normal-metropolitana", "conchali-metropolitana",
 ]
 
-DELAY_MIN = 3.0
-DELAY_MAX = 7.0
+# Pausa entre peticiones (s). El orquestador la sube con estas variables de entorno para no cargar el sitio.
+DELAY_MIN = float(os.environ.get("PAUSA_MIN_S", 3.0))
+DELAY_MAX = float(os.environ.get("PAUSA_MAX_S", 7.0))
 
 HEADERS = {
     "User-Agent": (
