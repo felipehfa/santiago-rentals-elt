@@ -150,6 +150,11 @@ pausado o finalizado se decide en Silver.
   cuántas visitas aguantó entre bloqueos (en `bronze.runs.detalle` y en el log) para estimar el umbral real de la IP.
   Cuando el sitio deja de bloquear, cada 50 visitas buenas seguidas las pausas bajan a la mitad hasta volver a las
   originales. Solo aborta como `bloqueado` si 3 bloqueos seguidos no dejan avanzar ninguna visita.
+- **Rotación escalonada por antigüedad:** un aviso activo se vuelve a visitar cada 1, 2, 4, 7 o 14 días según tenga
+  hasta 14, 30, 60, 120 o más días de publicado (`DIAS_ROTACION_TRAMOS`). La edad sale del texto de Bronce ("hace 13 días",
+  "esta semana"…) más los días transcurridos; sin fecha cuenta como reciente. En la rotación va primero el más atrasado
+  respecto de su intervalo. Son unas 5.500 visitas por día si todo estuviera al día: se puso alto a propósito para
+  buscar el límite del sitio, y cada bloqueo registra cuántas visitas hubo en la última hora y en 24 h.
 - **Presupuesto de visitas:** `--presupuesto-dia` (1.500 por defecto) limita las visitas de una ventana móvil de 24 h,
   contando todas las corridas. La rotación recorre primero lo visitado hace más tiempo, así que con presupuesto
   limitado el ciclo completo se reparte sin dejar avisos sin revisar.
@@ -222,8 +227,8 @@ quedaron fuera el 2026-10-19; sus avisos ya cargados siguen en Bronce. Se cambia
 ## Cómo ejecutar
 
 **Todo el ciclo, sin intervención:** `python bronze/orquestador.py` alterna detalle y grilla (detalle, grilla, detalle…),
-con un presupuesto de 5.000 visitas de detalle por 24 h (`--presupuesto-dia`).
-La grilla corre como máximo cada 6 horas (`--grilla-cada-horas`). Si el detalle termina bloqueado, espera 30, 60 y luego
+con un presupuesto de 6.000 visitas de detalle por 24 h (`--presupuesto-dia`).
+El detalle trabaja en tandas de 400 visitas (`--tanda`) y, entre tandas, el orquestador revisa si ya toca la grilla, que corre como máximo cada 6 horas (`--grilla-cada-horas`) aunque la cola del detalle sea larga. Si el detalle termina bloqueado, espera 30, 60 y luego
 120 minutos y lo relanza; si la grilla es bloqueada, espera igual y reanuda solo con las comunas que faltaban. Si se agota
 el presupuesto de 24 h, espera a que se libere. Las pausas entre peticiones son de 6 a 12 s (`--pausa-min/--pausa-max`).
 Su registro es `logs/orquestador.log`; para detenerlo con calma se crea el archivo `logs/orquestador.stop`.

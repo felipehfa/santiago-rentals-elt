@@ -5,7 +5,7 @@ Arma una cola de avisos a visitar, derivada con SQL de las tablas de la grilla y
   1. nuevo          aviso que nunca se visitó con éxito
   2. desaparecido   dejó de aparecer en la última grilla exitosa: ¿pausado, finalizado o eliminado?
   3. tarjeta_cambio su tarjeta de la grilla cambió desde la última visita (probable cambio de precio)
-  4. rotacion       activo sin revisar hace más de DIAS_ROTACION días
+  4. rotacion       activo sin revisar hace más de su intervalo (DIAS_ROTACION_TRAMOS, según su antigüedad)
 
 Cada visita queda en bronze.detalle_intentos. Solo si lo observado cambió se agrega una fila a
 bronze.detalle_avisos, con la evidencia cruda de estado y precio (la interpretación es de Silver).
@@ -44,7 +44,10 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
                     handlers=[logging.StreamHandler(), logging.FileHandler(_RUTA_LOG, encoding="utf-8")])
 log = logging.getLogger("detalle")
 
-DIAS_ROTACION = 7
+# Rotación escalonada por antigüedad de la publicación: cada cuántos días se vuelve a visitar un aviso activo según tenga
+# hasta 14, 30, 60, 120 o más de 120 días. Los recientes cambian más (bajan de precio o se arriendan en pocos días).
+# Se pusieron frecuentes a propósito para buscar el límite del sitio; el 429 adaptativo protege. Sin fecha = como reciente.
+DIAS_ROTACION_TRAMOS = (1, 2, 4, 7, 14)
 DIAS_ENTRE_VISITAS_DESAPARECIDO = 2
 CADA_N_VISITAS_AVANCE = 50          # cada cuántas visitas se escribe una línea de avance
 MAX_FALLOS_POR_AVISO = 5          # error/no_encontrado consecutivos antes de dejar de insistir en un aviso
@@ -59,7 +62,7 @@ FACTOR_PAUSA_MAX = 8.0              # tope del multiplicador de las pausas entre
 VISITAS_PARA_RELAJAR = 50          # visitas buenas seguidas tras las que las pausas vuelven a bajar (a la mitad, hasta x1)
 MAX_BLOQUEOS_SEGUIDOS = 3           # bloqueos sin ninguna visita buena entre medio => abortar
 # Códigos de salida: el orquestador decide qué hacer según cómo terminó el detalle.
-CODIGOS_SALIDA = {"success": 0, "vacia": 0, "bloqueado": 1, "presupuesto": 4}
+CODIGOS_SALIDA = {"success": 0, "vacia": 5, "bloqueado": 1, "presupuesto": 4}
 PRESUPUESTO_24H = 1500              # visitas máximas en una ventana móvil de 24 h (--presupuesto-dia)
 
 # El sitio, ante tráfico que clasifica como automatizado, puede redirigir CUALQUIER URL a un muro de
@@ -337,18 +340,34 @@ fallos AS (SELECT i.id_aviso, count(*) AS n, max(i.scraped_at) AS ult_fallo
            FROM bronze.detalle_intentos i LEFT JOIN ok ON ok.id_aviso = i.id_aviso
            WHERE i.resultado IN ('error', 'no_encontrado') AND (ok.ult_ok IS NULL OR i.scraped_at > ok.ult_ok)
            GROUP BY i.id_aviso),
-det AS (SELECT DISTINCT ON (id_aviso) id_aviso, estado_texto FROM bronze.detalle_avisos
-        ORDER BY id_aviso, scraped_at DESC),
+det AS (SELECT DISTINCT ON (id_aviso) id_aviso, estado_texto, scraped_at AS det_en,
+               payload->>'fecha_publicacion_texto' AS txt_pub
+        FROM bronze.detalle_avisos ORDER BY id_aviso, scraped_at DESC),
+-- Edad de la publicación hoy: lo que decía el texto ("hace 13 días", "hace 2 meses", "esta semana", "hoy") cuando se
+-- observó, más los días transcurridos desde esa observación.
+edad AS (SELECT id_aviso,
+                CASE WHEN txt_pub = 'hoy' THEN 0
+                     WHEN txt_pub = 'esta semana' THEN 3
+                     WHEN txt_pub ~ '^hace [0-9]+ d' THEN substring(txt_pub from '[0-9]+')::int
+                     WHEN txt_pub ~ '^hace [0-9]+ mes' THEN substring(txt_pub from '[0-9]+')::int * 30
+                     WHEN txt_pub ~ '^hace [0-9]+ a' THEN substring(txt_pub from '[0-9]+')::int * 365
+                END + floor(extract(epoch FROM now() - det_en) / 86400)::int AS dias
+         FROM det),
+tramo AS (SELECT id_aviso,
+                 CASE WHEN dias IS NULL OR dias <= 14 THEN %(r0)s WHEN dias <= 30 THEN %(r1)s
+                      WHEN dias <= 60 THEN %(r2)s WHEN dias <= 120 THEN %(r3)s ELSE %(r4)s END AS interv
+          FROM edad),
 card AS (SELECT DISTINCT ON (id_aviso) id_aviso, comuna, tipo_propiedad, payload->>'url' AS url,
                 scraped_at AS ult_card FROM bronze.grilla_avisos ORDER BY id_aviso, scraped_at DESC),
 cola AS (
   SELECT gv.id_aviso, card.url, card.comuna, card.tipo_propiedad, ok.ult_ok,
+         extract(epoch FROM now() - ok.ult_ok) / 86400.0 / tr.interv AS vencido,
          CASE
            WHEN ok.ult_ok IS NULL THEN 'nuevo'
            WHEN gv.ultimo_run_id < cob.rid AND ok.ult_ok < now() - make_interval(days => %(dias_desap)s)
                 THEN 'desaparecido'
            WHEN card.ult_card > ok.ult_ok THEN 'tarjeta_cambio'
-           WHEN ok.ult_ok < now() - make_interval(days => %(dias_rot)s) THEN 'rotacion'
+           WHEN ok.ult_ok < now() - make_interval(days => tr.interv) THEN 'rotacion'
          END AS motivo
   FROM bronze.grilla_vistos gv
   JOIN card ON card.id_aviso = gv.id_aviso
@@ -356,6 +375,7 @@ cola AS (
   LEFT JOIN ok ON ok.id_aviso = gv.id_aviso
   LEFT JOIN fallos f ON f.id_aviso = gv.id_aviso
   LEFT JOIN det ON det.id_aviso = gv.id_aviso
+  LEFT JOIN tramo tr ON tr.id_aviso = gv.id_aviso
   WHERE card.url IS NOT NULL
     AND card.comuna = ANY(%(comunas)s)
     -- 'finalizado' es terminal: no se vuelve a visitar. Pausado sí, porque puede volver a publicarse.
@@ -368,6 +388,7 @@ cola AS (
 SELECT id_aviso, url, comuna, tipo_propiedad, motivo FROM cola
 WHERE motivo = ANY(%(motivos)s)
 ORDER BY CASE motivo WHEN 'nuevo' THEN 1 WHEN 'desaparecido' THEN 2 WHEN 'tarjeta_cambio' THEN 3 ELSE 4 END,
+         CASE WHEN motivo = 'rotacion' THEN -vencido ELSE 0 END,  -- en la rotación, primero el más atrasado respecto de su intervalo
          ult_ok NULLS FIRST, id_aviso DESC
 LIMIT %(limite)s
 """
@@ -375,11 +396,19 @@ LIMIT %(limite)s
 
 def obtener_cola(con, limite: int, motivos: list[str], comunas: list[str]) -> list[dict]:
     with con.cursor() as cur:
-        cur.execute(SQL_COLA, {"dias_desap": DIAS_ENTRE_VISITAS_DESAPARECIDO, "dias_rot": DIAS_ROTACION,
+        cur.execute(SQL_COLA, {"dias_desap": DIAS_ENTRE_VISITAS_DESAPARECIDO,
+                               **{f"r{i}": d for i, d in enumerate(DIAS_ROTACION_TRAMOS)},
                                "max_fallos": MAX_FALLOS_POR_AVISO, "horas_reint": HORAS_ENTRE_REINTENTOS,
                                "motivos": motivos, "comunas": comunas, "limite": limite})
         cols = [c[0] for c in cur.description]
         return [dict(zip(cols, fila)) for fila in cur.fetchall()]
+
+
+def visitas_ultima_hora(con) -> int:
+    with con.cursor() as cur:
+        cur.execute("SELECT count(*) FROM bronze.detalle_intentos "
+                    "WHERE scraped_at > now() - interval '1 hour' AND resultado <> 'bloqueado'")
+        return cur.fetchone()[0]
 
 
 def visitas_ultimas_24h(con) -> int:
@@ -499,8 +528,10 @@ def ejecutar(db: ConexionResiliente, limite: int, motivos: list[str], comunas: l
                 if bloqueos_seguidos >= MAX_BLOQUEOS_SEGUIDOS:
                     raise
                 factor = min(factor * 2, FACTOR_PAUSA_MAX)
-                log.warning("BLOQUEO %d (%s): aguantó %d visitas desde el anterior; espera %d min y baja el ritmo "
-                            "(pausas x%.0f)", bloqueos, e, visitas_desde_bloqueo, ESPERA_BLOQUEO_S // 60, factor)
+                en_hora, en_24h = db.ejecutar(visitas_ultima_hora), db.ejecutar(visitas_ultimas_24h)
+                log.warning("BLOQUEO %d (%s): aguantó %d visitas desde el anterior (última hora %d, 24 h %d); espera %d min "
+                            "y baja el ritmo (pausas x%.0f)", bloqueos, e, visitas_desde_bloqueo, en_hora, en_24h,
+                            ESPERA_BLOQUEO_S // 60, factor)
                 visitas_desde_bloqueo = fallos_seguidos = 0
                 time.sleep(ESPERA_BLOQUEO_S)
                 continue  # reintenta el mismo aviso
