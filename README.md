@@ -221,7 +221,7 @@ quedaron fuera el 2026-10-19; sus avisos ya cargados siguen en Bronce. Se cambia
 ## Cómo ejecutar
 
 **Todo el ciclo, sin intervención:** `python bronze/orquestador.py` alterna detalle y grilla (detalle, grilla, detalle…),
-con un presupuesto de 2.000 visitas de detalle por 24 h (`--presupuesto-dia`).
+con un presupuesto de 5.000 visitas de detalle por 24 h (`--presupuesto-dia`).
 La grilla corre como máximo cada 6 horas (`--grilla-cada-horas`). Si el detalle termina bloqueado, espera 30, 60 y luego
 120 minutos y lo relanza; si la grilla es bloqueada, espera igual y reanuda solo con las comunas que faltaban. Si se agota
 el presupuesto de 24 h, espera a que se libere. Las pausas entre peticiones son de 6 a 12 s (`--pausa-min/--pausa-max`).

@@ -10,7 +10,7 @@ Ciclo:  detalle -> grilla -> detalle -> grilla ...
   - La grilla corre como máximo cada `--grilla-cada-horas`, para no cargar el sitio con ~230 páginas seguidas.
   - Si el presupuesto de visitas se agota, espera a que se libere.
 
-Presupuesto: `--presupuesto-dia` (2.000 por defecto, lo que pide revisar cada aviso una vez por semana).
+Presupuesto: `--presupuesto-dia` (5.000 por defecto; revisar cada aviso una vez por semana pide ~1.800 al día).
 Pausa entre peticiones: `--pausa-min`/`--pausa-max` (6 y 12 s por defecto) se pasan a los dos scrapers.
 Para detenerlo con calma, crear el archivo `logs/orquestador.stop` (termina el paso en curso y sale).
 Registro: `logs/orquestador.log` (fijo, fuera de git).
@@ -153,7 +153,7 @@ def paso_grilla(db, pausa) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--grilla-cada-horas", type=float, default=6.0, help="separación mínima entre dos grillas")
-    ap.add_argument("--presupuesto-dia", type=int, default=2000, help="visitas de detalle por ventana móvil de 24 h")
+    ap.add_argument("--presupuesto-dia", type=int, default=5000, help="visitas de detalle por ventana móvil de 24 h")
     ap.add_argument("--pausa-min", type=float, default=6.0)
     ap.add_argument("--pausa-max", type=float, default=12.0)
     ap.add_argument("--max-ciclos", type=int, default=0, help="0 = sin límite")
