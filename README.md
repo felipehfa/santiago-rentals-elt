@@ -288,17 +288,57 @@ Dónde ocurre cada cosa: **solo Bronce habla con el sitio**. La revisión de est
 el sitio: leen lo que Bronce dejó. La única llamada externa fuera de Bronce es la de Silver a `mindicador.cl`
 (UF y dólar).
 
+## Diagramas
+
+Hechos con [Fluyo](https://fluyo.space). Cada diagrama es un `.svg` (vista estática, la que se ve aquí) y un `.fluyo.json` en
+`docs/diagramas/`; ese archivo se abre con el botón **Abrir** de fluyo.space para reproducir sus **Historias** (el orden en el
+tiempo de un proceso, animado) y exportar un GIF. Los scripts que los generan están en `docs/diagramas/herramientas/` (ver su
+`LEEME.md`).
+
+### Arquitectura del ELT
+
+![Arquitectura del ELT](docs/diagramas/elt-arquitectura.svg)
+
+El recorrido de un aviso desde el portal hasta su predicción, de izquierda a derecha:
+
+- **Captura.** Dos scrapers visitan el portal. La *grilla* descubre qué avisos existen en las 12 comunas (si una búsqueda
+  declara más de 1.800 resultados se parte por rango de precio, porque el sitio corta en 2.016). El *detalle* visita cada aviso
+  para leer su estado y su precio, siguiendo una cola de prioridades: nuevo, desaparecido, tarjeta cambiada y rotación por
+  antigüedad; quedan fuera los finalizados, los proyectos y los avisos con 5 fallos.
+- **Bronce.** Registro crudo, al que solo se agrega: cada visita queda en `detalle_intentos` y una observación nueva solo si el
+  aviso cambió. El HTML original queda aparte en *landing* (local, fuera de git).
+- **Silver.** Limpia y une las fuentes: UF y dólar de mindicador.cl a la fecha del precio, y la unidad vecinal (IGVUST) de cada
+  aviso. Marca banderas de anomalía: superficie < 12 o > 500 m², precio < 100 mil o > 8 M y precio por m² atípico.
+- **Gold.** `aviso_entrenamiento` deja como aptos los avisos con detalle, que no son proyecto ni finalizados hace más de
+  90 días, con precio, superficie y coordenadas, y sin banderas. Es el único punto de contacto con el repo del modelo, que
+  devuelve sus predicciones a `gold.predicciones`.
+- **Permisos.** `scraper_local` escribe en Bronce, `ml_lectura` lee Gold y `ml_scoring` lee Gold e inserta predicciones.
+
+Historias: *Un aviso nuevo, de la publicación a la predicción* (diez pasos, de la grilla a la tabla de predicciones) y
+*Un 429: espera y retoma con menos ritmo*.
+
+### Orquestador del scraping
+
+![Orquestador del scraping](docs/diagramas/elt-orquestador.svg)
+
+Cómo se mantienen activos los dos scrapers sin intervención y qué hacen cuando el sitio los frena:
+
+- **Orquestador.** Alterna *tandas* de 400 visitas del detalle y, cada 6 horas, la grilla, que entra a su hora aunque la cola
+  del detalle sea larga. Si no hay nada que visitar, espera hasta 30 minutos y vuelve a mirar.
+- **Detalle.** Recorre su cola con un presupuesto de visitas por ventana móvil de 24 horas y pausas aleatorias entre visitas
+  (configurables; hoy de 3 a 6 s). La rotación revisa cada aviso activo cada 1, 2, 4, 7 o 14 días según su antigüedad.
+- **Un 429.** El scraper no aborta: espera 30 minutos, duplica las pausas (hasta ×8) y las baja a la mitad cada 50 visitas
+  buenas hasta volver a las originales. El ritmo con que termina una tanda se guarda y la siguiente lo retoma. Si 3 bloqueos
+  seguidos no dejan avanzar, aborta y el orquestador espera 30, 60 o 120 minutos antes de relanzarlo.
+- **Grilla.** Si el sitio la bloquea, reanuda solo las comunas que le faltaban. Una grilla incompleta no marca avisos como
+  desaparecidos en las comunas que no cubrió.
+
+Historias: *Una tanda de detalle y la grilla a su hora*, *Un 429 y la recuperación* y *La grilla bloqueada reanuda lo que
+faltaba*.
+
 ## Documentación
 
-- `docs/diagramas/`: diagramas de proceso hechos con [Fluyo](https://fluyo.space), cada uno con sus Historias animadas.
-  Cada diagrama trae el `.svg` (vista estática, abajo) y el `.fluyo.json`, que se abre con el botón **Abrir** de fluyo.space
-  para reproducir las Historias y exportar el GIF. Se generan con los scripts de `docs/diagramas/herramientas/` (ver su
-  `LEEME.md`).
-
-  ![Arquitectura del ELT](docs/diagramas/elt-arquitectura.svg)
-
-  ![Orquestador del scraping](docs/diagramas/elt-orquestador.svg)
-
+- `docs/diagramas/`: diagramas de proceso hechos con Fluyo (ver la sección *Diagramas*).
 - `docs/01_antecedentes_concepcion_y_databricks.md`: arquitectura, decisiones y problemas de los dos
   proyectos anteriores, con la referencia técnica de limpieza, features y modelo para Silver y Gold.
 - `docs/02_bitacora_problemas.md`: problemas de este proyecto y cómo se resolvieron. Se actualiza con

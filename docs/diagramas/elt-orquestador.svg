@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1645" height="808" viewBox="-145.00 -79.00 1645.00 808.00">
+<rect x="-145" y="-79" width="1645" height="808" fill="#ffffff"/>
 <path d="M 135.00 285.00 L 135.00 257.00 L 135.00 245.50 Q 135.00 237.50 143.00 237.50 L 327.56 237.50 Q 335.56 237.50 335.56 229.50 L 335.56 218.00 L 335.56 201.20" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
 <path d="M 335.56 193.00 L 339.56 204.00 L 335.56 201.20 L 331.56 204.00 Z" fill="#888888"/>
 <rect x="213.81" y="226.45" width="42.94" height="22.10" fill="#ffffff"/>
