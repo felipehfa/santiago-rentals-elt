@@ -154,3 +154,19 @@ CREATE TABLE IF NOT EXISTS gold.predicciones (
     costo_total_predicho_clp    NUMERIC NOT NULL
 );
 CREATE INDEX IF NOT EXISTS predicciones_aviso_idx ON gold.predicciones (id_aviso, predicho_en);
+
+-- Etiquetado de mercado (oportunidad / precio de mercado / caro) y confianza de la estimación. Se agregan después de crear
+-- la tabla, con ALTER, para no perder las predicciones ya guardadas: las filas anteriores quedan con estos campos en NULL.
+ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS costo_total_publicado_clp NUMERIC;  -- lo que cuesta el aviso (arriendo + gastos comunes)
+ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS cv_ensamble NUMERIC;                -- desviación / media de las 10 predicciones del ensamble
+ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS nivel_confianza TEXT;              -- alta confianza | confianza media | baja confianza
+ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS z_robusto NUMERIC;                  -- error normalizado por decil de costo (mediana / MAD)
+ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS etiqueta TEXT;                     -- oportunidad | precio_de_mercado | caro
+ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS banda_inferior_clp NUMERIC;        -- rango de costo total que sería precio de mercado
+ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS banda_superior_clp NUMERIC;
+
+-- La predicción vigente de cada aviso: la de la versión más nueva del modelo y, dentro de ella, la más reciente.
+CREATE OR REPLACE VIEW gold.predicciones_vigentes AS
+    SELECT DISTINCT ON (id_aviso) *
+    FROM gold.predicciones
+    ORDER BY id_aviso, modelo_version DESC, predicho_en DESC;
