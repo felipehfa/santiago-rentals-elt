@@ -11,6 +11,125 @@ Los scrapers se ejecutan **de forma local** (no en GitHub Actions) y escriben a 
 propio. La razón: el sitio bloquea las IPs de datacenter, y en el proyecto de Concepción eso pasó
 inadvertido durante 17 días (ver `docs/01_antecedentes_concepcion_y_databricks.md`).
 
+## Diagramas del proceso
+
+Hechos con [Fluyo](https://fluyo.space). Cada diagrama es un `.svg` (la vista estática que se ve aquí) y un `.fluyo.json` en
+`docs/diagramas/`; ese archivo se abre con el botón **Abrir** de fluyo.space para reproducir sus **Historias** (el orden en el
+tiempo de un proceso, animado) y exportar un GIF. Los scripts que los generan están en `docs/diagramas/herramientas/` (ver su
+`LEEME.md`). Van en el orden del proceso: la arquitectura general, la grilla, la cola del detalle, el orquestador, Silver y Gold.
+
+### 1. Arquitectura del ELT
+
+![Arquitectura del ELT](docs/diagramas/elt-arquitectura.svg)
+
+El recorrido de un aviso desde el portal hasta su predicción, de izquierda a derecha:
+
+- **Captura.** Dos scrapers visitan el portal. La *grilla* descubre qué avisos existen en las 12 comunas; el *detalle* visita cada
+  aviso para leer su estado y su precio.
+- **Bronce.** Registro crudo, al que solo se agrega: cada visita queda en `detalle_intentos` y una observación nueva solo si el
+  aviso cambió. El HTML original queda aparte en *landing* (local, fuera de git).
+- **Silver.** Limpia y une las fuentes: UF y dólar de mindicador.cl a la fecha del precio, y la unidad vecinal (IGVUST) de cada
+  aviso. Marca banderas de anomalía.
+- **Gold.** `aviso_entrenamiento` deja los avisos aptos para entrenar. Es el único punto de contacto con el repo del modelo, que
+  devuelve sus predicciones a `gold.predicciones`.
+- **Permisos.** `scraper_local` escribe en Bronce, `ml_lectura` lee Gold y `ml_scoring` lee Gold e inserta predicciones.
+
+Historias: *Un aviso nuevo, de la publicación a la predicción* y *Un 429: espera y retoma con menos ritmo*.
+
+### 2. Flujo de la grilla
+
+![Flujo de la grilla](docs/diagramas/elt-grilla.svg)
+
+Cómo se descubre qué avisos existen (`bronze/scraper_grilla.py`):
+
+1. Para cada comuna de `config.COMUNAS_RM` pide la página 1 y lee el **total declarado** ("N resultados").
+2. El sitio corta cada búsqueda en 2.016 resultados (responde 404 desde la página 43). Si el total supera **1.800**, la búsqueda se
+   parte en rangos de precio: parte de una escalera de rangos y divide a la mitad cualquiera que siga siendo grande. Los bordes se
+   solapan y los duplicados se absorben por ID.
+3. Recorre las páginas de cada búsqueda y guarda el HTML y las tarjetas. Una tarjeta entra a Bronce **solo si cambió** (hash de su
+   contenido, sin el `tracking_id` aleatorio de la URL).
+4. Al cerrar cada comuna compara los avisos únicos capturados con el total declarado y registra su **cobertura**: `completa` si
+   faltan menos de max(10, 1 %). Una corrida con alguna comuna `parcial` queda `parcial`.
+5. **Bloqueo.** Con HTTP 403 o 429, o con 3 búsquedas seguidas cuya página 1 viene vacía sin que el sitio diga "0 resultados", la
+   corrida se marca `bloqueado`: una respuesta vacía nunca es un éxito.
+
+Historias: *Una comuna chica: sin partir*, *Santiago: más de 1.800, se parte por precio* y *El sitio bloquea la búsqueda*.
+
+### 3. Cola y reglas del detalle
+
+![Cola y reglas del detalle](docs/diagramas/elt-cola-detalle.svg)
+
+Qué avisos visita el detalle y en qué orden (`bronze/scraper_detalle.py`). La cola se calcula con SQL, sin contadores mutables:
+
+| Prioridad | Motivo | Condición |
+|---|---|---|
+| 1 | `nuevo` | Nunca se visitó con éxito |
+| 2 | `desaparecido` | No apareció en la última corrida **completa de su comuna** y su última visita exitosa es de hace más de 2 días |
+| 3 | `tarjeta_cambio` | Su tarjeta de la grilla cambió desde la última visita |
+| 4 | `rotacion` | Pasó su intervalo de revisita, que depende de la antigüedad: cada 1, 2, 4, 7 o 14 días para avisos de hasta 14, 30, 60, 120 o más días |
+
+Quedan **fuera**: los finalizados (terminal; un pausado sí se revisa), los ya clasificados como `proyecto`, los avisos de otras
+comunas y los que acumulan 5 fallos o fallaron hace menos de 12 horas. Cada visita termina en `ok` (se guarda una observación si
+el aviso cambió), `proyecto`, `no_encontrado`, `error` o un bloqueo. Bronce no interpreta: si un aviso está pausado o finalizado se
+decide en Silver.
+
+Historias: *Un aviso nuevo se visita primero*, *Un aviso desaparecido resulta ser un proyecto* y *Revisita por rotación y un 429*.
+
+### 4. Orquestador del scraping
+
+![Orquestador del scraping](docs/diagramas/elt-orquestador.svg)
+
+Cómo se mantienen activos los dos scrapers sin intervención y qué hacen cuando el sitio los frena:
+
+- **Orquestador.** Alterna *tandas* de 400 visitas del detalle y, cada 6 horas, la grilla, que entra a su hora aunque la cola
+  del detalle sea larga. Si no hay nada que visitar, espera hasta 30 minutos y vuelve a mirar.
+- **Detalle.** Recorre su cola con un presupuesto de visitas por ventana móvil de 24 horas y pausas aleatorias entre visitas
+  (configurables; hoy de 3 a 6 s).
+- **Un 429.** El scraper no aborta: espera 30 minutos, duplica las pausas (hasta ×8) y las baja a la mitad cada 50 visitas
+  buenas hasta volver a las originales. El ritmo con que termina una tanda se guarda y la siguiente lo retoma. Si 3 bloqueos
+  seguidos no dejan avanzar, aborta y el orquestador espera 30, 60 o 120 minutos antes de relanzarlo.
+- **Grilla.** Si el sitio la bloquea, reanuda solo las comunas que le faltaban. Una grilla incompleta no marca avisos como
+  desaparecidos en las comunas que no cubrió.
+
+Historias: *Una tanda de detalle y la grilla a su hora*, *Un 429 y la recuperación* y *La grilla bloqueada reanuda lo que
+faltaba*.
+
+### 5. Silver: limpieza y banderas
+
+![Silver: limpieza y banderas](docs/diagramas/elt-silver.svg)
+
+`silver/construir_silver.py` reconstruye `silver.avisos` completa desde Bronce, en una sola transacción (si algo falla, queda la
+tabla anterior). No toca el sitio. Cada aviso toma su último estado y pasa por:
+
+- **Tipado y monedas.** Pasa los textos a números y convierte el precio a CLP con la UF o el dólar del día de la visita (si ese
+  día no hay valor, el anterior más cercano hasta 5 días atrás; más lejos queda en blanco y se marca).
+- **Estado del aviso**, leído del texto del banner: sin texto es `activo`; "finaliz…" es `finalizado`; "pausad…" es `pausado`.
+- **Fecha de publicación aproximada**: el texto relativo ("hace 13 días") restado a la fecha de la primera observación.
+- **Banderas de calidad** (umbrales provisionales): superficie útil < 12 o > 500 m²; precio < 100 mil o > 8 millones; conteos
+  imposibles (más de 6 dormitorios, 5 baños o 15 estacionamientos); sin coordenadas o fuera de la Región Metropolitana; gastos
+  comunes faltantes; moneda sin valor de conversión.
+- **Precio por m² atípico** (segunda pasada): el logaritmo del costo total por m² útil se compara con la mediana de su comuna con
+  un z robusto (MAD); se marca si es mayor que 5. Las comunas con menos de 30 avisos usan la región entera.
+- **Unidad vecinal.** Cada aviso con coordenadas se asigna a su unidad vecinal y recibe el índice socioeconómico (IGVUST).
+
+Historias: *Un aviso normal, de Bronce a Silver* y *Un aviso con precio por m² absurdo*.
+
+### 6. Gold: aptitud para entrenar
+
+![Gold: aptitud para entrenar](docs/diagramas/elt-gold.svg)
+
+`gold/construir_gold.py` lee solo Silver. Construye tres cosas:
+
+- **`gold.aviso_entrenamiento`**: un aviso es **apto** si no tiene ningún motivo de exclusión. Los motivos se acumulan en
+  `motivo_exclusion` para poder revisar qué descarta: proyecto, sin detalle, estado no reconocido, finalizado hace más de 90 días,
+  sin precio, sin superficie, sin coordenadas, coordenada fuera de la región, conteo imposible, superficie sospechosa, precio
+  sospechoso y precio por m² atípico. Incluye el título y la descripción, que usa el modelo.
+- **`gold.dim_estado_aviso_scd2` y `gold.dim_precio_aviso_scd2`**: intervalos de vigencia del estado y del precio de cada aviso
+  (con poca historia todavía: se llenan a medida que las revisitas acumulan cambios).
+- **`gold.predicciones`** no se reconstruye: solo recibe filas del modelo.
+
+Historias: *Un aviso apto llega al modelo*, *Un aviso con superficie absurda queda fuera* y *Cada cambio queda con su vigencia*.
+
 ## Estado actual
 
 | Pieza | Estado |
@@ -25,7 +144,7 @@ inadvertido durante 17 días (ver `docs/01_antecedentes_concepcion_y_databricks.
 | Gold: `gold.aviso_entrenamiento` | Funcionando: 14.947 avisos, 12.597 aptos (1.912 aún sin detalle; el resto, ~440, excluidos por calidad). Incluye el título y la descripción del aviso, que usa el modelo |
 | Gold: `gold.predicciones` | La escribe el scoring por lotes del modelo (rol `ml_scoring`, `INSERT` y `SELECT`): predicción, etiqueta de mercado (oportunidad / precio de mercado / caro), confianza y banda de mercado. `gold.predicciones_vigentes` es la última de cada aviso |
 | Modelo | Funcionando en el repo `santiago-rentals-ml` |
-| Orquestador y tarea programada de Windows | Pendientes |
+| Orquestador (`bronze/orquestador.py`) | Funcionando: alterna detalle y grilla con esperas ante un 429. Falta la tarea programada de Windows y sumarle Silver y Gold |
 
 Cifras al 18-oct-2026 (cambian con cada corrida):
 
@@ -40,37 +159,8 @@ Cifras al 18-oct-2026 (cambian con cada corrida):
 
 ## Arquitectura
 
-```
-Portal Inmobiliario
-        │  requests + BeautifulSoup (IP local, delays de 3 a 7 s)
-        ▼
-┌───────────────────────────┐        ┌────────────────────────────────────────┐
-│ bronze/scraper_grilla.py  │        │ bronze/scraper_detalle.py              │
-│  qué avisos existen       │        │  qué dice cada aviso (estado y precio) │
-│  12 comunas, por rango de │        │  cola de prioridades derivada con SQL  │
-│  precio si superan 1.800  │        │                                        │
-└───────────┬───────────────┘        └───────────────┬────────────────────────┘
-            │                                        │
-            ├──────────────► landing/ (HTML crudo .gz, local) ◄───────────┤
-            ▼                                        ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ Supabase (Postgres) · schema bronze · solo inserciones                      │
-│  grilla_avisos  grilla_vistos  grilla_paginas  grilla_cobertura             │
-│  detalle_avisos detalle_intentos  runs                                      │
-│  igvust_uv  (referencia estática: nivel socioeconómico por Unidad Vecinal)  │
-└─────────────────────────────────────────────────────────────────────────────┘
-            │
-            ▼   silver/construir_silver.py  (solo lee Bronce; nunca toca el sitio)
-        Silver: tipado, normalización de monedas, banderas de calidad (superficie, precio, costo por m2
-                atípico en su comuna), Unidad Vecinal de cada aviso
-                silver.avisos (estado actual) · silver.aviso_observaciones (historia tipada)
-                silver.indicadores_diarios (UF y dólar) · silver.aviso_uv
-            ▼   gold/construir_gold.py  (solo lee Silver)
-        Gold: gold.dim_estado_aviso_scd2 · gold.dim_precio_aviso_scd2 · gold.aviso_entrenamiento
-              gold.predicciones (no se reconstruye: solo recibe filas del modelo)
-            ▼   santiago-rentals-ml
-        Modelo de ML
-```
+El diagrama de la arquitectura está al inicio de este README (sección *Diagramas del proceso*). Las capas, de la
+fuente al modelo:
 
 ### Capas
 
@@ -124,7 +214,7 @@ y se ordena por prioridad:
 | 1 | `nuevo` | Nunca se visitó con éxito (más recientes primero) |
 | 2 | `desaparecido` | No apareció en la última corrida **completa de su comuna** y su última visita exitosa es de hace más de 2 días |
 | 3 | `tarjeta_cambio` | Su tarjeta de la grilla cambió desde la última visita |
-| 4 | `rotacion` | Sin revisar hace más de 7 días |
+| 4 | `rotacion` | Pasó su intervalo de revisita según la antigüedad del aviso (1, 2, 4, 7 o 14 días) |
 
 Quedan fuera de la cola los avisos cuyo último estado contiene "finaliz" (terminal; un pausado sí se
 revisa), los que ya se clasificaron como `proyecto`, y los que acumulan 5 fallos seguidos o fallaron hace
@@ -287,54 +377,6 @@ Dónde ocurre cada cosa: **solo Bronce habla con el sitio**. La revisión de est
 `bronze/scraper_detalle.py` (primera visita y revisitas, el mismo script). Silver y Gold nunca tocan
 el sitio: leen lo que Bronce dejó. La única llamada externa fuera de Bronce es la de Silver a `mindicador.cl`
 (UF y dólar).
-
-## Diagramas
-
-Hechos con [Fluyo](https://fluyo.space). Cada diagrama es un `.svg` (vista estática, la que se ve aquí) y un `.fluyo.json` en
-`docs/diagramas/`; ese archivo se abre con el botón **Abrir** de fluyo.space para reproducir sus **Historias** (el orden en el
-tiempo de un proceso, animado) y exportar un GIF. Los scripts que los generan están en `docs/diagramas/herramientas/` (ver su
-`LEEME.md`).
-
-### Arquitectura del ELT
-
-![Arquitectura del ELT](docs/diagramas/elt-arquitectura.svg)
-
-El recorrido de un aviso desde el portal hasta su predicción, de izquierda a derecha:
-
-- **Captura.** Dos scrapers visitan el portal. La *grilla* descubre qué avisos existen en las 12 comunas (si una búsqueda
-  declara más de 1.800 resultados se parte por rango de precio, porque el sitio corta en 2.016). El *detalle* visita cada aviso
-  para leer su estado y su precio, siguiendo una cola de prioridades: nuevo, desaparecido, tarjeta cambiada y rotación por
-  antigüedad; quedan fuera los finalizados, los proyectos y los avisos con 5 fallos.
-- **Bronce.** Registro crudo, al que solo se agrega: cada visita queda en `detalle_intentos` y una observación nueva solo si el
-  aviso cambió. El HTML original queda aparte en *landing* (local, fuera de git).
-- **Silver.** Limpia y une las fuentes: UF y dólar de mindicador.cl a la fecha del precio, y la unidad vecinal (IGVUST) de cada
-  aviso. Marca banderas de anomalía: superficie < 12 o > 500 m², precio < 100 mil o > 8 M y precio por m² atípico.
-- **Gold.** `aviso_entrenamiento` deja como aptos los avisos con detalle, que no son proyecto ni finalizados hace más de
-  90 días, con precio, superficie y coordenadas, y sin banderas. Es el único punto de contacto con el repo del modelo, que
-  devuelve sus predicciones a `gold.predicciones`.
-- **Permisos.** `scraper_local` escribe en Bronce, `ml_lectura` lee Gold y `ml_scoring` lee Gold e inserta predicciones.
-
-Historias: *Un aviso nuevo, de la publicación a la predicción* (diez pasos, de la grilla a la tabla de predicciones) y
-*Un 429: espera y retoma con menos ritmo*.
-
-### Orquestador del scraping
-
-![Orquestador del scraping](docs/diagramas/elt-orquestador.svg)
-
-Cómo se mantienen activos los dos scrapers sin intervención y qué hacen cuando el sitio los frena:
-
-- **Orquestador.** Alterna *tandas* de 400 visitas del detalle y, cada 6 horas, la grilla, que entra a su hora aunque la cola
-  del detalle sea larga. Si no hay nada que visitar, espera hasta 30 minutos y vuelve a mirar.
-- **Detalle.** Recorre su cola con un presupuesto de visitas por ventana móvil de 24 horas y pausas aleatorias entre visitas
-  (configurables; hoy de 3 a 6 s). La rotación revisa cada aviso activo cada 1, 2, 4, 7 o 14 días según su antigüedad.
-- **Un 429.** El scraper no aborta: espera 30 minutos, duplica las pausas (hasta ×8) y las baja a la mitad cada 50 visitas
-  buenas hasta volver a las originales. El ritmo con que termina una tanda se guarda y la siguiente lo retoma. Si 3 bloqueos
-  seguidos no dejan avanzar, aborta y el orquestador espera 30, 60 o 120 minutos antes de relanzarlo.
-- **Grilla.** Si el sitio la bloquea, reanuda solo las comunas que le faltaban. Una grilla incompleta no marca avisos como
-  desaparecidos en las comunas que no cubrió.
-
-Historias: *Una tanda de detalle y la grilla a su hora*, *Un 429 y la recuperación* y *La grilla bloqueada reanuda lo que
-faltaba*.
 
 ## Documentación
 

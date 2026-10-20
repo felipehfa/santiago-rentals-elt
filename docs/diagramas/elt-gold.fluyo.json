@@ -1,0 +1,606 @@
+{
+ "version": 5,
+ "app": "fluyo",
+ "doc": {
+  "theme": "claro",
+  "pages": [
+   {
+    "name": "Gold: aptitud para entrenar",
+    "nodes": [
+     {
+      "id": 1,
+      "shape": "cylinder",
+      "x": 20,
+      "y": 250,
+      "w": 210,
+      "h": 110,
+      "label": "Silver",
+      "color": "#7fa66b",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 0,
+      "fs": 22
+     },
+     {
+      "id": 2,
+      "shape": "diamond",
+      "x": 350,
+      "y": 225,
+      "w": 250,
+      "h": 150,
+      "label": "¿Apto?",
+      "color": "#c16a6a",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 1,
+      "fs": 22
+     },
+     {
+      "id": 3,
+      "shape": "cylinder",
+      "x": 720,
+      "y": 130,
+      "w": 240,
+      "h": 110,
+      "label": "Gold: aptos",
+      "color": "#7fa66b",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 2,
+      "fs": 22
+     },
+     {
+      "id": 4,
+      "shape": "rect",
+      "x": 1090,
+      "y": 140,
+      "w": 260,
+      "h": 90,
+      "label": "Modelo (repo ML)",
+      "color": "#9b7fb5",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 3,
+      "fs": 22
+     },
+     {
+      "id": 5,
+      "shape": "cylinder",
+      "x": 1090,
+      "y": 300,
+      "w": 260,
+      "h": 110,
+      "label": "gold.predicciones",
+      "color": "#7bb85b",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 4,
+      "fs": 22
+     },
+     {
+      "id": 6,
+      "shape": "rect",
+      "x": 720,
+      "y": 400,
+      "w": 240,
+      "h": 90,
+      "label": "No apto + motivo",
+      "color": "#8f8f8f",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 5,
+      "fs": 22
+     },
+     {
+      "id": 7,
+      "shape": "cylinder",
+      "x": 330,
+      "y": 500,
+      "w": 290,
+      "h": 110,
+      "label": "SCD2: estado y precio",
+      "color": "#7fa66b",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 6,
+      "fs": 22
+     },
+     {
+      "id": 8,
+      "shape": "rect",
+      "x": 690,
+      "y": -20,
+      "w": 334,
+      "h": 66,
+      "label": "Sin ningún motivo de exclusión",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 7,
+      "fs": 17
+     },
+     {
+      "id": 9,
+      "shape": "rect",
+      "x": 1130,
+      "y": 480,
+      "w": 437,
+      "h": 187,
+      "label": "No apto si:\n• proyecto o sin detalle\n• finalizado hace más de 90 días\n• sin precio, superficie o coordenadas\n• banderas de anomalía",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 8,
+      "fs": 17
+     },
+     {
+      "id": 10,
+      "shape": "rect",
+      "x": 640,
+      "y": 620,
+      "w": 379,
+      "h": 77,
+      "label": "Intervalos de vigencia de\nestado y de precio por aviso",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 9,
+      "fs": 17
+     }
+    ],
+    "edges": [
+     {
+      "id": 11,
+      "from": 1,
+      "to": 2,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "evalúa",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 12,
+      "from": 2,
+      "to": 3,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "sí",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 13,
+      "from": 2,
+      "to": 6,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "no",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 14,
+      "from": 3,
+      "to": 4,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "entrena",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 15,
+      "from": 4,
+      "to": 5,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "INSERT",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 16,
+      "from": 1,
+      "to": 7,
+      "fromSide": "s",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "historia",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     }
+    ],
+    "nextId": 17,
+    "behaviors": [],
+    "scenarios": [
+     {
+      "id": 1,
+      "engineVersion": 2,
+      "name": "Un aviso apto llega al modelo",
+      "nextStepId": 7,
+      "steps": [
+       {
+        "id": 1,
+        "at": 0,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 11
+       },
+       {
+        "id": 2,
+        "at": 300,
+        "eventTypeId": 2,
+        "action": "OCCURRENCE",
+        "nodeId": 2
+       },
+       {
+        "id": 3,
+        "at": 600,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 12
+       },
+       {
+        "id": 4,
+        "at": 1200,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 14
+       },
+       {
+        "id": 5,
+        "at": 1500,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 15
+       },
+       {
+        "id": 6,
+        "at": 1800,
+        "eventTypeId": 2,
+        "action": "OCCURRENCE",
+        "nodeId": 5
+       }
+      ],
+      "arrivalDependencies": [
+       {
+        "stepId": 2,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 3,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 4,
+        "waitsForArrivalOf": [
+         3
+        ]
+       },
+       {
+        "stepId": 5,
+        "waitsForArrivalOf": [
+         4
+        ]
+       },
+       {
+        "stepId": 6,
+        "waitsForArrivalOf": [
+         5
+        ]
+       }
+      ]
+     },
+     {
+      "id": 2,
+      "engineVersion": 2,
+      "name": "Un aviso con superficie absurda queda fuera",
+      "nextStepId": 5,
+      "steps": [
+       {
+        "id": 1,
+        "at": 0,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 11
+       },
+       {
+        "id": 2,
+        "at": 300,
+        "eventTypeId": 2,
+        "action": "OCCURRENCE",
+        "nodeId": 2
+       },
+       {
+        "id": 3,
+        "at": 600,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 13
+       },
+       {
+        "id": 4,
+        "at": 900,
+        "eventTypeId": 3,
+        "action": "OCCURRENCE",
+        "nodeId": 6
+       }
+      ],
+      "arrivalDependencies": [
+       {
+        "stepId": 2,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 3,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 4,
+        "waitsForArrivalOf": [
+         3
+        ]
+       }
+      ]
+     },
+     {
+      "id": 3,
+      "engineVersion": 2,
+      "name": "Cada cambio queda con su vigencia",
+      "nextStepId": 3,
+      "steps": [
+       {
+        "id": 1,
+        "at": 0,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 16
+       },
+       {
+        "id": 2,
+        "at": 300,
+        "eventTypeId": 2,
+        "action": "OCCURRENCE",
+        "nodeId": 7
+       }
+      ],
+      "arrivalDependencies": [
+       {
+        "stepId": 2,
+        "waitsForArrivalOf": [
+         1
+        ]
+       }
+      ]
+     }
+    ],
+    "nextScenarioId": 4
+   }
+  ],
+  "cur": 0,
+  "customBg": "#ffffff",
+  "eventTypes": [
+   {
+    "id": 1,
+    "name": "Envía",
+    "primitive": "FLOW",
+    "sentenceTemplate": "{source} envía a {target}",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     },
+     "connectionEffects": {
+      "size": "medium",
+      "style": "direct",
+      "trail": "none",
+      "arrival": "none",
+      "during": "none"
+     }
+    }
+   },
+   {
+    "id": 2,
+    "name": "Procesa",
+    "primitive": "OCCURRENCE",
+    "sentenceTemplate": "{target} procesa",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     }
+    }
+   },
+   {
+    "id": 3,
+    "name": "Excluye",
+    "primitive": "OCCURRENCE",
+    "sentenceTemplate": "{target}: se guarda el motivo",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     }
+    }
+   }
+  ],
+  "nextEventTypeId": 4
+ },
+ "settings": {
+  "speed": 0.5,
+  "dots": 3,
+  "build": false,
+  "stagger": 0.45,
+  "grid": true,
+  "snap": false,
+  "font": "Georgia, serif",
+  "single": false
+ }
+}

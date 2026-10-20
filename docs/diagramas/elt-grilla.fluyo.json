@@ -1,0 +1,835 @@
+{
+ "version": 5,
+ "app": "fluyo",
+ "doc": {
+  "theme": "claro",
+  "pages": [
+   {
+    "name": "Flujo de la grilla",
+    "nodes": [
+     {
+      "id": 1,
+      "shape": "rect",
+      "x": 20,
+      "y": 160,
+      "w": 230,
+      "h": 90,
+      "label": "Cada comuna",
+      "color": "#c9b458",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 0,
+      "fs": 22
+     },
+     {
+      "id": 2,
+      "shape": "rect",
+      "x": 340,
+      "y": 160,
+      "w": 250,
+      "h": 90,
+      "label": "Total declarado",
+      "color": "#6a9fb5",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 1,
+      "fs": 22
+     },
+     {
+      "id": 3,
+      "shape": "diamond",
+      "x": 680,
+      "y": 135,
+      "w": 260,
+      "h": 140,
+      "label": "¿Más de 1.800?",
+      "color": "#c16a6a",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 2,
+      "fs": 22
+     },
+     {
+      "id": 4,
+      "shape": "rect",
+      "x": 1040,
+      "y": 20,
+      "w": 250,
+      "h": 90,
+      "label": "Parte por precio",
+      "color": "#6a9fb5",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 3,
+      "fs": 22
+     },
+     {
+      "id": 5,
+      "shape": "rect",
+      "x": 1040,
+      "y": 250,
+      "w": 250,
+      "h": 90,
+      "label": "Recorre páginas",
+      "color": "#6a9fb5",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 4,
+      "fs": 22
+     },
+     {
+      "id": 6,
+      "shape": "cylinder",
+      "x": 1400,
+      "y": 240,
+      "w": 210,
+      "h": 110,
+      "label": "Bronce",
+      "color": "#c98f5b",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 5,
+      "fs": 22
+     },
+     {
+      "id": 7,
+      "shape": "rect",
+      "x": 1400,
+      "y": 470,
+      "w": 210,
+      "h": 90,
+      "label": "Cobertura",
+      "color": "#5b9bd0",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 6,
+      "fs": 22
+     },
+     {
+      "id": 8,
+      "shape": "rect",
+      "x": 1040,
+      "y": 470,
+      "w": 250,
+      "h": 90,
+      "label": "Bloqueo: aborta",
+      "color": "#c16a6a",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 7,
+      "fs": 22
+     },
+     {
+      "id": 9,
+      "shape": "rect",
+      "x": 320,
+      "y": 30,
+      "w": 311,
+      "h": 77,
+      "label": "El sitio corta cada búsqueda\nen 2.016 resultados",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 8,
+      "fs": 17
+     },
+     {
+      "id": 10,
+      "shape": "rect",
+      "x": 1320,
+      "y": 20,
+      "w": 311,
+      "h": 77,
+      "label": "Escalera de rangos; divide\nlos grandes a la mitad",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 9,
+      "fs": 17
+     },
+     {
+      "id": 11,
+      "shape": "rect",
+      "x": 1400,
+      "y": 130,
+      "w": 241,
+      "h": 66,
+      "label": "Solo si la tarjeta cambió",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 10,
+      "fs": 17
+     },
+     {
+      "id": 12,
+      "shape": "rect",
+      "x": 1380,
+      "y": 590,
+      "w": 311,
+      "h": 77,
+      "label": "Completa si faltan menos\nde max(10, 1 %)",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 11,
+      "fs": 17
+     },
+     {
+      "id": 13,
+      "shape": "rect",
+      "x": 1000,
+      "y": 590,
+      "w": 334,
+      "h": 77,
+      "label": "429, 403 o página 1 vacía\n3 veces: nunca es éxito",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 12,
+      "fs": 17
+     }
+    ],
+    "edges": [
+     {
+      "id": 14,
+      "from": 1,
+      "to": 2,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "pide",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 15,
+      "from": 2,
+      "to": 3,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "total",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 16,
+      "from": 3,
+      "to": 4,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "sí",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 17,
+      "from": 3,
+      "to": 5,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "no",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 18,
+      "from": 4,
+      "to": 5,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "cada rango",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 19,
+      "from": 5,
+      "to": 6,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "tarjetas",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 20,
+      "from": 6,
+      "to": 7,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "cierra",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 21,
+      "from": 5,
+      "to": 8,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "bloqueo",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     }
+    ],
+    "nextId": 22,
+    "behaviors": [],
+    "scenarios": [
+     {
+      "id": 1,
+      "engineVersion": 2,
+      "name": "Una comuna chica: sin partir",
+      "nextStepId": 8,
+      "steps": [
+       {
+        "id": 1,
+        "at": 0,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 14
+       },
+       {
+        "id": 2,
+        "at": 300,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 15
+       },
+       {
+        "id": 3,
+        "at": 600,
+        "eventTypeId": 2,
+        "action": "OCCURRENCE",
+        "nodeId": 3
+       },
+       {
+        "id": 4,
+        "at": 900,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 17
+       },
+       {
+        "id": 5,
+        "at": 1600,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 19
+       },
+       {
+        "id": 6,
+        "at": 1900,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 20
+       },
+       {
+        "id": 7,
+        "at": 2200,
+        "eventTypeId": 4,
+        "action": "OCCURRENCE",
+        "nodeId": 7
+       }
+      ],
+      "arrivalDependencies": [
+       {
+        "stepId": 2,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 3,
+        "waitsForArrivalOf": [
+         2
+        ]
+       },
+       {
+        "stepId": 4,
+        "waitsForArrivalOf": [
+         2
+        ]
+       },
+       {
+        "stepId": 5,
+        "waitsForArrivalOf": [
+         4
+        ]
+       },
+       {
+        "stepId": 6,
+        "waitsForArrivalOf": [
+         5
+        ]
+       },
+       {
+        "stepId": 7,
+        "waitsForArrivalOf": [
+         6
+        ]
+       }
+      ]
+     },
+     {
+      "id": 2,
+      "engineVersion": 2,
+      "name": "Santiago: más de 1.800, se parte por precio",
+      "nextStepId": 9,
+      "steps": [
+       {
+        "id": 1,
+        "at": 0,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 14
+       },
+       {
+        "id": 2,
+        "at": 300,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 15
+       },
+       {
+        "id": 3,
+        "at": 600,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 16
+       },
+       {
+        "id": 4,
+        "at": 900,
+        "eventTypeId": 2,
+        "action": "OCCURRENCE",
+        "nodeId": 4
+       },
+       {
+        "id": 5,
+        "at": 1600,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 18
+       },
+       {
+        "id": 6,
+        "at": 2300,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 19
+       },
+       {
+        "id": 7,
+        "at": 2600,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 20
+       },
+       {
+        "id": 8,
+        "at": 2900,
+        "eventTypeId": 4,
+        "action": "OCCURRENCE",
+        "nodeId": 7
+       }
+      ],
+      "arrivalDependencies": [
+       {
+        "stepId": 2,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 3,
+        "waitsForArrivalOf": [
+         2
+        ]
+       },
+       {
+        "stepId": 4,
+        "waitsForArrivalOf": [
+         3
+        ]
+       },
+       {
+        "stepId": 5,
+        "waitsForArrivalOf": [
+         3
+        ]
+       },
+       {
+        "stepId": 6,
+        "waitsForArrivalOf": [
+         5
+        ]
+       },
+       {
+        "stepId": 7,
+        "waitsForArrivalOf": [
+         6
+        ]
+       },
+       {
+        "stepId": 8,
+        "waitsForArrivalOf": [
+         7
+        ]
+       }
+      ]
+     },
+     {
+      "id": 3,
+      "engineVersion": 2,
+      "name": "El sitio bloquea la búsqueda",
+      "nextStepId": 6,
+      "steps": [
+       {
+        "id": 1,
+        "at": 0,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 14
+       },
+       {
+        "id": 2,
+        "at": 300,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 15
+       },
+       {
+        "id": 3,
+        "at": 600,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 17
+       },
+       {
+        "id": 4,
+        "at": 1400,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 21
+       },
+       {
+        "id": 5,
+        "at": 1700,
+        "eventTypeId": 3,
+        "action": "OCCURRENCE",
+        "nodeId": 8
+       }
+      ],
+      "arrivalDependencies": [
+       {
+        "stepId": 2,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 3,
+        "waitsForArrivalOf": [
+         2
+        ]
+       },
+       {
+        "stepId": 4,
+        "waitsForArrivalOf": [
+         3
+        ]
+       },
+       {
+        "stepId": 5,
+        "waitsForArrivalOf": [
+         4
+        ]
+       }
+      ]
+     }
+    ],
+    "nextScenarioId": 4
+   }
+  ],
+  "cur": 0,
+  "customBg": "#ffffff",
+  "eventTypes": [
+   {
+    "id": 1,
+    "name": "Envía",
+    "primitive": "FLOW",
+    "sentenceTemplate": "{source} envía a {target}",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     },
+     "connectionEffects": {
+      "size": "medium",
+      "style": "direct",
+      "trail": "none",
+      "arrival": "none",
+      "during": "none"
+     }
+    }
+   },
+   {
+    "id": 2,
+    "name": "Procesa",
+    "primitive": "OCCURRENCE",
+    "sentenceTemplate": "{target} procesa",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     }
+    }
+   },
+   {
+    "id": 3,
+    "name": "Bloquea",
+    "primitive": "OCCURRENCE",
+    "sentenceTemplate": "{target}: el sitio bloquea",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     }
+    }
+   },
+   {
+    "id": 4,
+    "name": "Completa",
+    "primitive": "OCCURRENCE",
+    "sentenceTemplate": "{target} queda completa",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     }
+    }
+   }
+  ],
+  "nextEventTypeId": 5
+ },
+ "settings": {
+  "speed": 0.5,
+  "dots": 3,
+  "build": false,
+  "stagger": 0.45,
+  "grid": true,
+  "snap": false,
+  "font": "Georgia, serif",
+  "single": false
+ }
+}

@@ -1,0 +1,843 @@
+{
+ "version": 5,
+ "app": "fluyo",
+ "doc": {
+  "theme": "claro",
+  "pages": [
+   {
+    "name": "Cola y reglas del detalle",
+    "nodes": [
+     {
+      "id": 1,
+      "shape": "cylinder",
+      "x": 20,
+      "y": 250,
+      "w": 220,
+      "h": 110,
+      "label": "Avisos vistos",
+      "color": "#c98f5b",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 0,
+      "fs": 22
+     },
+     {
+      "id": 2,
+      "shape": "rect",
+      "x": 340,
+      "y": 20,
+      "w": 270,
+      "h": 90,
+      "label": "1. Nuevo\nnunca visitado",
+      "color": "#6a9fb5",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 1,
+      "fs": 22
+     },
+     {
+      "id": 3,
+      "shape": "rect",
+      "x": 340,
+      "y": 180,
+      "w": 270,
+      "h": 90,
+      "label": "2. Desaparecido\nya no sale en la grilla",
+      "color": "#6a9fb5",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 2,
+      "fs": 22
+     },
+     {
+      "id": 4,
+      "shape": "rect",
+      "x": 340,
+      "y": 340,
+      "w": 270,
+      "h": 90,
+      "label": "3. Tarjeta cambiada\nsu tarjeta cambió",
+      "color": "#6a9fb5",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 3,
+      "fs": 22
+     },
+     {
+      "id": 5,
+      "shape": "rect",
+      "x": 340,
+      "y": 500,
+      "w": 270,
+      "h": 90,
+      "label": "4. Rotación\ncada 1 a 14 días",
+      "color": "#6a9fb5",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 4,
+      "fs": 22
+     },
+     {
+      "id": 6,
+      "shape": "rect",
+      "x": 770,
+      "y": 255,
+      "w": 190,
+      "h": 100,
+      "label": "Visita",
+      "color": "#c9b458",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 5,
+      "fs": 22
+     },
+     {
+      "id": 7,
+      "shape": "cylinder",
+      "x": 1120,
+      "y": 10,
+      "w": 250,
+      "h": 110,
+      "label": "Observación",
+      "color": "#c98f5b",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 6,
+      "fs": 22
+     },
+     {
+      "id": 8,
+      "shape": "rect",
+      "x": 1120,
+      "y": 180,
+      "w": 290,
+      "h": 90,
+      "label": "Proyecto: se excluye",
+      "color": "#8f8f8f",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 7,
+      "fs": 22
+     },
+     {
+      "id": 9,
+      "shape": "rect",
+      "x": 1120,
+      "y": 350,
+      "w": 290,
+      "h": 90,
+      "label": "Reintenta en 12 h",
+      "color": "#5bb0a0",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 8,
+      "fs": 22
+     },
+     {
+      "id": 10,
+      "shape": "rect",
+      "x": 1120,
+      "y": 520,
+      "w": 290,
+      "h": 90,
+      "label": "429: espera 30 min",
+      "color": "#c16a6a",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 9,
+      "fs": 22
+     },
+     {
+      "id": 11,
+      "shape": "rect",
+      "x": 10,
+      "y": 470,
+      "w": 322,
+      "h": 121,
+      "label": "Fuera de la cola:\nfinalizados, proyectos,\n5 fallos y otras comunas",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 10,
+      "fs": 17
+     },
+     {
+      "id": 12,
+      "shape": "rect",
+      "x": 330,
+      "y": 650,
+      "w": 460,
+      "h": 77,
+      "label": "Edad ≤ 14, 30, 60, 120 o más días:\nvuelve cada 1, 2, 4, 7 o 14 días",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 11,
+      "fs": 17
+     },
+     {
+      "id": 13,
+      "shape": "rect",
+      "x": 1420,
+      "y": 30,
+      "w": 288,
+      "h": 77,
+      "label": "Solo si el aviso cambió",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 12,
+      "fs": 17
+     },
+     {
+      "id": 14,
+      "shape": "rect",
+      "x": 1110,
+      "y": 650,
+      "w": 379,
+      "h": 77,
+      "label": "Pausas ×2 (hasta ×8); a la\nmitad cada 50 visitas buenas",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 13,
+      "fs": 17
+     }
+    ],
+    "edges": [
+     {
+      "id": 15,
+      "from": 1,
+      "to": 2,
+      "fromSide": "e",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "SQL",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 16,
+      "from": 1,
+      "to": 3,
+      "fromSide": "e",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 17,
+      "from": 1,
+      "to": 4,
+      "fromSide": "e",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 18,
+      "from": 1,
+      "to": 5,
+      "fromSide": "e",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 19,
+      "from": 2,
+      "to": 6,
+      "fromSide": "e",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 20,
+      "from": 3,
+      "to": 6,
+      "fromSide": "e",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 21,
+      "from": 4,
+      "to": 6,
+      "fromSide": "e",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 22,
+      "from": 5,
+      "to": 6,
+      "fromSide": "e",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 23,
+      "from": 6,
+      "to": 7,
+      "fromSide": "e",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "ok",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 24,
+      "from": 6,
+      "to": 8,
+      "fromSide": "e",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "proyecto",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 25,
+      "from": 6,
+      "to": 9,
+      "fromSide": "e",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "error",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 26,
+      "from": 6,
+      "to": 10,
+      "fromSide": "e",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "429",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     }
+    ],
+    "nextId": 27,
+    "behaviors": [],
+    "scenarios": [
+     {
+      "id": 1,
+      "engineVersion": 2,
+      "name": "Un aviso nuevo se visita primero",
+      "nextStepId": 5,
+      "steps": [
+       {
+        "id": 1,
+        "at": 0,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 15
+       },
+       {
+        "id": 2,
+        "at": 300,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 19
+       },
+       {
+        "id": 3,
+        "at": 600,
+        "eventTypeId": 2,
+        "action": "OCCURRENCE",
+        "nodeId": 6
+       },
+       {
+        "id": 4,
+        "at": 900,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 23
+       }
+      ],
+      "arrivalDependencies": [
+       {
+        "stepId": 2,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 3,
+        "waitsForArrivalOf": [
+         2
+        ]
+       },
+       {
+        "stepId": 4,
+        "waitsForArrivalOf": [
+         2
+        ]
+       }
+      ]
+     },
+     {
+      "id": 2,
+      "engineVersion": 2,
+      "name": "Un aviso desaparecido resulta ser un proyecto",
+      "nextStepId": 6,
+      "steps": [
+       {
+        "id": 1,
+        "at": 0,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 16
+       },
+       {
+        "id": 2,
+        "at": 300,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 20
+       },
+       {
+        "id": 3,
+        "at": 600,
+        "eventTypeId": 2,
+        "action": "OCCURRENCE",
+        "nodeId": 6
+       },
+       {
+        "id": 4,
+        "at": 900,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 24
+       },
+       {
+        "id": 5,
+        "at": 1200,
+        "eventTypeId": 3,
+        "action": "OCCURRENCE",
+        "nodeId": 8
+       }
+      ],
+      "arrivalDependencies": [
+       {
+        "stepId": 2,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 3,
+        "waitsForArrivalOf": [
+         2
+        ]
+       },
+       {
+        "stepId": 4,
+        "waitsForArrivalOf": [
+         2
+        ]
+       },
+       {
+        "stepId": 5,
+        "waitsForArrivalOf": [
+         4
+        ]
+       }
+      ]
+     },
+     {
+      "id": 3,
+      "engineVersion": 2,
+      "name": "Revisita por rotación y un 429",
+      "nextStepId": 6,
+      "steps": [
+       {
+        "id": 1,
+        "at": 0,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 18
+       },
+       {
+        "id": 2,
+        "at": 300,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 22
+       },
+       {
+        "id": 3,
+        "at": 1100,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 26
+       },
+       {
+        "id": 4,
+        "at": 1400,
+        "eventTypeId": 4,
+        "action": "OCCURRENCE",
+        "nodeId": 10
+       },
+       {
+        "id": 5,
+        "at": 3400,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 23
+       }
+      ],
+      "arrivalDependencies": [
+       {
+        "stepId": 2,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 3,
+        "waitsForArrivalOf": [
+         2
+        ]
+       },
+       {
+        "stepId": 4,
+        "waitsForArrivalOf": [
+         3
+        ]
+       }
+      ]
+     }
+    ],
+    "nextScenarioId": 4
+   }
+  ],
+  "cur": 0,
+  "customBg": "#ffffff",
+  "eventTypes": [
+   {
+    "id": 1,
+    "name": "Envía",
+    "primitive": "FLOW",
+    "sentenceTemplate": "{source} envía a {target}",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     },
+     "connectionEffects": {
+      "size": "medium",
+      "style": "direct",
+      "trail": "none",
+      "arrival": "none",
+      "during": "none"
+     }
+    }
+   },
+   {
+    "id": 2,
+    "name": "Procesa",
+    "primitive": "OCCURRENCE",
+    "sentenceTemplate": "{target} procesa",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     }
+    }
+   },
+   {
+    "id": 3,
+    "name": "Se excluye",
+    "primitive": "OCCURRENCE",
+    "sentenceTemplate": "{target}: no se vuelve a visitar",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     }
+    }
+   },
+   {
+    "id": 4,
+    "name": "Espera",
+    "primitive": "OCCURRENCE",
+    "sentenceTemplate": "{target} y baja el ritmo",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     }
+    }
+   }
+  ],
+  "nextEventTypeId": 5
+ },
+ "settings": {
+  "speed": 0.5,
+  "dots": 3,
+  "build": false,
+  "stagger": 0.45,
+  "grid": true,
+  "snap": false,
+  "font": "Georgia, serif",
+  "single": false
+ }
+}

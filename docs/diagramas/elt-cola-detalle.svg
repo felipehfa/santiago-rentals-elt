@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1795" height="814" viewBox="-191.00 -85.00 1795.00 813.50">
+<rect x="-191" y="-85" width="1795" height="813.5" fill="#ffffff"/>
+<path d="M 130.00 250.00 L 158.00 250.00 L 162.75 250.00 Q 167.50 250.00 167.50 245.25 L 167.50 24.75 Q 167.50 20.00 172.25 20.00 L 177.00 20.00 L 193.80 20.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 202.00 20.00 L 191.00 24.00 L 193.80 20.00 L 191.00 16.00 Z" fill="#888888"/>
+<rect x="141.61" y="119.70" width="51.78" height="30.60" fill="#ffffff"/>
+<text x="167.50" y="135.00" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">SQL</text>
+<path d="M 130.00 250.00 L 158.00 250.00 L 162.75 250.00 Q 167.50 250.00 167.50 245.25 L 167.50 184.75 Q 167.50 180.00 172.25 180.00 L 177.00 180.00 L 193.80 180.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 202.00 180.00 L 191.00 184.00 L 193.80 180.00 L 191.00 176.00 Z" fill="#888888"/>
+<path d="M 130.00 250.00 L 158.00 250.00 L 162.75 250.00 Q 167.50 250.00 167.50 254.75 L 167.50 335.25 Q 167.50 340.00 172.25 340.00 L 177.00 340.00 L 193.80 340.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 202.00 340.00 L 191.00 344.00 L 193.80 340.00 L 191.00 336.00 Z" fill="#888888"/>
+<path d="M 130.00 250.00 L 158.00 250.00 L 162.75 250.00 Q 167.50 250.00 167.50 254.75 L 167.50 495.25 Q 167.50 500.00 172.25 500.00 L 177.00 500.00 L 193.80 500.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 202.00 500.00 L 191.00 504.00 L 193.80 500.00 L 191.00 496.00 Z" fill="#888888"/>
+<path d="M 475.00 20.00 L 503.00 20.00 L 567.00 20.00 Q 575.00 20.00 575.00 28.00 L 575.00 247.00 Q 575.00 255.00 583.00 255.00 L 647.00 255.00 L 663.80 255.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 672.00 255.00 L 661.00 259.00 L 663.80 255.00 L 661.00 251.00 Z" fill="#888888"/>
+<path d="M 475.00 180.00 L 503.00 180.00 L 567.00 180.00 Q 575.00 180.00 575.00 188.00 L 575.00 247.00 Q 575.00 255.00 583.00 255.00 L 647.00 255.00 L 663.80 255.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 672.00 255.00 L 661.00 259.00 L 663.80 255.00 L 661.00 251.00 Z" fill="#888888"/>
+<path d="M 475.00 340.00 L 503.00 340.00 L 567.00 340.00 Q 575.00 340.00 575.00 332.00 L 575.00 263.00 Q 575.00 255.00 583.00 255.00 L 647.00 255.00 L 663.80 255.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 672.00 255.00 L 661.00 259.00 L 663.80 255.00 L 661.00 251.00 Z" fill="#888888"/>
+<path d="M 475.00 500.00 L 503.00 500.00 L 567.00 500.00 Q 575.00 500.00 575.00 492.00 L 575.00 263.00 Q 575.00 255.00 583.00 255.00 L 647.00 255.00 L 663.80 255.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 672.00 255.00 L 661.00 259.00 L 663.80 255.00 L 661.00 251.00 Z" fill="#888888"/>
+<path d="M 865.00 255.00 L 893.00 255.00 L 922.00 255.00 Q 930.00 255.00 930.00 247.00 L 930.00 18.00 Q 930.00 10.00 938.00 10.00 L 967.00 10.00 L 983.80 10.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 992.00 10.00 L 981.00 14.00 L 983.80 10.00 L 981.00 6.00 Z" fill="#888888"/>
+<rect x="914.64" y="117.20" width="30.72" height="30.60" fill="#ffffff"/>
+<text x="930.00" y="132.50" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">ok</text>
+<path d="M 865.00 255.00 L 893.00 255.00 L 912.00 255.00 Q 920.00 255.00 920.00 247.00 L 920.00 188.00 Q 920.00 180.00 928.00 180.00 L 947.00 180.00 L 963.80 180.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 972.00 180.00 L 961.00 184.00 L 963.80 180.00 L 961.00 176.00 Z" fill="#888888"/>
+<rect x="880.52" y="202.20" width="78.96" height="30.60" fill="#ffffff"/>
+<text x="920.00" y="217.50" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">proyecto</text>
+<path d="M 865.00 255.00 L 893.00 255.00 L 912.00 255.00 Q 920.00 255.00 920.00 263.00 L 920.00 342.00 Q 920.00 350.00 928.00 350.00 L 947.00 350.00 L 963.80 350.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 972.00 350.00 L 961.00 354.00 L 963.80 350.00 L 961.00 346.00 Z" fill="#888888"/>
+<rect x="896.54" y="287.20" width="46.92" height="30.60" fill="#ffffff"/>
+<text x="920.00" y="302.50" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">error</text>
+<path d="M 865.00 255.00 L 893.00 255.00 L 912.00 255.00 Q 920.00 255.00 920.00 263.00 L 920.00 512.00 Q 920.00 520.00 928.00 520.00 L 947.00 520.00 L 963.80 520.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 972.00 520.00 L 961.00 524.00 L 963.80 520.00 L 961.00 516.00 Z" fill="#888888"/>
+<rect x="899.96" y="372.20" width="40.08" height="30.60" fill="#ffffff"/>
+<text x="920.00" y="387.50" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">429</text>
+<g id="node-1">
+<path d="M -90.00 211.00 L -90.00 289.00 A 110.00 16.00 0 0 0 130.00 289.00 L 130.00 211.00 A 110.00 16.00 0 0 0 -90.00 211.00 Z" fill="rgba(201,143,91,0.18)" stroke="#c98f5b" stroke-width="2.5"/>
+<path d="M 130.00 211.00 A 110.00 16.00 0 0 1 -90.00 211.00" fill="none" stroke="#c98f5b" stroke-width="2.5"/>
+<text x="20.00" y="256.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Avisos vistos</text>
+</g>
+<g id="node-2">
+<rect x="205.00" y="-25.00" width="270" height="90" rx="10" ry="10" fill="rgba(106,159,181,0.18)" stroke="#6a9fb5" stroke-width="2.5"/>
+<text x="340.00" y="6.25" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">1. Nuevo</text>
+<text x="340.00" y="33.75" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">nunca visitado</text>
+</g>
+<g id="node-3">
+<rect x="205.00" y="135.00" width="270" height="90" rx="10" ry="10" fill="rgba(106,159,181,0.18)" stroke="#6a9fb5" stroke-width="2.5"/>
+<text x="340.00" y="166.25" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">2. Desaparecido</text>
+<text x="340.00" y="193.75" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">ya no sale en la grilla</text>
+</g>
+<g id="node-4">
+<rect x="205.00" y="295.00" width="270" height="90" rx="10" ry="10" fill="rgba(106,159,181,0.18)" stroke="#6a9fb5" stroke-width="2.5"/>
+<text x="340.00" y="326.25" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">3. Tarjeta cambiada</text>
+<text x="340.00" y="353.75" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">su tarjeta cambió</text>
+</g>
+<g id="node-5">
+<rect x="205.00" y="455.00" width="270" height="90" rx="10" ry="10" fill="rgba(106,159,181,0.18)" stroke="#6a9fb5" stroke-width="2.5"/>
+<text x="340.00" y="486.25" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">4. Rotación</text>
+<text x="340.00" y="513.75" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">cada 1 a 14 días</text>
+</g>
+<g id="node-6">
+<rect x="675.00" y="205.00" width="190" height="100" rx="10" ry="10" fill="rgba(201,180,88,0.18)" stroke="#c9b458" stroke-width="2.5"/>
+<text x="770.00" y="255.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Visita</text>
+</g>
+<g id="node-7">
+<path d="M 995.00 -29.00 L 995.00 49.00 A 125.00 16.00 0 0 0 1245.00 49.00 L 1245.00 -29.00 A 125.00 16.00 0 0 0 995.00 -29.00 Z" fill="rgba(201,143,91,0.18)" stroke="#c98f5b" stroke-width="2.5"/>
+<path d="M 1245.00 -29.00 A 125.00 16.00 0 0 1 995.00 -29.00" fill="none" stroke="#c98f5b" stroke-width="2.5"/>
+<text x="1120.00" y="16.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Observación</text>
+</g>
+<g id="node-8">
+<rect x="975.00" y="135.00" width="290" height="90" rx="10" ry="10" fill="rgba(143,143,143,0.18)" stroke="#8f8f8f" stroke-width="2.5"/>
+<text x="1120.00" y="180.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Proyecto: se excluye</text>
+</g>
+<g id="node-9">
+<rect x="975.00" y="305.00" width="290" height="90" rx="10" ry="10" fill="rgba(91,176,160,0.18)" stroke="#5bb0a0" stroke-width="2.5"/>
+<text x="1120.00" y="350.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Reintenta en 12 h</text>
+</g>
+<g id="node-10">
+<rect x="975.00" y="475.00" width="290" height="90" rx="10" ry="10" fill="rgba(193,106,106,0.18)" stroke="#c16a6a" stroke-width="2.5"/>
+<text x="1120.00" y="520.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">429: espera 30 min</text>
+</g>
+<g id="node-11">
+<rect x="-151.00" y="409.50" width="322" height="121" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="10.00" y="448.75" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Fuera de la cola:</text>
+<text x="10.00" y="470.00" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">finalizados, proyectos,</text>
+<text x="10.00" y="491.25" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">5 fallos y otras comunas</text>
+</g>
+<g id="node-12">
+<rect x="100.00" y="611.50" width="460" height="77" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="330.00" y="639.38" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Edad ≤ 14, 30, 60, 120 o más días:</text>
+<text x="330.00" y="660.63" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">vuelve cada 1, 2, 4, 7 o 14 días</text>
+</g>
+<g id="node-13">
+<rect x="1276.00" y="-8.50" width="288" height="77" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="1420.00" y="30.00" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Solo si el aviso cambió</text>
+</g>
+<g id="node-14">
+<rect x="920.50" y="611.50" width="379" height="77" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="1110.00" y="639.38" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Pausas ×2 (hasta ×8); a la</text>
+<text x="1110.00" y="660.63" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">mitad cada 50 visitas buenas</text>
+</g>
+</svg>
