@@ -21,6 +21,19 @@ COMUNAS_RM = [
     "huechuraba-metropolitana", "quinta-normal-metropolitana", "conchali-metropolitana",
 ]
 
+# Código de comuna (INE) de cada slug. La asignación de unidad vecinal solo usa los polígonos de las comunas que se scrapean.
+CODIGOS_COMUNA = {
+    "santiago-metropolitana": 13101, "cerrillos-metropolitana": 13102, "conchali-metropolitana": 13104,
+    "estacion-central-metropolitana": 13106, "huechuraba-metropolitana": 13107, "independencia-metropolitana": 13108,
+    "la-florida-metropolitana": 13110, "lo-barnechea-metropolitana": 13113, "las-condes-metropolitana": 13114,
+    "la-reina-metropolitana": 13115, "macul-metropolitana": 13118, "maipu-metropolitana": 13119,
+    "nunoa-metropolitana": 13120, "pedro-aguirre-cerda-metropolitana": 13121, "penalolen-metropolitana": 13122,
+    "providencia-metropolitana": 13123, "quilicura-metropolitana": 13125, "quinta-normal-metropolitana": 13126,
+    "recoleta-metropolitana": 13127, "san-miguel-metropolitana": 13130, "vitacura-metropolitana": 13132,
+    "puente-alto-metropolitana": 13201, "san-bernardo-metropolitana": 13401,
+}
+COD_COM_ALCANCE = sorted(CODIGOS_COMUNA[c] for c in COMUNAS_RM)
+
 # Pausa entre peticiones (s). El orquestador la sube con estas variables de entorno para no cargar el sitio.
 DELAY_MIN = float(os.environ.get("PAUSA_MIN_S", 3.0))
 DELAY_MAX = float(os.environ.get("PAUSA_MAX_S", 7.0))

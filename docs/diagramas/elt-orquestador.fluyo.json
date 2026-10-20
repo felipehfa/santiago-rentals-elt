@@ -150,14 +150,14 @@
      {
       "id": 8,
       "shape": "rect",
-      "x": 320,
-      "y": 20,
-      "w": 379,
-      "h": 73,
-      "label": "Presupuesto: 6.000 visitas\npor 24 h",
-      "color": "#8f8f8f",
-      "fill": "none",
-      "border": "dashed",
+      "x": 1530,
+      "y": 275,
+      "w": 270,
+      "h": 90,
+      "label": "Silver y Gold (cada 3 h)",
+      "color": "#6a9fb5",
+      "fill": null,
+      "border": "solid",
       "lblPos": "center",
       "textBg": null,
       "textColor": null,
@@ -165,16 +165,16 @@
       "bold": false,
       "pulse": false,
       "order": 7,
-      "fs": 17
+      "fs": 22
      },
      {
       "id": 9,
       "shape": "rect",
-      "x": 1090,
-      "y": 20,
-      "w": 391,
-      "h": 121,
-      "label": "429: pausas ×2 (hasta ×8)\ny vuelven a la mitad cada\n50 visitas buenas",
+      "x": 1500,
+      "y": 410,
+      "w": 379,
+      "h": 97,
+      "label": "Entre dos tandas; si falla,\nreintenta a los 30 min",
       "color": "#8f8f8f",
       "fill": "none",
       "border": "dashed",
@@ -190,6 +190,46 @@
      {
       "id": 10,
       "shape": "rect",
+      "x": 320,
+      "y": 20,
+      "w": 379,
+      "h": 73,
+      "label": "Presupuesto: 6.000 visitas\npor 24 h",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 9,
+      "fs": 17
+     },
+     {
+      "id": 11,
+      "shape": "rect",
+      "x": 1090,
+      "y": 20,
+      "w": 391,
+      "h": 121,
+      "label": "429: pausas ×2 (hasta ×8)\ny vuelven a la mitad cada\n50 visitas buenas",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 10,
+      "fs": 17
+     },
+     {
+      "id": 12,
+      "shape": "rect",
       "x": 330,
       "y": 560,
       "w": 379,
@@ -204,13 +244,13 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 9,
+      "order": 11,
       "fs": 17
      }
     ],
     "edges": [
      {
-      "id": 11,
+      "id": 13,
       "from": 1,
       "to": 2,
       "fromSide": null,
@@ -228,7 +268,7 @@
       "fs": 18
      },
      {
-      "id": 12,
+      "id": 14,
       "from": 1,
       "to": 3,
       "fromSide": null,
@@ -246,7 +286,7 @@
       "fs": 18
      },
      {
-      "id": 13,
+      "id": 15,
       "from": 2,
       "to": 4,
       "fromSide": null,
@@ -264,7 +304,7 @@
       "fs": 18
      },
      {
-      "id": 14,
+      "id": 16,
       "from": 3,
       "to": 4,
       "fromSide": null,
@@ -282,7 +322,7 @@
       "fs": 18
      },
      {
-      "id": 15,
+      "id": 17,
       "from": 2,
       "to": 6,
       "fromSide": "e",
@@ -300,7 +340,7 @@
       "fs": 18
      },
      {
-      "id": 16,
+      "id": 18,
       "from": 3,
       "to": 6,
       "fromSide": "e",
@@ -318,7 +358,25 @@
       "fs": 18
      },
      {
-      "id": 17,
+      "id": 19,
+      "from": 6,
+      "to": 8,
+      "fromSide": "e",
+      "toSide": "w",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "reconstruye",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal",
+      "fs": 18
+     },
+     {
+      "id": 20,
       "from": 4,
       "to": 5,
       "fromSide": null,
@@ -336,7 +394,7 @@
       "fs": 18
      },
      {
-      "id": 18,
+      "id": 21,
       "from": 5,
       "to": 2,
       "fromSide": null,
@@ -354,7 +412,7 @@
       "fs": 18
      }
     ],
-    "nextId": 19,
+    "nextId": 22,
     "behaviors": [],
     "scenarios": [
      {
@@ -368,21 +426,21 @@
         "at": 0,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 11
+        "edgeId": 13
        },
        {
         "id": 2,
         "at": 300,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 13
+        "edgeId": 15
        },
        {
         "id": 3,
         "at": 600,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 15
+        "edgeId": 17
        },
        {
         "id": 4,
@@ -396,28 +454,28 @@
         "at": 1800,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 12
+        "edgeId": 14
        },
        {
         "id": 6,
         "at": 2100,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 14
+        "edgeId": 16
        },
        {
         "id": 7,
         "at": 2400,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 16
+        "edgeId": 18
        },
        {
         "id": 8,
         "at": 3300,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 11
+        "edgeId": 13
        }
       ],
       "arrivalDependencies": [
@@ -476,7 +534,7 @@
         "at": 0,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 13
+        "edgeId": 15
        },
        {
         "id": 2,
@@ -490,7 +548,7 @@
         "at": 600,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 17
+        "edgeId": 20
        },
        {
         "id": 4,
@@ -504,21 +562,21 @@
         "at": 2400,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 18
+        "edgeId": 21
        },
        {
         "id": 6,
         "at": 2700,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 13
+        "edgeId": 15
        },
        {
         "id": 7,
         "at": 3000,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 15
+        "edgeId": 17
        }
       ],
       "arrivalDependencies": [
@@ -571,14 +629,14 @@
         "at": 0,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 12
+        "edgeId": 14
        },
        {
         "id": 2,
         "at": 300,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 14
+        "edgeId": 16
        },
        {
         "id": 3,
@@ -599,7 +657,7 @@
         "at": 3200,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 12
+        "edgeId": 14
        },
        {
         "id": 6,
@@ -613,7 +671,7 @@
         "at": 3800,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 16
+        "edgeId": 18
        }
       ],
       "arrivalDependencies": [

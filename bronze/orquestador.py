@@ -7,6 +7,8 @@ Ciclo:  tanda de detalle -> (si toca, grilla) -> tanda de detalle -> ...
     Si queda bloqueado, el orquestador espera (la espera crece en cada intento) y vuelve a lanzarlo.
   - Grilla: busca avisos nuevos y cambios en las comunas de config.COMUNAS_RM. Si el sitio la bloquea a mitad de camino,
     espera y reanuda solo con las comunas que faltaban en esa corrida, sin repetir las ya completas.
+  - Silver y Gold: cada `--silver-gold-cada-horas` (3 por defecto) se reconstruyen desde Bronce, entre dos tandas de detalle
+    (así nunca coinciden con una grilla en curso). Si fallan, se reintenta a los 30 minutos. Estado: `logs/silver_gold.json`.
   - La grilla corre como máximo cada `--grilla-cada-horas`, para no cargar el sitio con ~230 páginas seguidas.
   - Si el presupuesto de visitas se agota, espera a que se libere.
 
@@ -20,6 +22,7 @@ Uso:
     python bronze/orquestador.py --grilla-cada-horas 12 --max-ciclos 2
 """
 import argparse
+import json
 import logging
 import os
 import subprocess
@@ -35,6 +38,7 @@ from common.db import ConexionResiliente  # noqa: E402
 
 RUTA_LOG = RAIZ / "logs" / "orquestador.log"
 RUTA_STOP = RAIZ / "logs" / "orquestador.stop"
+RUTA_SILVER_GOLD = RAIZ / "logs" / "silver_gold.json"
 RUTA_LOG.parent.mkdir(exist_ok=True)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s",
                     handlers=[logging.StreamHandler(), logging.FileHandler(RUTA_LOG, encoding="utf-8")])
@@ -44,6 +48,7 @@ ESPERA_DETALLE_BLOQUEADO_S = (30 * 60, 60 * 60, 120 * 60)  # crece con cada inte
 ESPERA_GRILLA_BLOQUEADA_S = (30 * 60, 60 * 60, 120 * 60)
 ESPERA_SIN_TRABAJO_S = 30 * 60  # sin nada que visitar o sin presupuesto: se revisa de nuevo cada tanto
 ESPERA_GRILLA_FALLIDA_S = 2 * 60 * 60  # tras agotar las reanudaciones, antes de volver a intentar la grilla
+REINTENTO_SILVER_GOLD_S = 30 * 60  # tras un fallo de Silver o Gold
 MAX_REINTENTOS_GRILLA = 6   # reanudaciones seguidas de una misma grilla antes de dejarla para el próximo ciclo
 
 COD_DETALLE_PRESUPUESTO, COD_DETALLE_VACIA = 4, 5  # ver CODIGOS_SALIDA en scraper_detalle.py
@@ -154,9 +159,45 @@ def paso_grilla(db, pausa) -> str:
     return "fallo"
 
 
+def leer_estado_silver_gold() -> dict:
+    try:
+        return json.loads(RUTA_SILVER_GOLD.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def toca_silver_gold(cada_horas: float) -> bool:
+    """True si pasó el intervalo desde la última reconstrucción buena (o 30 min desde el último intento fallido)."""
+    estado = leer_estado_silver_gold()
+    ahora = datetime.now()
+    try:
+        if estado.get("fallo") and (ahora - datetime.fromisoformat(estado["fallo"])).total_seconds() < REINTENTO_SILVER_GOLD_S:
+            return False
+        return (ahora - datetime.fromisoformat(estado["ok"])).total_seconds() >= cada_horas * 3600
+    except (KeyError, ValueError):
+        return True
+
+
+def paso_silver_gold() -> bool:
+    """Reconstruye Silver y luego Gold (corren con BD_STRING, el dueño). Registra el resultado en el archivo de estado."""
+    estado = leer_estado_silver_gold()
+    for script in ("silver/construir_silver.py", "gold/construir_gold.py"):
+        entorno = {**os.environ, "PYTHONPATH": str(RAIZ)}
+        log.info("Lanza %s", script)
+        if subprocess.run([sys.executable, str(RAIZ / script)], cwd=RAIZ, env=entorno, check=False).returncode != 0:
+            log.error("%s falló; Silver y Gold se reintentan en %d min", script, REINTENTO_SILVER_GOLD_S // 60)
+            estado["fallo"] = datetime.now().isoformat(timespec="seconds")
+            RUTA_SILVER_GOLD.write_text(json.dumps(estado), encoding="utf-8")
+            return False
+    RUTA_SILVER_GOLD.write_text(json.dumps({"ok": datetime.now().isoformat(timespec="seconds")}), encoding="utf-8")
+    log.info("Silver y Gold reconstruidos")
+    return True
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--grilla-cada-horas", type=float, default=6.0, help="separación mínima entre dos grillas")
+    ap.add_argument("--silver-gold-cada-horas", type=float, default=3.0, help="separación entre reconstrucciones de Silver y Gold")
     ap.add_argument("--presupuesto-dia", type=int, default=6000, help="visitas de detalle por ventana móvil de 24 h")
     ap.add_argument("--factor-pausa", type=float, default=1.0,
                     help="multiplicador inicial de las pausas del detalle (baja solo con visitas buenas seguidas)")
@@ -178,6 +219,11 @@ def main() -> int:
             resultado = paso_detalle(pausa, args.presupuesto_dia, args.factor_pausa, args.tanda)
             if resultado == "parar":
                 break
+
+            if toca_silver_gold(args.silver_gold_cada_horas):
+                paso_silver_gold()
+                if hay_orden_de_parar():
+                    break
 
             ultima = ultima_grilla_buena(db)
             hace_h = (datetime.now(ultima.tzinfo) - ultima).total_seconds() / 3600 if ultima else float("inf")

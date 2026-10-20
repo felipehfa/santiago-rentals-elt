@@ -17,6 +17,7 @@ from psycopg2.extras import execute_values
 
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
+import config  # noqa: E402
 from common.db import conectar  # noqa: E402
 from silver.asignar_uv import asignar_uv  # noqa: E402
 
@@ -73,7 +74,7 @@ def construir_avisos(con) -> int:
             # construye Silver, y con el aislamiento por defecto cada sentencia vería datos distintos.
             cur.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
             cur.execute((RUTA_SQL / "010_construir_avisos.sql").read_text(encoding="utf-8"))
-            asignar_uv(cur)  # necesita las coordenadas que acaba de dejar 010
+            asignar_uv(cur, config.COD_COM_ALCANCE)  # necesita las coordenadas que acaba de dejar 010
             cur.execute((RUTA_SQL / "030_unidad_vecinal.sql").read_text(encoding="utf-8"))
             cur.execute((RUTA_SQL / "020_construir_observaciones.sql").read_text(encoding="utf-8"))
             cur.execute("SELECT count(*) FROM silver.avisos")

@@ -85,6 +85,8 @@ Cómo se mantienen activos los dos scrapers sin intervención y qué hacen cuand
   del detalle sea larga. Si no hay nada que visitar, espera hasta 30 minutos y vuelve a mirar.
 - **Detalle.** Recorre su cola con un presupuesto de visitas por ventana móvil de 24 horas y pausas aleatorias entre visitas
   (configurables; hoy de 3 a 6 s).
+- **Silver y Gold.** Cada 3 horas, entre dos tandas de detalle (así nunca coinciden con una grilla), reconstruye Silver y luego
+  Gold desde Bronce. Si falla, reintenta a los 30 minutos; el estado queda en `logs/silver_gold.json`.
 - **Un 429.** El scraper no aborta: espera 30 minutos, duplica las pausas (hasta ×8) y las baja a la mitad cada 50 visitas
   buenas hasta volver a las originales. El ritmo con que termina una tanda se guarda y la siguiente lo retoma. Si 3 bloqueos
   seguidos no dejan avanzar, aborta y el orquestador espera 30, 60 o 120 minutos antes de relanzarlo.
@@ -110,7 +112,13 @@ tabla anterior). No toca el sitio. Cada aviso toma su último estado y pasa por:
   comunes faltantes; moneda sin valor de conversión.
 - **Precio por m² atípico** (segunda pasada): el logaritmo del costo total por m² útil se compara con la mediana de su comuna con
   un z robusto (MAD); se marca si es mayor que 5. Las comunas con menos de 30 avisos usan la región entera.
-- **Unidad vecinal.** Cada aviso con coordenadas se asigna a su unidad vecinal y recibe el índice socioeconómico (IGVUST).
+- **Unidad vecinal.** Cada aviso con coordenadas se asigna a su unidad vecinal y recibe el índice socioeconómico (IGVUST). Solo
+  se usan los polígonos de las comunas que se scrapean (385 de las 1.369 unidades de la Región Metropolitana que hay en Bronce) y
+  el cruce es **incremental**: `silver.aviso_uv` guarda las coordenadas con que se asignó cada aviso y solo se cruzan los
+  nuevos o los que cambiaron de coordenadas. El caché se descarta si se vuelve a cargar el archivo del IGVUST o cambia la lista
+  de comunas. El archivo grande (el shapefile) no se lee en Silver: solo se lee al cargarlo a Bronce con `cargar_igvust.py`. Un
+  aviso cuyas coordenadas caen en una comuna fuera de la lista (por ejemplo, una coordenada mal escrita) queda sin unidad vecinal
+  y con la bandera `uv_sin_poligono`, en vez de recibir la de otra comuna.
 
 Historias: *Un aviso normal, de Bronce a Silver* y *Un aviso con precio por m² absurdo*.
 
@@ -144,7 +152,7 @@ Historias: *Un aviso apto llega al modelo*, *Un aviso con superficie absurda que
 | Gold: `gold.aviso_entrenamiento` | Funcionando: 14.947 avisos, 12.597 aptos (1.912 aún sin detalle; el resto, ~440, excluidos por calidad). Incluye el título y la descripción del aviso, que usa el modelo |
 | Gold: `gold.predicciones` | La escribe el scoring por lotes del modelo (rol `ml_scoring`, `INSERT` y `SELECT`): predicción, etiqueta de mercado (oportunidad / precio de mercado / caro), confianza y banda de mercado. `gold.predicciones_vigentes` es la última de cada aviso |
 | Modelo | Funcionando en el repo `santiago-rentals-ml` |
-| Orquestador (`bronze/orquestador.py`) | Funcionando: alterna detalle y grilla con esperas ante un 429. Falta la tarea programada de Windows y sumarle Silver y Gold |
+| Orquestador (`bronze/orquestador.py`) | Funcionando: alterna detalle y grilla con esperas ante un 429. Reconstruye Silver y Gold cada 3 h. Falta la tarea programada de Windows |
 
 Cifras al 18-oct-2026 (cambian con cada corrida):
 
@@ -290,7 +298,7 @@ santiago-rentals-elt/
 ├── bronze/
 │   ├── scraper_grilla.py
 │   ├── scraper_detalle.py
-│   ├── orquestador.py         # alterna detalle y grilla; espera y reanuda ante un 429
+│   ├── orquestador.py         # alterna detalle y grilla, reconstruye Silver y Gold cada 3 h; espera y reanuda ante un 429
 │   └── sql/                   # 001_schema, 002_detalle, 003_cobertura
 ├── scripts/
 │   ├── aplicar_ddl.py         # aplica los .sql en orden (idempotente)
@@ -323,6 +331,7 @@ con un presupuesto de 6.000 visitas de detalle por 24 h (`--presupuesto-dia`).
 El detalle trabaja en tandas de 400 visitas (`--tanda`) y, entre tandas, el orquestador revisa si ya toca la grilla, que corre como máximo cada 6 horas (`--grilla-cada-horas`) aunque la cola del detalle sea larga. Si el detalle termina bloqueado, espera 30, 60 y luego
 120 minutos y lo relanza; si la grilla es bloqueada, espera igual y reanuda solo con las comunas que faltaban. Si se agota
 el presupuesto de 24 h, espera a que se libere. Las pausas entre peticiones son de 6 a 12 s (`--pausa-min/--pausa-max`).
+Cada 3 horas (`--silver-gold-cada-horas`), entre dos tandas, reconstruye Silver y Gold; si falla, reintenta a los 30 minutos.
 Su registro es `logs/orquestador.log`; para detenerlo con calma se crea el archivo `logs/orquestador.stop`.
 
 Cada scraper por separado:
@@ -362,8 +371,8 @@ terminar ocuparán unos 2 GB de HTML en `landing/` y ~70 MB en Supabase.
    `gold.aviso_entrenamiento`) y `ml_scoring` (ese `SELECT` más `INSERT` en `gold.predicciones`). Se crearon en
    Supabase y el SQL no se conserva en el repo. Los scrapers usan `BD_STRING_SCRAPER`; Silver, Gold y las
    migraciones siguen con `BD_STRING` (rol dueño).
-4. **Silver y Gold** ya existen (ver el estado de arriba). El orquestador (`bronze/orquestador.py`) solo encadena
-   detalle y grilla; falta incluir Silver y Gold y revisar los umbrales de las banderas de calidad y de aptitud, que son provisionales.
+4. **Silver y Gold** ya existen (ver el estado de arriba). El orquestador (`bronze/orquestador.py`) encadena
+   detalle y grilla y reconstruye Silver y Gold cada 3 h; falta revisar los umbrales de las banderas de calidad y de aptitud, que son provisionales.
 5. **Validar los SCD2 con historia real**, cuando las revisitas acumulen varios días de cambios.
 6. **Modelo:** vive en el repo `santiago-rentals-ml`. Target decidido: `costo_total_clp`. Las variables que
    dependen del split (`nivel_barrio`, `precio_m2_sector`, imputación de superficie) se ajustan solo con

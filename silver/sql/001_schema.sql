@@ -225,6 +225,12 @@ CREATE TABLE IF NOT EXISTS silver.aviso_uv (
     id_aviso    TEXT PRIMARY KEY,
     uv_rsh      BIGINT NOT NULL
 );
+-- Es además un caché: guarda las coordenadas con que se asignó cada aviso y la "base" (carga del IGVUST y comunas usadas), para
+-- no repetir el cruce punto-en-polígono con avisos que no cambiaron. Un aviso que no cae en ninguna UV queda con uv_rsh NULL.
+ALTER TABLE silver.aviso_uv ALTER COLUMN uv_rsh DROP NOT NULL;
+ALTER TABLE silver.aviso_uv ADD COLUMN IF NOT EXISTS latitud NUMERIC;
+ALTER TABLE silver.aviso_uv ADD COLUMN IF NOT EXISTS longitud NUMERIC;
+ALTER TABLE silver.aviso_uv ADD COLUMN IF NOT EXISTS base TEXT;
 
 CREATE INDEX IF NOT EXISTS avisos_comuna_idx ON silver.avisos (comuna);
 CREATE INDEX IF NOT EXISTS avisos_estado_idx ON silver.avisos (estado_publicacion);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1528" height="717" viewBox="-202.50 -80.50 1528.00 717.00">
-<rect x="-202.5" y="-80.5" width="1528" height="717" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1932" height="717" viewBox="-202.50 -80.50 1932.00 717.00">
+<rect x="-202.5" y="-80.5" width="1932" height="717" fill="#ffffff"/>
 <path d="M 126.67 220.00 L 126.67 200.50 Q 126.67 192.50 134.67 192.50 L 236.00 192.50 Q 244.00 192.50 244.00 184.50 L 244.00 176.20" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
 <path d="M 244.00 168.00 L 248.00 179.00 L 244.00 176.20 L 240.00 179.00 Z" fill="#888888"/>
 <rect x="157.91" y="177.20" width="54.84" height="30.60" fill="#ffffff"/>
@@ -25,6 +25,10 @@
 <path d="M 1100.00 328.00 L 1104.00 339.00 L 1100.00 336.20 L 1096.00 339.00 Z" fill="#888888"/>
 <rect x="804.48" y="424.70" width="71.04" height="30.60" fill="#ffffff"/>
 <text x="840.00" y="440.00" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">tarjetas</text>
+<path d="M 1205.00 270.00 L 1233.00 270.00 L 1297.50 270.00 Q 1300.00 270.00 1300.00 272.50 L 1300.00 272.50 Q 1300.00 275.00 1302.50 275.00 L 1367.00 275.00 L 1383.80 275.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 1392.00 275.00 L 1381.00 279.00 L 1383.80 275.00 L 1381.00 271.00 Z" fill="#888888"/>
+<rect x="1248.46" y="257.20" width="103.08" height="30.60" fill="#ffffff"/>
+<text x="1300.00" y="272.50" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">reconstruye</text>
 <path d="M 720.00 235.00 L 720.00 207.00 L 720.00 147.50 L 720.00 88.00 L 720.00 71.20" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
 <path d="M 720.00 63.00 L 724.00 74.00 L 720.00 71.20 L 716.00 74.00 Z" fill="#888888"/>
 <rect x="699.96" y="132.20" width="40.08" height="30.60" fill="#ffffff"/>
@@ -65,17 +69,26 @@
 <text x="10.00" y="441.25" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">cada 6 h</text>
 </g>
 <g id="node-8">
+<rect x="1395.00" y="230.00" width="270" height="90" rx="10" ry="10" fill="rgba(106,159,181,0.18)" stroke="#6a9fb5" stroke-width="2.5"/>
+<text x="1530.00" y="275.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Silver y Gold (cada 3 h)</text>
+</g>
+<g id="node-9">
+<rect x="1310.50" y="361.50" width="379" height="97" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="1500.00" y="399.38" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Entre dos tandas; si falla,</text>
+<text x="1500.00" y="420.63" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">reintenta a los 30 min</text>
+</g>
+<g id="node-10">
 <rect x="130.50" y="-16.50" width="379" height="73" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
 <text x="320.00" y="9.38" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Presupuesto: 6.000 visitas</text>
 <text x="320.00" y="30.63" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">por 24 h</text>
 </g>
-<g id="node-9">
+<g id="node-11">
 <rect x="894.50" y="-40.50" width="391" height="121" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
 <text x="1090.00" y="-1.25" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">429: pausas ×2 (hasta ×8)</text>
 <text x="1090.00" y="20.00" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">y vuelven a la mitad cada</text>
 <text x="1090.00" y="41.25" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">50 visitas buenas</text>
 </g>
-<g id="node-10">
+<g id="node-12">
 <rect x="140.50" y="523.50" width="379" height="73" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
 <text x="330.00" y="549.38" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Si la bloquean, reanuda</text>
 <text x="330.00" y="570.63" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">las comunas que faltaban</text>
