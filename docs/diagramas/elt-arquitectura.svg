@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2120" height="714" viewBox="-110.00 -59.00 2120.00 714.00">
+<path d="M 290.00 193.61 L 262.00 193.61 L 228.00 193.61 Q 220.00 193.61 220.00 201.61 L 220.00 228.39 Q 220.00 236.39 212.00 236.39 L 178.00 236.39 L 161.20 236.39" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 153.00 236.39 L 164.00 232.39 L 161.20 236.39 L 164.00 240.39 Z" fill="#888888"/>
+<rect x="180.46" y="203.95" width="79.08" height="22.10" fill="#ffffff"/>
+<text x="220.00" y="215.00" font-family="Georgia, serif" font-size="13" fill="#444444" text-anchor="middle" dominant-baseline="middle">lista avisos</text>
+<path d="M 290.00 346.39 L 262.00 346.39 L 228.00 346.39 Q 220.00 346.39 220.00 338.39 L 220.00 311.61 Q 220.00 303.61 212.00 303.61 L 178.00 303.61 L 161.20 303.61" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 153.00 303.61 L 164.00 299.61 L 161.20 303.61 L 164.00 307.61 Z" fill="#888888"/>
+<rect x="180.46" y="313.95" width="79.08" height="22.10" fill="#ffffff"/>
+<text x="220.00" y="325.00" font-family="Georgia, serif" font-size="13" fill="#444444" text-anchor="middle" dominant-baseline="middle">visita aviso</text>
+<path d="M 510.00 189.03 L 538.00 189.03 L 572.00 189.03 Q 580.00 189.03 580.00 197.03 L 580.00 217.97 Q 580.00 225.97 588.00 225.97 L 622.00 225.97 L 638.80 225.97" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 647.00 225.97 L 636.00 229.97 L 638.80 225.97 L 636.00 221.97 Z" fill="#888888"/>
+<rect x="552.68" y="196.45" width="54.64" height="22.10" fill="#ffffff"/>
+<text x="580.00" y="207.50" font-family="Georgia, serif" font-size="13" fill="#444444" text-anchor="middle" dominant-baseline="middle">tarjetas</text>
+<path d="M 510.00 341.81 L 538.00 341.81 L 572.00 341.81 Q 580.00 341.81 580.00 333.81 L 580.00 301.19 Q 580.00 293.19 588.00 293.19 L 622.00 293.19 L 638.80 293.19" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 647.00 293.19 L 636.00 297.19 L 638.80 293.19 L 636.00 289.19 Z" fill="#888888"/>
+<rect x="539.68" y="306.45" width="80.64" height="22.10" fill="#ffffff"/>
+<text x="580.00" y="317.50" font-family="Georgia, serif" font-size="13" fill="#444444" text-anchor="middle" dominant-baseline="middle">observación</text>
+<path d="M 760.00 310.00 L 760.00 338.00 L 760.00 410.00 L 760.00 482.00 L 760.00 498.80" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 760.00 507.00 L 756.00 496.00 L 760.00 498.80 L 764.00 496.00 Z" fill="#888888"/>
+<rect x="717.66" y="398.95" width="84.67" height="22.10" fill="#ffffff"/>
+<text x="760.00" y="410.00" font-family="Georgia, serif" font-size="13" fill="#444444" text-anchor="middle" dominant-baseline="middle">HTML crudo</text>
+<path d="M 870.00 255.00 L 898.00 255.00 L 940.00 255.00 L 982.00 255.00 L 998.80 255.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 1007.00 255.00 L 996.00 259.00 L 998.80 255.00 L 996.00 251.00 Z" fill="#888888"/>
+<rect x="915.87" y="243.95" width="48.27" height="22.10" fill="#ffffff"/>
+<text x="940.00" y="255.00" font-family="Georgia, serif" font-size="13" fill="#444444" text-anchor="middle" dominant-baseline="middle">limpia</text>
+<path d="M 1021.85 545.00 L 1021.85 517.00 L 1021.85 435.50 Q 1021.85 427.50 1029.85 427.50 L 1093.38 427.50 Q 1101.38 427.50 1101.38 419.50 L 1101.38 338.00 L 1101.38 321.20" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 1101.38 313.00 L 1105.38 324.00 L 1101.38 321.20 L 1097.38 324.00 Z" fill="#888888"/>
+<rect x="1025.20" y="416.45" width="72.84" height="22.10" fill="#ffffff"/>
+<text x="1061.62" y="427.50" font-family="Georgia, serif" font-size="13" fill="#444444" text-anchor="middle" dominant-baseline="middle">UF y dólar</text>
+<path d="M 1236.00 545.00 L 1236.00 517.00 L 1236.00 435.50 Q 1236.00 427.50 1228.00 427.50 L 1150.00 427.50 Q 1142.00 427.50 1142.00 419.50 L 1142.00 338.00 L 1142.00 321.20" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 1142.00 313.00 L 1146.00 324.00 L 1142.00 321.20 L 1138.00 324.00 Z" fill="#888888"/>
+<rect x="1174.16" y="416.45" width="29.68" height="22.10" fill="#ffffff"/>
+<text x="1189.00" y="427.50" font-family="Georgia, serif" font-size="13" fill="#444444" text-anchor="middle" dominant-baseline="middle">UV</text>
+<path d="M 1230.00 255.00 L 1258.00 255.00 L 1300.00 255.00 L 1342.00 255.00 L 1358.80 255.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 1367.00 255.00 L 1356.00 259.00 L 1358.80 255.00 L 1356.00 251.00 Z" fill="#888888"/>
+<rect x="1278.53" y="243.95" width="42.94" height="22.10" fill="#ffffff"/>
+<text x="1300.00" y="255.00" font-family="Georgia, serif" font-size="13" fill="#444444" text-anchor="middle" dominant-baseline="middle">aptos</text>
+<path d="M 1590.00 225.97 L 1618.00 225.97 L 1652.00 225.97 Q 1660.00 225.97 1660.00 217.97 L 1660.00 197.03 Q 1660.00 189.03 1668.00 189.03 L 1702.00 189.03 L 1718.80 189.03" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 1727.00 189.03 L 1716.00 193.03 L 1718.80 189.03 L 1716.00 185.03 Z" fill="#888888"/>
+<rect x="1594.79" y="196.45" width="130.43" height="22.10" fill="#ffffff"/>
+<text x="1660.00" y="207.50" font-family="Georgia, serif" font-size="13" fill="#444444" text-anchor="middle" dominant-baseline="middle">aviso_entrenamiento</text>
+<path d="M 1840.00 200.00 L 1840.00 228.00 L 1840.00 265.00 L 1840.00 302.00 L 1840.00 318.80" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 1840.00 327.00 L 1836.00 316.00 L 1840.00 318.80 L 1844.00 316.00 Z" fill="#888888"/>
+<rect x="1809.95" y="253.95" width="60.10" height="22.10" fill="#ffffff"/>
+<text x="1840.00" y="265.00" font-family="Georgia, serif" font-size="13" fill="#444444" text-anchor="middle" dominant-baseline="middle">INSERT</text>
+<g id="node-1">
+<rect x="-70.00" y="230.00" width="220" height="80" rx="10" ry="10" fill="rgba(143,143,143,0.18)" stroke="#8f8f8f" stroke-width="2.5"/>
+<text x="40.00" y="270.00" font-family="Georgia, serif" font-size="19.4" fill="#111111" text-anchor="middle" dominant-baseline="middle">Portal Inmobiliario</text>
+</g>
+<g id="node-2">
+<rect x="290.00" y="120.00" width="220" height="80" rx="10" ry="10" fill="rgba(106,159,181,0.18)" stroke="#6a9fb5" stroke-width="2.5"/>
+<text x="400.00" y="160.00" font-family="Georgia, serif" font-size="19.4" fill="#111111" text-anchor="middle" dominant-baseline="middle">Scraper de grilla</text>
+</g>
+<g id="node-3">
+<rect x="290.00" y="340.00" width="220" height="80" rx="10" ry="10" fill="rgba(106,159,181,0.18)" stroke="#6a9fb5" stroke-width="2.5"/>
+<text x="400.00" y="380.00" font-family="Georgia, serif" font-size="19.4" fill="#111111" text-anchor="middle" dominant-baseline="middle">Scraper de detalle</text>
+</g>
+<g id="node-4">
+<path d="M 650.00 216.00 L 650.00 294.00 A 110.00 16.00 0 0 0 870.00 294.00 L 870.00 216.00 A 110.00 16.00 0 0 0 650.00 216.00 Z" fill="rgba(201,143,91,0.18)" stroke="#c98f5b" stroke-width="2.5"/>
+<path d="M 870.00 216.00 A 110.00 16.00 0 0 1 650.00 216.00" fill="none" stroke="#c98f5b" stroke-width="2.5"/>
+<text x="760.00" y="261.00" font-family="Georgia, serif" font-size="20.8" fill="#111111" text-anchor="middle" dominant-baseline="middle">Bronce</text>
+</g>
+<g id="node-5">
+<path d="M 650.00 526.00 L 650.00 594.00 A 110.00 16.00 0 0 0 870.00 594.00 L 870.00 526.00 A 110.00 16.00 0 0 0 650.00 526.00 Z" fill="rgba(91,176,160,0.18)" stroke="#5bb0a0" stroke-width="2.5"/>
+<path d="M 870.00 526.00 A 110.00 16.00 0 0 1 650.00 526.00" fill="none" stroke="#5bb0a0" stroke-width="2.5"/>
+<text x="760.00" y="566.00" font-family="Georgia, serif" font-size="18.9" fill="#111111" text-anchor="middle" dominant-baseline="middle">Landing (HTML crudo)</text>
+</g>
+<g id="node-6">
+<path d="M 1010.00 216.00 L 1010.00 294.00 A 110.00 16.00 0 0 0 1230.00 294.00 L 1230.00 216.00 A 110.00 16.00 0 0 0 1010.00 216.00 Z" fill="rgba(127,166,107,0.18)" stroke="#7fa66b" stroke-width="2.5"/>
+<path d="M 1230.00 216.00 A 110.00 16.00 0 0 1 1010.00 216.00" fill="none" stroke="#7fa66b" stroke-width="2.5"/>
+<text x="1120.00" y="261.00" font-family="Georgia, serif" font-size="20.8" fill="#111111" text-anchor="middle" dominant-baseline="middle">Silver</text>
+</g>
+<g id="node-7">
+<rect x="910.00" y="545.00" width="200" height="70" rx="10" ry="10" fill="rgba(143,143,143,0.18)" stroke="#8f8f8f" stroke-width="2.5"/>
+<text x="1010.00" y="580.00" font-family="Georgia, serif" font-size="15.1" fill="#111111" text-anchor="middle" dominant-baseline="middle">mindicador.cl (UF y dólar)</text>
+</g>
+<g id="node-8">
+<rect x="1150.00" y="545.00" width="200" height="70" rx="10" ry="10" fill="rgba(143,143,143,0.18)" stroke="#8f8f8f" stroke-width="2.5"/>
+<text x="1250.00" y="580.00" font-family="Georgia, serif" font-size="14.5" fill="#111111" text-anchor="middle" dominant-baseline="middle">IGVUST (shapefile por UV)</text>
+</g>
+<g id="node-9">
+<path d="M 1370.00 216.00 L 1370.00 294.00 A 110.00 16.00 0 0 0 1590.00 294.00 L 1590.00 216.00 A 110.00 16.00 0 0 0 1370.00 216.00 Z" fill="rgba(127,166,107,0.18)" stroke="#7fa66b" stroke-width="2.5"/>
+<path d="M 1590.00 216.00 A 110.00 16.00 0 0 1 1370.00 216.00" fill="none" stroke="#7fa66b" stroke-width="2.5"/>
+<text x="1480.00" y="261.00" font-family="Georgia, serif" font-size="20.8" fill="#111111" text-anchor="middle" dominant-baseline="middle">Gold</text>
+</g>
+<g id="node-10">
+<rect x="1730.00" y="120.00" width="220" height="80" rx="10" ry="10" fill="rgba(155,127,181,0.18)" stroke="#9b7fb5" stroke-width="2.5"/>
+<text x="1840.00" y="160.00" font-family="Georgia, serif" font-size="19.4" fill="#111111" text-anchor="middle" dominant-baseline="middle">Modelo (repo ML)</text>
+</g>
+<g id="node-11">
+<path d="M 1730.00 346.00 L 1730.00 414.00 A 110.00 16.00 0 0 0 1950.00 414.00 L 1950.00 346.00 A 110.00 16.00 0 0 0 1730.00 346.00 Z" fill="rgba(123,184,91,0.18)" stroke="#7bb85b" stroke-width="2.5"/>
+<path d="M 1950.00 346.00 A 110.00 16.00 0 0 1 1730.00 346.00" fill="none" stroke="#7bb85b" stroke-width="2.5"/>
+<text x="1840.00" y="386.00" font-family="Georgia, serif" font-size="18.9" fill="#111111" text-anchor="middle" dominant-baseline="middle">gold.predicciones</text>
+</g>
+<g id="node-12">
+<rect x="190.00" y="-19.00" width="340" height="78" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="360.00" y="3.75" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">12 comunas. Si una búsqueda declara más de</text>
+<text x="360.00" y="20.00" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">1.800 resultados se parte por rango de precio</text>
+<text x="360.00" y="36.25" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">(el sitio corta en 2.016).</text>
+</g>
+<g id="node-13">
+<rect x="190.00" y="451.00" width="340" height="98" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="360.00" y="475.63" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Cola: nuevo, desaparecido, tarjeta cambiada y</text>
+<text x="360.00" y="491.88" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">rotación (cada 1 a 14 días según antigüedad).</text>
+<text x="360.00" y="508.13" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Fuera: finalizados, proyectos y avisos</text>
+<text x="360.00" y="524.38" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">con 5 fallos.</text>
+</g>
+<g id="node-14">
+<rect x="600.00" y="61.00" width="270" height="78" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="735.00" y="83.75" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Registro crudo: solo se agrega.</text>
+<text x="735.00" y="100.00" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Cada visita queda en detalle_intentos;</text>
+<text x="735.00" y="116.25" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">una observación nueva, si cambió.</text>
+</g>
+<g id="node-15">
+<rect x="920.00" y="51.00" width="360" height="98" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="1100.00" y="75.63" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Se reconstruye (REPEATABLE READ). Marca:</text>
+<text x="1100.00" y="91.88" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">superficie &lt; 12 o &gt; 500 m²; precio &lt; 100 mil</text>
+<text x="1100.00" y="108.13" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">o &gt; 8 M; precio por m² atípico</text>
+<text x="1100.00" y="124.38" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">(z robusto &gt; 5).</text>
+</g>
+<g id="node-16">
+<rect x="1300.00" y="51.00" width="340" height="98" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="1470.00" y="83.75" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Apto: con detalle, no proyecto, no finalizado</text>
+<text x="1470.00" y="100.00" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">hace más de 90 días, con precio, superficie y</text>
+<text x="1470.00" y="116.25" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">coordenadas, y sin banderas de anomalía.</text>
+</g>
+<g id="node-17">
+<rect x="1610.00" y="491.00" width="360" height="98" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="1790.00" y="523.75" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Roles: scraper_local escribe en Bronce;</text>
+<text x="1790.00" y="540.00" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">ml_lectura lee Gold; ml_scoring lee Gold</text>
+<text x="1790.00" y="556.25" font-family="Georgia, serif" font-size="13.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">e inserta en gold.predicciones.</text>
+</g>
+</svg>

@@ -150,6 +150,8 @@ pausado o finalizado se decide en Silver.
   cuántas visitas aguantó entre bloqueos (en `bronze.runs.detalle` y en el log) para estimar el umbral real de la IP.
   Cuando el sitio deja de bloquear, cada 50 visitas buenas seguidas las pausas bajan a la mitad hasta volver a las
   originales. Solo aborta como `bloqueado` si 3 bloqueos seguidos no dejan avanzar ninguna visita.
+  El factor de pausa con que termina cada tanda se guarda en `logs/detalle_ritmo.json` y la tanda siguiente lo retoma (si
+  fue hace menos de 2 horas), así la recuperación tras un 429 continúa entre tandas en vez de reiniciarse al ritmo base.
 - **Rotación escalonada por antigüedad:** un aviso activo se vuelve a visitar cada 1, 2, 4, 7 o 14 días según tenga
   hasta 14, 30, 60, 120 o más días de publicado (`DIAS_ROTACION_TRAMOS`). La edad sale del texto de Bronce ("hace 13 días",
   "esta semana"…) más los días transcurridos; sin fecha cuenta como reciente. En la rotación va primero el más atrasado
@@ -288,7 +290,15 @@ el sitio: leen lo que Bronce dejó. La única llamada externa fuera de Bronce es
 
 ## Documentación
 
-- `docs/arquitectura_elt.html`: diagrama interactivo de las etapas del ELT (fuente en `docs/arquitectura_elt.json`).
+- `docs/diagramas/`: diagramas de proceso hechos con [Fluyo](https://fluyo.space), cada uno con sus Historias animadas.
+  Cada diagrama trae el `.svg` (vista estática, abajo) y el `.fluyo.json`, que se abre con el botón **Abrir** de fluyo.space
+  para reproducir las Historias y exportar el GIF. Se generan con los scripts de `docs/diagramas/herramientas/` (ver su
+  `LEEME.md`).
+
+  ![Arquitectura del ELT](docs/diagramas/elt-arquitectura.svg)
+
+  ![Orquestador del scraping](docs/diagramas/elt-orquestador.svg)
+
 - `docs/01_antecedentes_concepcion_y_databricks.md`: arquitectura, decisiones y problemas de los dos
   proyectos anteriores, con la referencia técnica de limpieza, features y modelo para Silver y Gold.
 - `docs/02_bitacora_problemas.md`: problemas de este proyecto y cómo se resolvieron. Se actualiza con

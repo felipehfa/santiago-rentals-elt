@@ -1,0 +1,810 @@
+{
+ "version": 5,
+ "app": "fluyo",
+ "doc": {
+  "theme": "claro",
+  "pages": [
+   {
+    "name": "Orquestador del scraping",
+    "nodes": [
+     {
+      "id": 1,
+      "shape": "rect",
+      "x": 40,
+      "y": 330,
+      "w": 220,
+      "h": 90,
+      "label": "Orquestador",
+      "color": "#c9b458",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 0
+     },
+     {
+      "id": 2,
+      "shape": "rect",
+      "x": 420,
+      "y": 150,
+      "w": 240,
+      "h": 80,
+      "label": "Detalle (tandas de 400)",
+      "color": "#6a9fb5",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 1
+     },
+     {
+      "id": 3,
+      "shape": "rect",
+      "x": 420,
+      "y": 520,
+      "w": 240,
+      "h": 80,
+      "label": "Grilla (cada 6 h)",
+      "color": "#6a9fb5",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 2
+     },
+     {
+      "id": 4,
+      "shape": "rect",
+      "x": 880,
+      "y": 335,
+      "w": 220,
+      "h": 80,
+      "label": "Portal Inmobiliario",
+      "color": "#8f8f8f",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 3
+     },
+     {
+      "id": 5,
+      "shape": "rect",
+      "x": 850,
+      "y": 30,
+      "w": 300,
+      "h": 80,
+      "label": "Espera 30 min y baja el ritmo",
+      "color": "#c16a6a",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 4
+     },
+     {
+      "id": 6,
+      "shape": "cylinder",
+      "x": 1330,
+      "y": 320,
+      "w": 220,
+      "h": 110,
+      "label": "Bronce",
+      "color": "#c98f5b",
+      "fill": null,
+      "border": "solid",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 5
+     },
+     {
+      "id": 7,
+      "shape": "rect",
+      "x": 20,
+      "y": 170,
+      "w": 250,
+      "h": 98,
+      "label": "Alterna tandas de detalle y la\ngrilla. La grilla entra cada 6 h aunque\nla cola sea larga. Sin nada que\nvisitar, espera hasta 30 min.",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 6,
+      "fs": 13
+     },
+     {
+      "id": 8,
+      "shape": "rect",
+      "x": 400,
+      "y": 20,
+      "w": 400,
+      "h": 98,
+      "label": "Cola: nuevo, desaparecido, tarjeta cambiada\ny rotación por antigüedad (1, 2, 4, 7 o 14 días).\nPresupuesto: 6.000 visitas por 24 h.\nPausas de 3 a 6 s.",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 7,
+      "fs": 13
+     },
+     {
+      "id": 9,
+      "shape": "rect",
+      "x": 1240,
+      "y": 20,
+      "w": 440,
+      "h": 118,
+      "label": "429: espera 30 min, duplica las pausas (hasta ×8)\ny las baja a la mitad cada 50 visitas buenas.\nSi 3 bloqueos seguidos no avanzan, aborta y el\norquestador espera 30, 60 o 120 min.",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 8,
+      "fs": 13
+     },
+     {
+      "id": 10,
+      "shape": "rect",
+      "x": 400,
+      "y": 640,
+      "w": 360,
+      "h": 98,
+      "label": "12 comunas. Si la bloquean, reanuda solo las\nque faltaban. Una grilla incompleta no marca\navisos como desaparecidos en las comunas\nque no cubrió.",
+      "color": "#8f8f8f",
+      "fill": "none",
+      "border": "dashed",
+      "lblPos": "center",
+      "textBg": null,
+      "textColor": null,
+      "font": null,
+      "bold": false,
+      "pulse": false,
+      "order": 9,
+      "fs": 13
+     }
+    ],
+    "edges": [
+     {
+      "id": 11,
+      "from": 1,
+      "to": 2,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "tanda",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal"
+     },
+     {
+      "id": 12,
+      "from": 1,
+      "to": 3,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "si toca",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal"
+     },
+     {
+      "id": 13,
+      "from": 2,
+      "to": 4,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "visita aviso",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal"
+     },
+     {
+      "id": 14,
+      "from": 3,
+      "to": 4,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "páginas",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal"
+     },
+     {
+      "id": 15,
+      "from": 2,
+      "to": 6,
+      "fromSide": "e",
+      "toSide": "n",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "observación",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal"
+     },
+     {
+      "id": 16,
+      "from": 3,
+      "to": 6,
+      "fromSide": "e",
+      "toSide": "s",
+      "route": "ortho",
+      "waypoints": [],
+      "label": "tarjetas",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal"
+     },
+     {
+      "id": 17,
+      "from": 4,
+      "to": 5,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "429",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal"
+     },
+     {
+      "id": 18,
+      "from": 5,
+      "to": 2,
+      "fromSide": null,
+      "toSide": null,
+      "route": "ortho",
+      "waypoints": [],
+      "label": "reintenta",
+      "font": null,
+      "bold": false,
+      "animated": true,
+      "dashed": false,
+      "startArrow": false,
+      "endArrow": true,
+      "flowDir": "normal"
+     }
+    ],
+    "nextId": 19,
+    "behaviors": [],
+    "scenarios": [
+     {
+      "id": 1,
+      "engineVersion": 2,
+      "name": "Una tanda de detalle y la grilla a su hora",
+      "nextStepId": 9,
+      "steps": [
+       {
+        "id": 1,
+        "at": 0,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 11
+       },
+       {
+        "id": 2,
+        "at": 300,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 13
+       },
+       {
+        "id": 3,
+        "at": 600,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 15
+       },
+       {
+        "id": 4,
+        "at": 900,
+        "eventTypeId": 2,
+        "action": "OCCURRENCE",
+        "nodeId": 2
+       },
+       {
+        "id": 5,
+        "at": 1800,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 12
+       },
+       {
+        "id": 6,
+        "at": 2100,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 14
+       },
+       {
+        "id": 7,
+        "at": 2400,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 16
+       },
+       {
+        "id": 8,
+        "at": 3300,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 11
+       }
+      ],
+      "arrivalDependencies": [
+       {
+        "stepId": 2,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 3,
+        "waitsForArrivalOf": [
+         2
+        ]
+       },
+       {
+        "stepId": 4,
+        "waitsForArrivalOf": [
+         3
+        ]
+       },
+       {
+        "stepId": 5,
+        "waitsForArrivalOf": [
+         3
+        ]
+       },
+       {
+        "stepId": 6,
+        "waitsForArrivalOf": [
+         5
+        ]
+       },
+       {
+        "stepId": 7,
+        "waitsForArrivalOf": [
+         6
+        ]
+       },
+       {
+        "stepId": 8,
+        "waitsForArrivalOf": [
+         7
+        ]
+       }
+      ]
+     },
+     {
+      "id": 2,
+      "engineVersion": 2,
+      "name": "Un 429 y la recuperación",
+      "nextStepId": 8,
+      "steps": [
+       {
+        "id": 1,
+        "at": 0,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 13
+       },
+       {
+        "id": 2,
+        "at": 300,
+        "eventTypeId": 3,
+        "action": "OCCURRENCE",
+        "nodeId": 4
+       },
+       {
+        "id": 3,
+        "at": 600,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 17
+       },
+       {
+        "id": 4,
+        "at": 900,
+        "eventTypeId": 4,
+        "action": "OCCURRENCE",
+        "nodeId": 5
+       },
+       {
+        "id": 5,
+        "at": 2400,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 18
+       },
+       {
+        "id": 6,
+        "at": 2700,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 13
+       },
+       {
+        "id": 7,
+        "at": 3000,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 15
+       }
+      ],
+      "arrivalDependencies": [
+       {
+        "stepId": 2,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 3,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 4,
+        "waitsForArrivalOf": [
+         3
+        ]
+       },
+       {
+        "stepId": 5,
+        "waitsForArrivalOf": [
+         3
+        ]
+       },
+       {
+        "stepId": 6,
+        "waitsForArrivalOf": [
+         5
+        ]
+       },
+       {
+        "stepId": 7,
+        "waitsForArrivalOf": [
+         6
+        ]
+       }
+      ]
+     },
+     {
+      "id": 3,
+      "engineVersion": 2,
+      "name": "La grilla bloqueada reanuda lo que faltaba",
+      "nextStepId": 8,
+      "steps": [
+       {
+        "id": 1,
+        "at": 0,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 12
+       },
+       {
+        "id": 2,
+        "at": 300,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 14
+       },
+       {
+        "id": 3,
+        "at": 600,
+        "eventTypeId": 3,
+        "action": "OCCURRENCE",
+        "nodeId": 4
+       },
+       {
+        "id": 4,
+        "at": 1400,
+        "eventTypeId": 4,
+        "action": "OCCURRENCE",
+        "nodeId": 1
+       },
+       {
+        "id": 5,
+        "at": 3200,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 12
+       },
+       {
+        "id": 6,
+        "at": 3500,
+        "eventTypeId": 5,
+        "action": "OCCURRENCE",
+        "nodeId": 3
+       },
+       {
+        "id": 7,
+        "at": 3800,
+        "eventTypeId": 1,
+        "action": "SEND",
+        "edgeId": 16
+       }
+      ],
+      "arrivalDependencies": [
+       {
+        "stepId": 2,
+        "waitsForArrivalOf": [
+         1
+        ]
+       },
+       {
+        "stepId": 3,
+        "waitsForArrivalOf": [
+         2
+        ]
+       },
+       {
+        "stepId": 4,
+        "waitsForArrivalOf": [
+         2
+        ]
+       },
+       {
+        "stepId": 6,
+        "waitsForArrivalOf": [
+         5
+        ]
+       },
+       {
+        "stepId": 7,
+        "waitsForArrivalOf": [
+         5
+        ]
+       }
+      ]
+     }
+    ],
+    "nextScenarioId": 4
+   }
+  ],
+  "cur": 0,
+  "customBg": "#ffffff",
+  "eventTypes": [
+   {
+    "id": 1,
+    "name": "Envía",
+    "primitive": "FLOW",
+    "sentenceTemplate": "{source} envía a {target}",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     },
+     "connectionEffects": {
+      "size": "medium",
+      "style": "direct",
+      "trail": "none",
+      "arrival": "none",
+      "during": "none"
+     }
+    }
+   },
+   {
+    "id": 2,
+    "name": "Procesa",
+    "primitive": "OCCURRENCE",
+    "sentenceTemplate": "{target} procesa",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     }
+    }
+   },
+   {
+    "id": 3,
+    "name": "Bloquea (429)",
+    "primitive": "OCCURRENCE",
+    "sentenceTemplate": "{target} bloquea la IP",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     }
+    }
+   },
+   {
+    "id": 4,
+    "name": "Espera",
+    "primitive": "OCCURRENCE",
+    "sentenceTemplate": "{target} espera y baja el ritmo",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     }
+    }
+   },
+   {
+    "id": 5,
+    "name": "Reanuda",
+    "primitive": "OCCURRENCE",
+    "sentenceTemplate": "{target} reanuda lo que faltaba",
+    "visual": {
+     "kind": "token",
+     "value": "●"
+    },
+    "motion": "normal",
+    "presentation": {
+     "nodeEffects": {
+      "showSymbol": false,
+      "symbolSize": "medium",
+      "message": "",
+      "messageColor": "",
+      "messageSize": "medium",
+      "messageWeight": "normal",
+      "messageFont": "default",
+      "messagePosition": "above",
+      "highlight": false,
+      "blink": false,
+      "dim": false,
+      "fillColor": "",
+      "visualDuration": "normal",
+      "visualDurationMs": 1500
+     }
+    }
+   }
+  ],
+  "nextEventTypeId": 6
+ },
+ "settings": {
+  "speed": 0.5,
+  "dots": 3,
+  "build": false,
+  "stagger": 0.45,
+  "grid": true,
+  "snap": false,
+  "font": "Georgia, serif",
+  "single": false
+ }
+}

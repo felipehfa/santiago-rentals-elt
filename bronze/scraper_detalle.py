@@ -59,6 +59,8 @@ MAX_FALLOS_SEGUIDOS_EN_CORRIDA = 8  # ver Bloqueado más abajo
 # cuántas visitas aguantó, para estimar el umbral real. Solo aborta si varios bloqueos seguidos no dejan avanzar.
 ESPERA_BLOQUEO_S = 30 * 60
 FACTOR_PAUSA_MAX = 8.0              # tope del multiplicador de las pausas entre visitas (se duplica en cada bloqueo)
+RUTA_RITMO = RAIZ / "logs" / "detalle_ritmo.json"   # factor de pausa con que terminó la última corrida
+VIGENCIA_RITMO_H = 2.0                             # pasado este tiempo, el sitio ya se recuperó y se vuelve al ritmo base
 VISITAS_PARA_RELAJAR = 50          # visitas buenas seguidas tras las que las pausas vuelven a bajar (a la mitad, hasta x1)
 MAX_BLOQUEOS_SEGUIDOS = 3           # bloqueos sin ninguna visita buena entre medio => abortar
 # Códigos de salida: el orquestador decide qué hacer según cómo terminó el detalle.
@@ -404,6 +406,24 @@ def obtener_cola(con, limite: int, motivos: list[str], comunas: list[str]) -> li
         return [dict(zip(cols, fila)) for fila in cur.fetchall()]
 
 
+def leer_factor_guardado() -> float:
+    """Factor de pausa con que terminó la corrida anterior, si fue hace poco: la recuperación tras un 429 continúa entre
+    tandas en vez de reiniciarse al ritmo base."""
+    try:
+        datos = json.loads(RUTA_RITMO.read_text(encoding="utf-8"))
+        edad_h = (time.time() - float(datos["actualizado"])) / 3600
+        return float(datos["factor"]) if edad_h <= VIGENCIA_RITMO_H else 1.0
+    except (OSError, ValueError, KeyError):
+        return 1.0
+
+
+def guardar_factor(factor: float) -> None:
+    try:
+        RUTA_RITMO.write_text(json.dumps({"factor": factor, "actualizado": time.time()}), encoding="utf-8")
+    except OSError:
+        log.warning("No se pudo guardar el ritmo en %s", RUTA_RITMO.name)
+
+
 def visitas_ultima_hora(con) -> int:
     with con.cursor() as cur:
         cur.execute("SELECT count(*) FROM bronze.detalle_intentos "
@@ -493,7 +513,9 @@ def ejecutar(db: ConexionResiliente, limite: int, motivos: list[str], comunas: l
     visitas = filas = fallos_seguidos = fallidas = 0
     bloqueos = bloqueos_seguidos = visitas_desde_bloqueo = 0
     aguantes: list[int] = []
-    factor = max(1.0, min(factor_inicial, FACTOR_PAUSA_MAX))
+    factor = max(1.0, min(max(factor_inicial, leer_factor_guardado()), FACTOR_PAUSA_MAX))
+    if factor > 1:
+        log.info("Se retoma con las pausas en x%.0f (la corrida anterior terminó recuperándose de un bloqueo)", factor)
     t_inicio = time.monotonic()
     estado, detalle = "success", None
     try:
@@ -533,6 +555,7 @@ def ejecutar(db: ConexionResiliente, limite: int, motivos: list[str], comunas: l
                             "y baja el ritmo (pausas x%.0f)", bloqueos, e, visitas_desde_bloqueo, en_hora, en_24h,
                             ESPERA_BLOQUEO_S // 60, factor)
                 visitas_desde_bloqueo = fallos_seguidos = 0
+                guardar_factor(factor)
                 time.sleep(ESPERA_BLOQUEO_S)
                 continue  # reintenta el mismo aviso
             visitas += 1
@@ -542,6 +565,7 @@ def ejecutar(db: ConexionResiliente, limite: int, motivos: list[str], comunas: l
             if factor > 1 and visitas_desde_bloqueo % VISITAS_PARA_RELAJAR == 0:
                 factor = max(1.0, factor / 2)
                 log.info("%d visitas buenas seguidas: las pausas bajan a x%.0f", visitas_desde_bloqueo, factor)
+                guardar_factor(factor)
             i += 1
             if visitas % CADA_N_VISITAS_AVANCE == 0:
                 minutos = (time.monotonic() - t_inicio) / 60
@@ -559,6 +583,7 @@ def ejecutar(db: ConexionResiliente, limite: int, motivos: list[str], comunas: l
         raise
     if estado == "success" and bloqueos:
         detalle = f"{bloqueos} bloqueos superados; visitas entre bloqueos: {aguantes}"
+    guardar_factor(factor)
     db.ejecutar(cerrar_run, run_id, estado, visitas, filas, detalle)
     log.info("Fin: estado=%s, visitas=%d, observaciones nuevas=%d, bloqueos=%d", estado, visitas, filas, bloqueos)
     return estado, visitas
