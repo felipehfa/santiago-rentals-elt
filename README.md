@@ -148,7 +148,8 @@ pausado o finalizado se decide en Silver.
   reconectar, cierra la corrida como `error`. La grilla hace lo mismo con sus escrituras.
 - **Ante un 429 no aborta:** espera 30 minutos, duplica las pausas (hasta x8) y reintenta el mismo aviso. Anota
   cuántas visitas aguantó entre bloqueos (en `bronze.runs.detalle` y en el log) para estimar el umbral real de la IP.
-  Solo aborta como `bloqueado` si 3 bloqueos seguidos no dejan avanzar ninguna visita.
+  Cuando el sitio deja de bloquear, cada 50 visitas buenas seguidas las pausas bajan a la mitad hasta volver a las
+  originales. Solo aborta como `bloqueado` si 3 bloqueos seguidos no dejan avanzar ninguna visita.
 - **Presupuesto de visitas:** `--presupuesto-dia` (1.500 por defecto) limita las visitas de una ventana móvil de 24 h,
   contando todas las corridas. La rotación recorre primero lo visitado hace más tiempo, así que con presupuesto
   limitado el ciclo completo se reparte sin dejar avisos sin revisar.

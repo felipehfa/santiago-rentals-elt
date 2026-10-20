@@ -56,6 +56,7 @@ MAX_FALLOS_SEGUIDOS_EN_CORRIDA = 8  # ver Bloqueado más abajo
 # cuántas visitas aguantó, para estimar el umbral real. Solo aborta si varios bloqueos seguidos no dejan avanzar.
 ESPERA_BLOQUEO_S = 30 * 60
 FACTOR_PAUSA_MAX = 8.0              # tope del multiplicador de las pausas entre visitas (se duplica en cada bloqueo)
+VISITAS_PARA_RELAJAR = 50          # visitas buenas seguidas tras las que las pausas vuelven a bajar (a la mitad, hasta x1)
 MAX_BLOQUEOS_SEGUIDOS = 3           # bloqueos sin ninguna visita buena entre medio => abortar
 # Códigos de salida: el orquestador decide qué hacer según cómo terminó el detalle.
 CODIGOS_SALIDA = {"success": 0, "vacia": 0, "bloqueado": 1, "presupuesto": 4}
@@ -445,7 +446,7 @@ def cerrar_run(con, run_id, estado, visitas, filas, detalle) -> None:
 # ------------------------------------------------------------------ corrida
 
 def ejecutar(db: ConexionResiliente, limite: int, motivos: list[str], comunas: list[str],
-             presupuesto: int = PRESUPUESTO_24H) -> tuple[str, int]:
+             presupuesto: int = PRESUPUESTO_24H, factor_inicial: float = 1.0) -> tuple[str, int]:
     """`db` reabre la conexión si el servidor la corta (por ejemplo, al suspender el equipo)."""
     hechas = db.ejecutar(visitas_ultimas_24h)
     disponible = max(presupuesto - hechas, 0)
@@ -463,7 +464,7 @@ def ejecutar(db: ConexionResiliente, limite: int, motivos: list[str], comunas: l
     visitas = filas = fallos_seguidos = fallidas = 0
     bloqueos = bloqueos_seguidos = visitas_desde_bloqueo = 0
     aguantes: list[int] = []
-    factor = 1.0
+    factor = max(1.0, min(factor_inicial, FACTOR_PAUSA_MAX))
     t_inicio = time.monotonic()
     estado, detalle = "success", None
     try:
@@ -506,6 +507,10 @@ def ejecutar(db: ConexionResiliente, limite: int, motivos: list[str], comunas: l
             visitas += 1
             visitas_desde_bloqueo += 1
             bloqueos_seguidos = 0
+            # Cuando el sitio deja de bloquear (por ejemplo, al pasar las 24 h), las pausas vuelven a las originales por etapas.
+            if factor > 1 and visitas_desde_bloqueo % VISITAS_PARA_RELAJAR == 0:
+                factor = max(1.0, factor / 2)
+                log.info("%d visitas buenas seguidas: las pausas bajan a x%.0f", visitas_desde_bloqueo, factor)
             i += 1
             if visitas % CADA_N_VISITAS_AVANCE == 0:
                 minutos = (time.monotonic() - t_inicio) / 60
@@ -533,12 +538,14 @@ def main() -> int:
     ap.add_argument("--limite", type=int, default=300, help="máximo de avisos a visitar en esta corrida")
     ap.add_argument("--motivos", nargs="+", default=["nuevo", "desaparecido", "tarjeta_cambio", "rotacion"])
     ap.add_argument("--comunas", nargs="+", default=config.COMUNAS_RM, help="solo avisos de estas comunas")
+    ap.add_argument("--factor-pausa", type=float, default=1.0,
+                    help="multiplicador inicial de las pausas; baja solo tras visitas buenas seguidas")
     ap.add_argument("--presupuesto-dia", type=int, default=PRESUPUESTO_24H,
                     help="visitas máximas en una ventana móvil de 24 h (cuenta todas las corridas)")
     args = ap.parse_args()
     db = ConexionResiliente("BD_STRING_SCRAPER")
     try:
-        estado, _ = ejecutar(db, args.limite, args.motivos, args.comunas, args.presupuesto_dia)
+        estado, _ = ejecutar(db, args.limite, args.motivos, args.comunas, args.presupuesto_dia, args.factor_pausa)
     finally:
         db.close()
     return CODIGOS_SALIDA.get(estado, 1)

@@ -103,11 +103,12 @@ def comunas_cubiertas(db: ConexionResiliente, run_id: int) -> set[str]:
 
 # ------------------------------------------------------------------ pasos
 
-def paso_detalle(pausa, presupuesto: int) -> str:
+def paso_detalle(pausa, presupuesto: int, factor: float) -> str:
     """Corre el detalle hasta vaciar su cola. Devuelve 'listo', 'presupuesto' o 'parar'."""
     intento = 0
     while True:
-        codigo = correr("scraper_detalle.py", "--limite", "20000", "--presupuesto-dia", str(presupuesto), pausa=pausa)
+        codigo = correr("scraper_detalle.py", "--limite", "20000", "--presupuesto-dia", str(presupuesto),
+                        "--factor-pausa", str(factor), pausa=pausa)
         if codigo == 0:
             return "listo"
         if codigo == COD_DETALLE_PRESUPUESTO:
@@ -154,6 +155,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--grilla-cada-horas", type=float, default=6.0, help="separación mínima entre dos grillas")
     ap.add_argument("--presupuesto-dia", type=int, default=5000, help="visitas de detalle por ventana móvil de 24 h")
+    ap.add_argument("--factor-pausa", type=float, default=1.0,
+                    help="multiplicador inicial de las pausas del detalle (baja solo con visitas buenas seguidas)")
     ap.add_argument("--pausa-min", type=float, default=6.0)
     ap.add_argument("--pausa-max", type=float, default=12.0)
     ap.add_argument("--max-ciclos", type=int, default=0, help="0 = sin límite")
@@ -168,7 +171,7 @@ def main() -> int:
         log.info("INICIO orquestador | %d comunas | pausas %.0f-%.0f s | grilla cada %.0f h", len(config.COMUNAS_RM),
                  *pausa, args.grilla_cada_horas)
         while not hay_orden_de_parar():
-            resultado = paso_detalle(pausa, args.presupuesto_dia)
+            resultado = paso_detalle(pausa, args.presupuesto_dia, args.factor_pausa)
             if resultado == "parar":
                 break
             if resultado == "presupuesto":
