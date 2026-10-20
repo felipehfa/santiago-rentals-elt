@@ -34,13 +34,18 @@ from psycopg2.extras import Json
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
 import config  # noqa: E402
-from common.db import conectar  # noqa: E402
+from common.db import ConexionResiliente  # noqa: E402
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+_RUTA_LOG = RAIZ / "logs" / "detalle.log"
+_RUTA_LOG.parent.mkdir(exist_ok=True)
+# Pantalla y archivo fijo (logs/detalle.log, fuera de git): el avance queda aunque la salida no se redirija.
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s",
+                    handlers=[logging.StreamHandler(), logging.FileHandler(_RUTA_LOG, encoding="utf-8")])
 log = logging.getLogger("detalle")
 
 DIAS_ROTACION = 7
 DIAS_ENTRE_VISITAS_DESAPARECIDO = 2
+CADA_N_VISITAS_AVANCE = 50          # cada cuántas visitas se escribe una línea de avance
 MAX_FALLOS_POR_AVISO = 5          # error/no_encontrado consecutivos antes de dejar de insistir en un aviso
 HORAS_ENTRE_REINTENTOS = 12
 MAX_FALLOS_SEGUIDOS_EN_CORRIDA = 8  # ver Bloqueado más abajo
@@ -340,6 +345,7 @@ cola AS (
   LEFT JOIN fallos f ON f.id_aviso = gv.id_aviso
   LEFT JOIN det ON det.id_aviso = gv.id_aviso
   WHERE card.url IS NOT NULL
+    AND card.comuna = ANY(%(comunas)s)
     -- 'finalizado' es terminal: no se vuelve a visitar. Pausado sí, porque puede volver a publicarse.
     AND COALESCE(det.estado_texto, '') NOT ILIKE '%%finaliz%%'
     AND NOT EXISTS (SELECT 1 FROM bronze.detalle_intentos p
@@ -355,11 +361,11 @@ LIMIT %(limite)s
 """
 
 
-def obtener_cola(con, limite: int, motivos: list[str]) -> list[dict]:
+def obtener_cola(con, limite: int, motivos: list[str], comunas: list[str]) -> list[dict]:
     with con.cursor() as cur:
         cur.execute(SQL_COLA, {"dias_desap": DIAS_ENTRE_VISITAS_DESAPARECIDO, "dias_rot": DIAS_ROTACION,
                                "max_fallos": MAX_FALLOS_POR_AVISO, "horas_reint": HORAS_ENTRE_REINTENTOS,
-                               "motivos": motivos, "limite": limite})
+                               "motivos": motivos, "comunas": comunas, "limite": limite})
         cols = [c[0] for c in cur.description]
         return [dict(zip(cols, fila)) for fila in cur.fetchall()]
 
@@ -420,44 +426,54 @@ def cerrar_run(con, run_id, estado, visitas, filas, detalle) -> None:
 
 # ------------------------------------------------------------------ corrida
 
-def ejecutar(con, limite: int, motivos: list[str]) -> tuple[str, int]:
-    cola = obtener_cola(con, limite, motivos)
+def ejecutar(db: ConexionResiliente, limite: int, motivos: list[str], comunas: list[str]) -> tuple[str, int]:
+    """`db` reabre la conexión si el servidor la corta (por ejemplo, al suspender el equipo)."""
+    cola = db.ejecutar(obtener_cola, limite, motivos, comunas)
     por_motivo = {m: sum(1 for c in cola if c["motivo"] == m) for m in motivos}
     log.info("Cola: %d avisos %s", len(cola), por_motivo)
 
-    run_id = iniciar_run(con)
-    visitas = filas = fallos_seguidos = 0
+    run_id = db.ejecutar(iniciar_run)
+    visitas = filas = fallos_seguidos = fallidas = 0
+    t_inicio = time.monotonic()
     estado, detalle = "success", None
     try:
         for item in cola:
             referer = f"{config.BASE_URL}/{config.OPERACION}/{item['tipo_propiedad']}/{item['comuna']}"
             r = visitar(item["url"], item["id_aviso"], referer)
-            registrar_intento(con, run_id, item["id_aviso"], item["motivo"], r)
+            db.ejecutar(registrar_intento, run_id, item["id_aviso"], item["motivo"], r)
             visitas += 1
 
             if r["resultado"] in ("captcha", "bloqueado"):
                 raise Bloqueado(f"{r['resultado']}: {r['detalle']}")
             if r["resultado"] == "ok":
                 fallos_seguidos = 0
-                if guardar_observacion(con, run_id, item["id_aviso"], item["motivo"], r):
+                if db.ejecutar(guardar_observacion, run_id, item["id_aviso"], item["motivo"], r):
                     filas += 1
             elif r["resultado"] == "proyecto":
                 fallos_seguidos = 0  # respuesta válida del sitio: no es señal de bloqueo
                 log.info("%s es un proyecto inmobiliario (%s)", item["id_aviso"], r["detalle"])
             else:
                 fallos_seguidos += 1
+                fallidas += 1
                 log.warning("%s: %s (%s)", item["id_aviso"], r["resultado"], r["detalle"])
                 # Varios fallos seguidos suelen ser el sitio bloqueándonos, no avisos eliminados.
                 if fallos_seguidos >= MAX_FALLOS_SEGUIDOS_EN_CORRIDA:
                     raise Bloqueado(f"{fallos_seguidos} fallos consecutivos")
+            if visitas % CADA_N_VISITAS_AVANCE == 0:
+                minutos = (time.monotonic() - t_inicio) / 60
+                ritmo = visitas / minutos if minutos else 0.0
+                resta = (len(cola) - visitas) / ritmo if ritmo else float("inf")
+                log.info("Avance: %d/%d (%.0f %%) | %.1f visitas/min | observaciones nuevas %d | sin leer %d | "
+                         "resta ~%d h %02d min", visitas, len(cola), 100 * visitas / len(cola), ritmo, filas,
+                         fallidas, resta // 60, resta % 60)
             time.sleep(random.uniform(config.DELAY_MIN, config.DELAY_MAX))
     except Bloqueado as e:
         estado, detalle = "bloqueado", str(e)
         log.error("ABORTADO: %s", e)
     except Exception as e:  # noqa: BLE001 - se registra en runs y se relanza
-        cerrar_run(con, run_id, "error", visitas, filas, repr(e))
+        db.ejecutar(cerrar_run, run_id, "error", visitas, filas, repr(e))
         raise
-    cerrar_run(con, run_id, estado, visitas, filas, detalle)
+    db.ejecutar(cerrar_run, run_id, estado, visitas, filas, detalle)
     log.info("Fin: estado=%s, visitas=%d, observaciones nuevas=%d", estado, visitas, filas)
     return estado, visitas
 
@@ -466,12 +482,13 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--limite", type=int, default=300, help="máximo de avisos a visitar en esta corrida")
     ap.add_argument("--motivos", nargs="+", default=["nuevo", "desaparecido", "tarjeta_cambio", "rotacion"])
+    ap.add_argument("--comunas", nargs="+", default=config.COMUNAS_RM, help="solo avisos de estas comunas")
     args = ap.parse_args()
-    con = conectar("BD_STRING_SCRAPER")
+    db = ConexionResiliente("BD_STRING_SCRAPER")
     try:
-        estado, _ = ejecutar(con, args.limite, args.motivos)
+        estado, _ = ejecutar(db, args.limite, args.motivos, args.comunas)
     finally:
-        con.close()
+        db.close()
     return 0 if estado == "success" else 1
 
 

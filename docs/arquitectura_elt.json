@@ -18,7 +18,7 @@
           "grilla",
           "bronce"
         ],
-        "note": "23 comunas. Si una búsqueda declara más de 1.800 resultados se parte por rango de precio, porque el sitio corta en 2.016."
+        "note": "12 comunas. Si una búsqueda declara más de 1.800 resultados se parte por rango de precio, porque el sitio corta en 2.016."
       },
       {
         "id": "cola",
@@ -106,7 +106,7 @@
       "sublabel": "qué avisos existen",
       "stage": 1,
       "row": 0,
-      "tag": "23 comunas"
+      "tag": "12 comunas"
     },
     {
       "id": "detalle",

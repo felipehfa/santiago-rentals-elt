@@ -17,6 +17,7 @@ import math
 import random
 import re
 import sys
+import functools
 import time
 from datetime import date
 from pathlib import Path
@@ -29,10 +30,29 @@ from psycopg2.extras import Json, execute_values
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
 import config  # noqa: E402
-from common.db import conectar  # noqa: E402
+from common.db import ConexionResiliente  # noqa: E402
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+_RUTA_LOG = RAIZ / "logs" / "grilla.log"
+_RUTA_LOG.parent.mkdir(exist_ok=True)
+# Pantalla y archivo fijo (logs/grilla.log, fuera de git). El log es un resumen: una línea por comuna, más los
+# eventos que importan (segmentación, alertas, aborto). Las líneas por página son DEBUG: se ven con --detalle.
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s",
+                    handlers=[logging.StreamHandler(), logging.FileHandler(_RUTA_LOG, encoding="utf-8")])
 log = logging.getLogger("grilla")
+
+
+def _miles(n) -> str:
+    return "?" if n is None else f"{n:,}".replace(",", ".")
+
+
+def _corto(comuna: str) -> str:
+    return comuna.removesuffix("-metropolitana")
+
+
+def _duracion(segundos: float) -> str:
+    m, s = divmod(int(segundos), 60)
+    h, m = divmod(m, 60)
+    return f"{h} h {m:02d} min" if h else f"{m} min {s:02d} s"
 
 RE_ID_AVISO = re.compile(r"(MLC-\d+)")
 RE_TOTAL = re.compile(r"([\d.]+)\s+resultados", re.IGNORECASE)
@@ -114,7 +134,7 @@ def pedir_html(url: str, reintentos: int = 3) -> tuple[Optional[int], Optional[s
             if status == 404:
                 return status, None
         except requests.RequestException as e:
-            log.warning("Error de red (%s/%s) en %s: %s", intento, reintentos, url, e)
+            log.warning("ALERTA  error de red (%s/%s) en %s: %s", intento, reintentos, url, type(e).__name__)
         time.sleep(5 * intento)
     return status, None
 
@@ -182,12 +202,24 @@ def hash_payload(payload: dict) -> str:
 
 # ------------------------------------------------------------------ persistencia
 
+def resiliente(fn):
+    """Si `con` es una ConexionResiliente, la operación se repite tras reconectar cuando la conexión se cae."""
+    @functools.wraps(fn)
+    def envoltura(con, *args, **kwargs):
+        if isinstance(con, ConexionResiliente):
+            return con.ejecutar(lambda c: fn(c, *args, **kwargs))
+        return fn(con, *args, **kwargs)
+    return envoltura
+
+
+@resiliente
 def iniciar_run(con, fuente: str) -> int:
     with con, con.cursor() as cur:
         cur.execute("INSERT INTO bronze.runs (fuente) VALUES (%s) RETURNING run_id", (fuente,))
         return cur.fetchone()[0]
 
 
+@resiliente
 def cerrar_run(con, run_id: int, estado: str, paginas: int, filas: int, detalle: Optional[str]) -> None:
     with con, con.cursor() as cur:
         cur.execute(
@@ -196,6 +228,7 @@ def cerrar_run(con, run_id: int, estado: str, paginas: int, filas: int, detalle:
         )
 
 
+@resiliente
 def registrar_pagina(con, run_id, comuna, tipo, pagina, url, status, n_tarjetas, total, html_path, sha,
                      segmento: Optional[str] = None) -> None:
     with con, con.cursor() as cur:
@@ -207,6 +240,7 @@ def registrar_pagina(con, run_id, comuna, tipo, pagina, url, status, n_tarjetas,
         )
 
 
+@resiliente
 def registrar_cobertura(con, run_id, comuna, tipo, segmentada, total, unicos, estado) -> None:
     with con, con.cursor() as cur:
         cur.execute(
@@ -217,6 +251,7 @@ def registrar_cobertura(con, run_id, comuna, tipo, segmentada, total, unicos, es
         )
 
 
+@resiliente
 def guardar_tarjetas(con, run_id: int, comuna: str, tipo: str, pagina: int, tarjetas: list[dict]) -> int:
     """Inserta solo los avisos cuyo payload cambió. Devuelve cuántas filas nuevas entraron."""
     if not tarjetas:
@@ -296,8 +331,8 @@ def scrapear_busqueda(con, run_id: int, prog: Progreso, comuna: str, tipo: str, 
             # El 17-oct-2026 GitHub Actions recibió 100 páginas vacías y cerró en 'success'.
             if not tarjetas and total != 0:
                 prog.anomalos_seguidos += 1
-                log.warning("Página 1 vacía en %s/%s %s (status=%s, total=%s)", comuna, tipo,
-                            texto_segmento(segmento), status, total)
+                log.warning("ALERTA  %s %s: página 1 vacía %s(status=%s, total=%s)", comuna, tipo,
+                            f"en rango {texto_segmento(segmento)} " if segmento else "", status, total)
                 if prog.anomalos_seguidos >= MAX_COMBOS_ANOMALOS_SEGUIDOS:
                     raise Bloqueado(f"{prog.anomalos_seguidos} búsquedas seguidas con página 1 vacía")
             else:
@@ -309,8 +344,8 @@ def scrapear_busqueda(con, run_id: int, prog: Progreso, comuna: str, tipo: str, 
             prog.filas += guardar_tarjetas(con, run_id, comuna, tipo, pagina, tarjetas)
         vistos.update(t["id_aviso"] for t in tarjetas)
         tarjetas_busqueda += len(tarjetas)
-        log.info("%s %s %s p%d: %d tarjetas (%s declarados)", comuna, tipo, texto_segmento(segmento) or "-",
-                 pagina, len(tarjetas), total)
+        log.debug("%s %s %s p%d: %d tarjetas (%s declarados)", comuna, tipo, texto_segmento(segmento) or "-",
+                  pagina, len(tarjetas), total)
 
         if segmentar and pagina == 1 and total is not None and total > UMBRAL_SEGMENTAR:
             return total, True
@@ -331,7 +366,7 @@ def scrapear_en_segmentos(con, run_id, prog, comuna, tipo, segmento: Segmento, m
         return
     partes = dividir_segmento(segmento)
     if not partes:
-        log.warning("%s %s: rango %s ya no se puede partir; se captura hasta el tope del sitio",
+        log.warning("ALERTA  %s %s: el rango %s ya no se puede partir; se captura hasta el tope del sitio",
                     comuna, tipo, texto_segmento(segmento))
         scrapear_busqueda(con, run_id, prog, comuna, tipo, segmento, max_paginas, vistos, segmentar=False)
         return
@@ -352,28 +387,39 @@ def scrapear(con, comunas: list[str], tipos: list[str], max_paginas: Optional[in
     run_id = iniciar_run(con, "grilla") if con else 0
     prog = Progreso()
     estado, detalle = "success", None
+    t_inicio = time.monotonic()
+    unicos_total, incompletas = 0, []
+    log.info("INICIO  grilla | %d comunas | %s", len(comunas), ", ".join(tipos))
 
     try:
-        for comuna in comunas:
+        for i, comuna in enumerate(comunas, start=1):
             for tipo in tipos:
+                t_comuna, paginas_antes = time.monotonic(), prog.paginas
                 vistos: set = set()
                 total, grande = scrapear_busqueda(con, run_id, prog, comuna, tipo, None, max_paginas, vistos,
                                                   segmentar=True)
                 if grande:
-                    log.info("%s %s declara %s resultados (> %d): se segmenta por precio",
-                             comuna, tipo, total, UMBRAL_SEGMENTAR)
+                    log.info("SEGMENTA %s: declara %s (> %s), se parte por precio en %d rangos",
+                             _corto(comuna), _miles(total), _miles(UMBRAL_SEGMENTAR), len(ESCALERA_PRECIO))
                     for segmento in ESCALERA_PRECIO:
                         scrapear_en_segmentos(con, run_id, prog, comuna, tipo, segmento, max_paginas, vistos)
 
                 cobertura = estado_cobertura(total, len(vistos), acotada=bool(max_paginas))
-                log.info("%s %s: %d avisos únicos de %s declarados -> %s", comuna, tipo, len(vistos), total, cobertura)
+                unicos_total += len(vistos)
+                if cobertura != "completa":
+                    incompletas.append(_corto(comuna))
+                pct = f" ({100 * len(vistos) / total:.1f} %)".replace(".", ",") if total else ""
+                etiqueta = _corto(comuna) if len(tipos) == 1 else f"{_corto(comuna)} {tipo}"
+                log.info("[%2d/%d] %-26s %s de %s declarados%s | %s | %d págs | %s", i, len(comunas), etiqueta,
+                         _miles(len(vistos)), _miles(total), pct, "INCOMPLETA" if cobertura != "completa"
+                         else "completa", prog.paginas - paginas_antes, _duracion(time.monotonic() - t_comuna))
                 if con:
                     registrar_cobertura(con, run_id, comuna, tipo, grande, total, len(vistos), cobertura)
                 if cobertura != "completa" and estado == "success":
                     estado = "parcial"
     except Bloqueado as e:
         estado, detalle = "bloqueado", str(e)
-        log.error("ABORTADO: %s", e)
+        log.error("ABORTADO %s", e)
     except Exception as e:  # noqa: BLE001 - se registra en runs y se relanza
         if con:
             cerrar_run(con, run_id, "error", prog.paginas, prog.filas, repr(e))
@@ -381,6 +427,9 @@ def scrapear(con, comunas: list[str], tipos: list[str], max_paginas: Optional[in
 
     if con:
         cerrar_run(con, run_id, estado, prog.paginas, prog.filas, detalle)
+    log.info("FIN     %s | %d comunas | %s avisos únicos | %s filas nuevas | %s págs | %s | incompletas: %s", estado,
+             len(comunas), _miles(unicos_total), _miles(prog.filas), _miles(prog.paginas),
+             _duracion(time.monotonic() - t_inicio), ", ".join(incompletas) or "ninguna")
     return prog.paginas, prog.filas, estado
 
 
@@ -391,15 +440,18 @@ def main() -> int:
     ap.add_argument("--tipos", nargs="+", default=config.TIPOS_PROPIEDAD)
     ap.add_argument("--max-paginas", type=int, default=None, help="tope por comuna x tipo (pruebas)")
     ap.add_argument("--sin-bd", action="store_true", help="solo guarda el landing, no escribe en Supabase")
+    ap.add_argument("--detalle", action="store_true", help="registra una línea por página (depuración)")
     args = ap.parse_args()
+    if args.detalle:
+        log.setLevel(logging.DEBUG)
+        logging.getLogger().setLevel(logging.DEBUG)
 
-    con = None if args.sin_bd else conectar("BD_STRING_SCRAPER")
+    con = None if args.sin_bd else ConexionResiliente("BD_STRING_SCRAPER")
     try:
-        paginas, filas, estado = scrapear(con, args.comunas, args.tipos, args.max_paginas)
+        _, _, estado = scrapear(con, args.comunas, args.tipos, args.max_paginas)
     finally:
         if con:
             con.close()
-    log.info("Fin: estado=%s, páginas=%d, filas nuevas=%d", estado, paginas, filas)
     return 0 if estado == "success" else 1
 
 

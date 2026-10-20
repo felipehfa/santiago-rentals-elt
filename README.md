@@ -16,7 +16,7 @@ inadvertido durante 17 días (ver `docs/01_antecedentes_concepcion_y_databricks.
 | Pieza | Estado |
 |---|---|
 | Landing (HTML crudo en disco) | Funcionando |
-| Bronce: grilla | Funcionando. Primera carga completa de las 23 comunas |
+| Bronce: grilla | Funcionando. Primera carga completa de las 23 comunas; desde el 2026-10-19 se scrapean 12 |
 | Bronce: detalle | Funcionando. Primera carga a medias: 13.035 de ~14.900 avisos con observación |
 | Silver: `silver.avisos` | Funcionando (14.947 filas; se reconstruye completa desde Bronce) |
 | Silver: `silver.aviso_observaciones` | Funcionando (una fila por cambio observado en el detalle; hoy 1 por aviso) |
@@ -47,7 +47,7 @@ Portal Inmobiliario
 ┌───────────────────────────┐        ┌────────────────────────────────────────┐
 │ bronze/scraper_grilla.py  │        │ bronze/scraper_detalle.py              │
 │  qué avisos existen       │        │  qué dice cada aviso (estado y precio) │
-│  23 comunas, por rango de │        │  cola de prioridades derivada con SQL  │
+│  12 comunas, por rango de │        │  cola de prioridades derivada con SQL  │
 │  precio si superan 1.800  │        │                                        │
 └───────────┬───────────────┘        └───────────────┬────────────────────────┘
             │                                        │
@@ -143,6 +143,19 @@ pausado o finalizado se decide en Silver.
 - El muro de verificación de cuenta se detecta por la URL final y aborta la corrida sin tocar ningún aviso.
 - Un aviso solo se considera inalcanzable tras varios fallos entre corridas, nunca por uno solo.
 - 8 fallos seguidos en una corrida la abortan como `bloqueado`.
+- Si la base corta la conexión (por ejemplo, al suspender el equipo), el scraper **reconecta y repite la
+  operación** (`common/db.py::ConexionResiliente`, con esperas de 5 a 180 s) en vez de abortar. Si no logra
+  reconectar, cierra la corrida como `error`. La grilla hace lo mismo con sus escrituras.
+- **Solo las comunas de `config.COMUNAS_RM`:** la cola excluye avisos de otras comunas (`--comunas` cambia la lista).
+- **Log de avance:** además de la pantalla, cada corrida agrega sus líneas a `logs/detalle.log` (fuera de git).
+  Cada 50 visitas escribe una línea `Avance: 150/1322 (11 %) | 8,3 visitas/min | observaciones nuevas 148 |
+  sin leer 4 | resta ~2 h 20 min`. También quedan la cola inicial, cada aviso que no se pudo leer, las
+  reconexiones y el resumen final. El avance exacto está además en `bronze.detalle_intentos`.
+- **Log de la grilla:** `logs/grilla.log` (fuera de git), un resumen y no una línea por página: `INICIO`, una línea
+  por comuna (`[ 3/23] providencia  480 de 530 declarados (90,6 %) | INCOMPLETA | 12 págs | 4 min 43 s`),
+  `SEGMENTA` cuando parte por precio, `ALERTA` ante una página 1 vacía, un error de red o un rango que no se
+  puede partir, `ABORTADO` con el motivo y `FIN` con las comunas incompletas. Con `--detalle` agrega una línea
+  por página para depurar. Los dos scrapers escriben a pantalla y a su archivo fijo; no hay un log por turno.
 - Los **proyectos inmobiliarios** (que la grilla también lista como "Desde $X … N unidades disponibles")
   redirigen a una página de proyecto con otro ID. Se registran como `proyecto` y se excluyen; no sirven para
   el modelo.
@@ -151,7 +164,7 @@ pausado o finalizado se decide en Silver.
 
 | Decisión | Motivo |
 |---|---|
-| Ejecución local, no GitHub Actions | El sitio bloquea IPs de datacenter |
+| Ejecución local, no GitHub Actions | El sitio bloquea IPs de datacenter. Probado el 2026-10-19 desde un runner (rama `prueba-actions`): los 3 pedidos redirigieron a `/gz/account-verification` |
 | Solo departamentos en arriendo | Alcance del modelo |
 | Bronce de solo inserción, con hash | Historial de cambios sin repetir lo que no cambió |
 | Evidencia cruda, interpretación en Silver | Los incidentes de Concepción se agravaron porque el veredicto se guardaba junto al dato |
@@ -193,8 +206,10 @@ santiago-rentals-elt/
 ├── datos_externos/igvust/     # shapefile del índice socioeconómico (128 MB, fuera de git)
 ```
 
-Las comunas son 23: 15 principales y 8 de reserva (Puente Alto, San Bernardo, Peñalolén, Huechuraba,
-Quinta Normal, Conchalí, Cerrillos y Pedro Aguirre Cerda). Se amplían editando `config.COMUNAS_RM`.
+Se scrapean 12 comunas centrales o de interés: Santiago, Ñuñoa, Providencia, Estación Central, San Miguel,
+Independencia, Macul, La Florida, Recoleta, Huechuraba, Quinta Normal y Conchalí. Las otras 11 (Las Condes, Vitacura,
+Lo Barnechea, La Reina, Peñalolén, Quilicura, Maipú, Puente Alto, San Bernardo, Cerrillos y Pedro Aguirre Cerda)
+quedaron fuera el 2026-10-19; sus avisos ya cargados siguen en Bronce. Se cambian editando `config.COMUNAS_RM`.
 
 ## Cómo ejecutar
 
@@ -211,6 +226,7 @@ python bronze/scraper_grilla.py --sin-bd                   # solo landing, sin e
 
 python bronze/scraper_detalle.py --limite 300              # visita hasta 300 avisos de la cola
 python bronze/scraper_detalle.py --limite 20 --motivos nuevo
+python bronze/scraper_detalle.py --comunas nunoa-metropolitana   # solo esas comunas (por defecto, config.COMUNAS_RM)
 
 python bronze/cargar_igvust.py                             # una vez (o al actualizar el shapefile)
 python silver/construir_silver.py                          # reconstruye Silver desde Bronce

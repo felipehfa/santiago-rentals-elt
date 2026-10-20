@@ -36,6 +36,9 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
 | P-19 | 17-oct | El SCD2 no se podía validar porque aún no hay historia real | mitigado |
 | P-20 | 17-oct | El scraper de detalle recibió HTTP 429 y se abortó solo | abierto |
 | P-21 | 17-oct | Un aviso con gastos comunes de 95 millones pasó los flags de Silver | resuelto (18-oct) |
+| P-22 | 19-oct | El scraper de detalle abortó al suspenderse el equipo (conexión a la base cortada) | resuelto (19-oct) |
+| P-23 | 19-oct | La grilla murió con `connection already closed` tras un error de red | resuelto (19-oct) |
+| P-24 | 19-oct | GitHub Actions no puede scrapear el portal | confirmado (19-oct) |
 
 ---
 
@@ -305,6 +308,43 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
   ellos aptos hasta entonces; los 31 se revisaron a mano y eran todos errores de captura. El corte de 5 es
   deliberadamente holgado (con 3,5 marcaba 110 aptos y rozaba precios legítimos).
 - **Estado:** resuelto. La cota de 10 millones en el modelo se mantiene como red de seguridad.
+
+## P-22 · El scraper de detalle abortó al suspenderse el equipo
+
+- **Síntoma:** la corrida 29 se cortó a los 4 minutos con `server closed the connection unexpectedly` y luego
+  `connection already closed`; quedó en `en_curso` en `bronze.runs`. Se sospechó del rol nuevo `scraper_local`.
+- **Causa:** el usuario suspendió el notebook y el servidor cerró la conexión, que el scraper mantenía abierta
+  entre visitas sin reconectarse. Los dos roles tienen los mismos tiempos de inactividad y de consulta, así que
+  no era el rol.
+- **Resolución:** `common/db.py::ConexionResiliente` reabre la conexión y repite la operación (esperas de 5, 15,
+  45, 90 y 180 s para dar tiempo a que vuelva la red). `scraper_detalle.py` la usa en todas sus operaciones.
+  Probado matando la sesión desde el servidor (`pg_terminate_backend`): la operación se repitió sola. La corrida
+  huérfana 29 se marcó `error` a mano. Queda sin tratar que, tras reanudar, las visitas HTTP pueden fallar unos
+  segundos mientras vuelve la red y contar como fallos seguidos.
+- **Estado:** resuelto para la base; abierto para el caso de red caída durante la suspensión.
+
+---
+
+## P-23 · La grilla murió con `connection already closed`
+
+- **Síntoma:** a las 17:02 un error de red en Ñuñoa cortó también la conexión a la base; `cerrar_run` falló con
+  `InterfaceError` y la corrida 37 quedó `en_curso`. Santiago ya estaba guardada (4.301 avisos).
+- **Causa:** a diferencia del detalle, la grilla usaba una conexión simple (misma causa que P-22).
+- **Resolución:** las cinco funciones de escritura de `scraper_grilla.py` pasan por `ConexionResiliente` (decorador
+  `resiliente`). La corrida 37 se marcó `error` y se relanzó sin Santiago: 22 comunas, 43 min, 21 completas;
+  Ñuñoa quedó en 98,3 % (1.442 de 1.467).
+- **Estado:** resuelto.
+
+---
+
+## P-24 · GitHub Actions no puede scrapear el portal
+
+- **Síntoma:** desde un runner de Actions, 3 pedidos a páginas de grilla (con los mismos encabezados que el
+  scraper) devolvieron 302 a `/gz/account-verification`; desde el equipo local la misma petición da 200.
+- **Causa:** el sitio bloquea o exige verificación a IPs de centros de datos.
+- **Resolución:** los scrapers siguen locales. En Actions pueden correr Silver, Gold y el modelo, que no tocan el
+  portal. No se intenta saltar la verificación. La prueba vive en la rama `prueba-actions` del repo.
+- **Estado:** confirmado.
 
 ---
 

@@ -10,19 +10,14 @@ TIPOS_PROPIEDAD = ["departamento"]
 RESULTADOS_POR_PAGINA = 48  # tamaño real de página del sitio
 
 # Slugs en formato "comuna-metropolitana". Verificados con scripts/spike_slugs.py (todos responden 200).
-# Oleada 1 = núcleo; oleada 2 = segundo anillo; oleada 3 = reserva. Se scrapean todas.
+# Solo las comunas centrales o de interés. Quedaron fuera (2026-10-19): Las Condes, Vitacura, Lo Barnechea, La Reina,
+# Peñalolén, Quilicura, Maipú, Puente Alto, San Bernardo, Cerrillos y Pedro Aguirre Cerda. Sus avisos ya cargados
+# siguen en Bronce; para volver a scrapearlas basta agregar el slug acá.
 COMUNAS_RM = [
-    # oleada 1
     "santiago-metropolitana", "nunoa-metropolitana", "providencia-metropolitana",
-    "las-condes-metropolitana", "vitacura-metropolitana", "estacion-central-metropolitana",
-    "san-miguel-metropolitana", "independencia-metropolitana", "macul-metropolitana",
-    # oleada 2
-    "la-florida-metropolitana", "la-reina-metropolitana", "lo-barnechea-metropolitana",
-    "recoleta-metropolitana", "quilicura-metropolitana", "maipu-metropolitana",
-    # oleada 3 (reserva)
-    "puente-alto-metropolitana", "san-bernardo-metropolitana", "penalolen-metropolitana",
+    "estacion-central-metropolitana", "san-miguel-metropolitana", "independencia-metropolitana",
+    "macul-metropolitana", "la-florida-metropolitana", "recoleta-metropolitana",
     "huechuraba-metropolitana", "quinta-normal-metropolitana", "conchali-metropolitana",
-    "cerrillos-metropolitana", "pedro-aguirre-cerda-metropolitana",
 ]
 
 DELAY_MIN = 3.0
