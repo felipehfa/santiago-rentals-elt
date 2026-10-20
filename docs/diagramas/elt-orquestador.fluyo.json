@@ -10,10 +10,10 @@
      {
       "id": 1,
       "shape": "rect",
-      "x": 40,
-      "y": 330,
+      "x": 20,
+      "y": 270,
       "w": 220,
-      "h": 90,
+      "h": 100,
       "label": "Orquestador",
       "color": "#c9b458",
       "fill": null,
@@ -24,16 +24,17 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 0
+      "order": 0,
+      "fs": 22
      },
      {
       "id": 2,
       "shape": "rect",
-      "x": 420,
-      "y": 150,
-      "w": 240,
-      "h": 80,
-      "label": "Detalle (tandas de 400)",
+      "x": 340,
+      "y": 120,
+      "w": 250,
+      "h": 90,
+      "label": "Detalle (tandas)",
       "color": "#6a9fb5",
       "fill": null,
       "border": "solid",
@@ -43,15 +44,16 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 1
+      "order": 1,
+      "fs": 22
      },
      {
       "id": 3,
       "shape": "rect",
-      "x": 420,
-      "y": 520,
-      "w": 240,
-      "h": 80,
+      "x": 340,
+      "y": 440,
+      "w": 250,
+      "h": 90,
       "label": "Grilla (cada 6 h)",
       "color": "#6a9fb5",
       "fill": null,
@@ -62,15 +64,16 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 2
+      "order": 2,
+      "fs": 22
      },
      {
       "id": 4,
       "shape": "rect",
-      "x": 880,
-      "y": 335,
-      "w": 220,
-      "h": 80,
+      "x": 720,
+      "y": 280,
+      "w": 240,
+      "h": 90,
       "label": "Portal Inmobiliario",
       "color": "#8f8f8f",
       "fill": null,
@@ -81,16 +84,17 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 3
+      "order": 3,
+      "fs": 22
      },
      {
       "id": 5,
       "shape": "rect",
-      "x": 850,
-      "y": 30,
-      "w": 300,
+      "x": 720,
+      "y": 20,
+      "w": 240,
       "h": 80,
-      "label": "Espera 30 min y baja el ritmo",
+      "label": "Espera 30 min",
       "color": "#c16a6a",
       "fill": null,
       "border": "solid",
@@ -100,14 +104,15 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 4
+      "order": 4,
+      "fs": 22
      },
      {
       "id": 6,
       "shape": "cylinder",
-      "x": 1330,
-      "y": 320,
-      "w": 220,
+      "x": 1100,
+      "y": 270,
+      "w": 210,
       "h": 110,
       "label": "Bronce",
       "color": "#c98f5b",
@@ -119,16 +124,17 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 5
+      "order": 5,
+      "fs": 22
      },
      {
       "id": 7,
       "shape": "rect",
-      "x": 20,
-      "y": 170,
-      "w": 250,
-      "h": 98,
-      "label": "Alterna tandas de detalle y la\ngrilla. La grilla entra cada 6 h aunque\nla cola sea larga. Sin nada que\nvisitar, espera hasta 30 min.",
+      "x": 10,
+      "y": 420,
+      "w": 345,
+      "h": 97,
+      "label": "Alterna tandas de 400\nvisitas; la grilla entra\ncada 6 h",
       "color": "#8f8f8f",
       "fill": "none",
       "border": "dashed",
@@ -139,16 +145,16 @@
       "bold": false,
       "pulse": false,
       "order": 6,
-      "fs": 13
+      "fs": 17
      },
      {
       "id": 8,
       "shape": "rect",
-      "x": 400,
+      "x": 320,
       "y": 20,
-      "w": 400,
-      "h": 98,
-      "label": "Cola: nuevo, desaparecido, tarjeta cambiada\ny rotación por antigüedad (1, 2, 4, 7 o 14 días).\nPresupuesto: 6.000 visitas por 24 h.\nPausas de 3 a 6 s.",
+      "w": 379,
+      "h": 73,
+      "label": "Presupuesto: 6.000 visitas\npor 24 h",
       "color": "#8f8f8f",
       "fill": "none",
       "border": "dashed",
@@ -159,16 +165,16 @@
       "bold": false,
       "pulse": false,
       "order": 7,
-      "fs": 13
+      "fs": 17
      },
      {
       "id": 9,
       "shape": "rect",
-      "x": 1240,
+      "x": 1090,
       "y": 20,
-      "w": 440,
-      "h": 118,
-      "label": "429: espera 30 min, duplica las pausas (hasta ×8)\ny las baja a la mitad cada 50 visitas buenas.\nSi 3 bloqueos seguidos no avanzan, aborta y el\norquestador espera 30, 60 o 120 min.",
+      "w": 391,
+      "h": 121,
+      "label": "429: pausas ×2 (hasta ×8)\ny vuelven a la mitad cada\n50 visitas buenas",
       "color": "#8f8f8f",
       "fill": "none",
       "border": "dashed",
@@ -179,16 +185,16 @@
       "bold": false,
       "pulse": false,
       "order": 8,
-      "fs": 13
+      "fs": 17
      },
      {
       "id": 10,
       "shape": "rect",
-      "x": 400,
-      "y": 640,
-      "w": 360,
-      "h": 98,
-      "label": "12 comunas. Si la bloquean, reanuda solo las\nque faltaban. Una grilla incompleta no marca\navisos como desaparecidos en las comunas\nque no cubrió.",
+      "x": 330,
+      "y": 560,
+      "w": 379,
+      "h": 73,
+      "label": "Si la bloquean, reanuda\nlas comunas que faltaban",
       "color": "#8f8f8f",
       "fill": "none",
       "border": "dashed",
@@ -199,7 +205,7 @@
       "bold": false,
       "pulse": false,
       "order": 9,
-      "fs": 13
+      "fs": 17
      }
     ],
     "edges": [
@@ -218,7 +224,8 @@
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
       "id": 12,
@@ -235,7 +242,8 @@
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
       "id": 13,
@@ -245,14 +253,15 @@
       "toSide": null,
       "route": "ortho",
       "waypoints": [],
-      "label": "visita aviso",
+      "label": "visita",
       "font": null,
       "bold": false,
       "animated": true,
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
       "id": 14,
@@ -269,7 +278,8 @@
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
       "id": 15,
@@ -286,7 +296,8 @@
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
       "id": 16,
@@ -303,7 +314,8 @@
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
       "id": 17,
@@ -320,7 +332,8 @@
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
       "id": 18,
@@ -337,7 +350,8 @@
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      }
     ],
     "nextId": 19,

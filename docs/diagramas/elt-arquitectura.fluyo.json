@@ -10,10 +10,10 @@
      {
       "id": 1,
       "shape": "rect",
-      "x": 40,
-      "y": 270,
-      "w": 220,
-      "h": 80,
+      "x": 20,
+      "y": 215,
+      "w": 230,
+      "h": 90,
       "label": "Portal Inmobiliario",
       "color": "#8f8f8f",
       "fill": null,
@@ -24,15 +24,16 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 0
+      "order": 0,
+      "fs": 22
      },
      {
       "id": 2,
       "shape": "rect",
-      "x": 400,
-      "y": 160,
-      "w": 220,
-      "h": 80,
+      "x": 340,
+      "y": 120,
+      "w": 230,
+      "h": 90,
       "label": "Scraper de grilla",
       "color": "#6a9fb5",
       "fill": null,
@@ -43,15 +44,16 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 1
+      "order": 1,
+      "fs": 22
      },
      {
       "id": 3,
       "shape": "rect",
-      "x": 400,
-      "y": 380,
-      "w": 220,
-      "h": 80,
+      "x": 340,
+      "y": 310,
+      "w": 230,
+      "h": 90,
       "label": "Scraper de detalle",
       "color": "#6a9fb5",
       "fill": null,
@@ -62,14 +64,15 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 2
+      "order": 2,
+      "fs": 22
      },
      {
       "id": 4,
       "shape": "cylinder",
-      "x": 760,
-      "y": 255,
-      "w": 220,
+      "x": 700,
+      "y": 205,
+      "w": 210,
       "h": 110,
       "label": "Bronce",
       "color": "#c98f5b",
@@ -81,16 +84,17 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 3
+      "order": 3,
+      "fs": 22
      },
      {
       "id": 5,
       "shape": "cylinder",
-      "x": 760,
-      "y": 560,
-      "w": 220,
+      "x": 700,
+      "y": 440,
+      "w": 210,
       "h": 100,
-      "label": "Landing (HTML crudo)",
+      "label": "Landing (HTML)",
       "color": "#5bb0a0",
       "fill": null,
       "border": "solid",
@@ -100,14 +104,15 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 4
+      "order": 4,
+      "fs": 22
      },
      {
       "id": 6,
       "shape": "cylinder",
-      "x": 1120,
-      "y": 255,
-      "w": 220,
+      "x": 1040,
+      "y": 205,
+      "w": 210,
       "h": 110,
       "label": "Silver",
       "color": "#7fa66b",
@@ -119,16 +124,17 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 5
+      "order": 5,
+      "fs": 22
      },
      {
       "id": 7,
       "shape": "rect",
-      "x": 1010,
-      "y": 580,
-      "w": 200,
-      "h": 70,
-      "label": "mindicador.cl (UF y dólar)",
+      "x": 960,
+      "y": 440,
+      "w": 190,
+      "h": 80,
+      "label": "mindicador.cl",
       "color": "#8f8f8f",
       "fill": null,
       "border": "solid",
@@ -138,16 +144,17 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 6
+      "order": 6,
+      "fs": 22
      },
      {
       "id": 8,
       "shape": "rect",
-      "x": 1250,
-      "y": 580,
-      "w": 200,
-      "h": 70,
-      "label": "IGVUST (shapefile por UV)",
+      "x": 1190,
+      "y": 440,
+      "w": 150,
+      "h": 80,
+      "label": "IGVUST",
       "color": "#8f8f8f",
       "fill": null,
       "border": "solid",
@@ -157,14 +164,15 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 7
+      "order": 7,
+      "fs": 22
      },
      {
       "id": 9,
       "shape": "cylinder",
-      "x": 1480,
-      "y": 255,
-      "w": 220,
+      "x": 1380,
+      "y": 205,
+      "w": 210,
       "h": 110,
       "label": "Gold",
       "color": "#7fa66b",
@@ -176,15 +184,16 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 8
+      "order": 8,
+      "fs": 22
      },
      {
       "id": 10,
       "shape": "rect",
-      "x": 1840,
-      "y": 160,
-      "w": 220,
-      "h": 80,
+      "x": 1380,
+      "y": 400,
+      "w": 230,
+      "h": 90,
       "label": "Modelo (repo ML)",
       "color": "#9b7fb5",
       "fill": null,
@@ -195,14 +204,15 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 9
+      "order": 9,
+      "fs": 22
      },
      {
       "id": 11,
       "shape": "cylinder",
-      "x": 1840,
-      "y": 380,
-      "w": 220,
+      "x": 1380,
+      "y": 560,
+      "w": 230,
       "h": 100,
       "label": "gold.predicciones",
       "color": "#7bb85b",
@@ -214,16 +224,17 @@
       "font": null,
       "bold": false,
       "pulse": false,
-      "order": 10
+      "order": 10,
+      "fs": 22
      },
      {
       "id": 12,
       "shape": "rect",
-      "x": 360,
+      "x": 320,
       "y": 20,
-      "w": 340,
-      "h": 78,
-      "label": "12 comunas. Si una búsqueda declara más de\n1.800 resultados se parte por rango de precio\n(el sitio corta en 2.016).",
+      "w": 334,
+      "h": 73,
+      "label": "12 comunas; si pasan de 1.800\nresultados, se parte por precio",
       "color": "#8f8f8f",
       "fill": "none",
       "border": "dashed",
@@ -234,16 +245,16 @@
       "bold": false,
       "pulse": false,
       "order": 11,
-      "fs": 13
+      "fs": 17
      },
      {
       "id": 13,
       "shape": "rect",
-      "x": 360,
-      "y": 500,
-      "w": 340,
-      "h": 98,
-      "label": "Cola: nuevo, desaparecido, tarjeta cambiada y\nrotación (cada 1 a 14 días según antigüedad).\nFuera: finalizados, proyectos y avisos\ncon 5 fallos.",
+      "x": 300,
+      "y": 440,
+      "w": 379,
+      "h": 73,
+      "label": "Cola: nuevo, desaparecido, tarjeta\ncambiada y rotación por antigüedad",
       "color": "#8f8f8f",
       "fill": "none",
       "border": "dashed",
@@ -254,16 +265,16 @@
       "bold": false,
       "pulse": false,
       "order": 12,
-      "fs": 13
+      "fs": 17
      },
      {
       "id": 14,
       "shape": "rect",
-      "x": 735,
-      "y": 100,
-      "w": 270,
-      "h": 78,
-      "label": "Registro crudo: solo se agrega.\nCada visita queda en detalle_intentos;\nuna observación nueva, si cambió.",
+      "x": 680,
+      "y": 80,
+      "w": 288,
+      "h": 73,
+      "label": "Registro crudo:\nsolo se agrega",
       "color": "#8f8f8f",
       "fill": "none",
       "border": "dashed",
@@ -274,16 +285,16 @@
       "bold": false,
       "pulse": false,
       "order": 13,
-      "fs": 13
+      "fs": 17
      },
      {
       "id": 15,
       "shape": "rect",
-      "x": 1100,
-      "y": 100,
-      "w": 360,
-      "h": 98,
-      "label": "Se reconstruye (REPEATABLE READ). Marca:\nsuperficie < 12 o > 500 m²; precio < 100 mil\no > 8 M; precio por m² atípico\n(z robusto > 5).",
+      "x": 1020,
+      "y": 80,
+      "w": 288,
+      "h": 73,
+      "label": "Limpia y marca banderas\nde anomalía",
       "color": "#8f8f8f",
       "fill": "none",
       "border": "dashed",
@@ -294,16 +305,16 @@
       "bold": false,
       "pulse": false,
       "order": 14,
-      "fs": 13
+      "fs": 17
      },
      {
       "id": 16,
       "shape": "rect",
-      "x": 1470,
-      "y": 100,
-      "w": 340,
-      "h": 98,
-      "label": "Apto: con detalle, no proyecto, no finalizado\nhace más de 90 días, con precio, superficie y\ncoordenadas, y sin banderas de anomalía.",
+      "x": 1360,
+      "y": 80,
+      "w": 288,
+      "h": 73,
+      "label": "Aptos para entrenar:\nsin banderas",
       "color": "#8f8f8f",
       "fill": "none",
       "border": "dashed",
@@ -314,66 +325,48 @@
       "bold": false,
       "pulse": false,
       "order": 15,
-      "fs": 13
-     },
-     {
-      "id": 17,
-      "shape": "rect",
-      "x": 1790,
-      "y": 540,
-      "w": 360,
-      "h": 98,
-      "label": "Roles: scraper_local escribe en Bronce;\nml_lectura lee Gold; ml_scoring lee Gold\ne inserta en gold.predicciones.",
-      "color": "#8f8f8f",
-      "fill": "none",
-      "border": "dashed",
-      "lblPos": "center",
-      "textBg": null,
-      "textColor": null,
-      "font": null,
-      "bold": false,
-      "pulse": false,
-      "order": 16,
-      "fs": 13
+      "fs": 17
      }
     ],
     "edges": [
      {
-      "id": 18,
+      "id": 17,
       "from": 2,
       "to": 1,
       "fromSide": null,
       "toSide": null,
       "route": "ortho",
       "waypoints": [],
-      "label": "lista avisos",
+      "label": "lista",
       "font": null,
       "bold": false,
       "animated": true,
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
-      "id": 19,
+      "id": 18,
       "from": 3,
       "to": 1,
       "fromSide": null,
       "toSide": null,
       "route": "ortho",
       "waypoints": [],
-      "label": "visita aviso",
+      "label": "visita",
       "font": null,
       "bold": false,
       "animated": true,
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
-      "id": 20,
+      "id": 19,
       "from": 2,
       "to": 4,
       "fromSide": null,
@@ -387,10 +380,11 @@
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
-      "id": 21,
+      "id": 20,
       "from": 3,
       "to": 4,
       "fromSide": null,
@@ -404,27 +398,29 @@
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
-      "id": 22,
+      "id": 21,
       "from": 4,
       "to": 5,
       "fromSide": null,
       "toSide": null,
       "route": "ortho",
       "waypoints": [],
-      "label": "HTML crudo",
+      "label": "HTML",
       "font": null,
       "bold": false,
       "animated": true,
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
-      "id": 23,
+      "id": 22,
       "from": 4,
       "to": 6,
       "fromSide": null,
@@ -438,27 +434,29 @@
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
-      "id": 24,
+      "id": 23,
       "from": 7,
       "to": 6,
       "fromSide": null,
       "toSide": null,
       "route": "ortho",
       "waypoints": [],
-      "label": "UF y dólar",
+      "label": "UF, dólar",
       "font": null,
       "bold": false,
       "animated": true,
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
-      "id": 25,
+      "id": 24,
       "from": 8,
       "to": 6,
       "fromSide": null,
@@ -472,10 +470,11 @@
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
-      "id": 26,
+      "id": 25,
       "from": 6,
       "to": 9,
       "fromSide": null,
@@ -489,27 +488,29 @@
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
-      "id": 27,
+      "id": 26,
       "from": 9,
       "to": 10,
       "fromSide": null,
       "toSide": null,
       "route": "ortho",
       "waypoints": [],
-      "label": "aviso_entrenamiento",
+      "label": "datos",
       "font": null,
       "bold": false,
       "animated": true,
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      },
      {
-      "id": 28,
+      "id": 27,
       "from": 10,
       "to": 11,
       "fromSide": null,
@@ -523,10 +524,11 @@
       "dashed": false,
       "startArrow": false,
       "endArrow": true,
-      "flowDir": "normal"
+      "flowDir": "normal",
+      "fs": 18
      }
     ],
-    "nextId": 29,
+    "nextId": 28,
     "behaviors": [],
     "scenarios": [
      {
@@ -540,42 +542,42 @@
         "at": 0,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 18
+        "edgeId": 17
        },
        {
         "id": 2,
         "at": 300,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 20
+        "edgeId": 19
        },
        {
         "id": 3,
         "at": 900,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 19
+        "edgeId": 18
        },
        {
         "id": 4,
         "at": 1200,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 21
+        "edgeId": 20
        },
        {
         "id": 5,
         "at": 1400,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 22
+        "edgeId": 21
        },
        {
         "id": 6,
         "at": 1700,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 23
+        "edgeId": 22
        },
        {
         "id": 7,
@@ -589,7 +591,7 @@
         "at": 2300,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 26
+        "edgeId": 25
        },
        {
         "id": 9,
@@ -603,14 +605,14 @@
         "at": 2900,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 27
+        "edgeId": 26
        },
        {
         "id": 11,
         "at": 3200,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 28
+        "edgeId": 27
        },
        {
         "id": 12,
@@ -701,7 +703,7 @@
         "at": 0,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 19
+        "edgeId": 18
        },
        {
         "id": 2,
@@ -722,14 +724,14 @@
         "at": 3600,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 19
+        "edgeId": 18
        },
        {
         "id": 5,
         "at": 3900,
         "eventTypeId": 1,
         "action": "SEND",
-        "edgeId": 21
+        "edgeId": 20
        }
       ],
       "arrivalDependencies": [
