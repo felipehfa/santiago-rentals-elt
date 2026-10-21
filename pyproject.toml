@@ -1,0 +1,10 @@
+[tool.ruff]
+line-length = 130
+target-version = "py311"
+
+# Solo errores de sintaxis y de pyflakes (nombres sin definir, imports sin usar): el estilo del repo no se impone.
+[tool.ruff.lint]
+select = ["E9", "F"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

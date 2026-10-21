@@ -311,8 +311,12 @@ santiago-rentals-elt/
 │   ├── scraper_detalle.py
 │   ├── orquestador.py         # alterna detalle y grilla, reconstruye Silver y Gold cada hora; espera y reanuda ante un 429
 │   └── sql/                   # 001_schema, 002_detalle, 003_cobertura
+├── pyproject.toml             # ruff (sintaxis y pyflakes) y pytest
+├── tests/                     # HTML sintético, sin red ni base de datos (CI en .github/workflows/ci.yml)
 ├── scripts/
 │   ├── aplicar_ddl.py         # aplica los .sql en orden (idempotente)
+│   ├── vigilar_orquestador.ps1       # lanza el orquestador si no está corriendo (nunca dos)
+│   ├── instalar_tarea_windows.ps1    # registra la tarea programada que llama al anterior
 │   ├── spike_slugs.py         # verificó los slugs de las 23 comunas
 │   └── spike_detalle.py       # verificó dónde viven estado y precio en el detalle
 ├── docs/
@@ -383,7 +387,24 @@ python gold/construir_gold.py                              # reconstruye Gold de
 ```
 
 Todo es **reanudable**: si una corrida se corta, volver a lanzar el mismo comando retoma desde la cola. El
-PC debe quedar encendido y sin suspenderse durante las corridas largas. La primera carga completa del
+PC debe quedar encendido y sin suspenderse durante las corridas largas.
+
+**Mantenerlo corriendo sin depender de una sesión abierta.** `scripts/instalar_tarea_windows.ps1` (una sola vez) registra la
+tarea `SantiagoRentalsOrquestador`: al iniciar sesión y cada 10 minutos ejecuta `scripts/vigilar_orquestador.ps1`, que lanza el
+orquestador solo si no hay uno corriendo. Así se recupera tras un reinicio o una caída del proceso. Para detenerlo a propósito,
+crear `logs/orquestador.stop` (la tarea no lo relanza mientras el archivo exista; borrarlo para reanudar). Desactivar la
+suspensión del equipo sigue siendo manual. Quitar la tarea: `Unregister-ScheduledTask -TaskName SantiagoRentalsOrquestador`.
+
+**Alertas.** El repo del mapa tiene un workflow `vigilante` que corre cada hora en GitHub y falla (con correo) si Gold lleva más de
+3 horas sin reconstruirse o si el scoring se atrasó; avisa aunque el notebook esté apagado (ver el README de `santiago-rentals-vis`).
+
+## Pruebas y CI
+
+`python -m pytest -q` (19 pruebas, menos de un segundo) cubre con HTML sintético la extracción del detalle (campos, JSON de la
+página, precio, estado, hash sin campos volátiles), la grilla (URLs sin los filtros que el robots.txt bloquea, tarjetas,
+cobertura) y cuándo toca reconstruir Silver y Gold. También fija dos acuerdos de uso responsable: el User-Agent con contacto y el
+tope de 5.000 visitas por 24 h. El workflow `ci` corre ruff (sintaxis y pyflakes) y pytest en cada push. No hay pruebas del SQL de
+Silver y Gold: necesitarían una base Postgres de prueba. La primera carga completa del
 detalle son unos 15.000 avisos: con el ritmo medido (~8,7 visitas por minuto) son unas 29 horas. Al
 terminar ocuparán unos 2 GB de HTML en `landing/` y ~70 MB en Supabase.
 

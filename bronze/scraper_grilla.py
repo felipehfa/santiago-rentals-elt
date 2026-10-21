@@ -13,7 +13,6 @@ import gzip
 import hashlib
 import json
 import logging
-import math
 import random
 import re
 import sys

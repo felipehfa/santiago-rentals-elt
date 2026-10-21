@@ -1,0 +1,19 @@
+# CI: lint mínimo (sintaxis y pyflakes) y tests con HTML sintético. No usa secrets ni toca la red ni la base de datos.
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      # Solo lo que importan los scrapers; geopandas y compañía son de la carga única de datos externos.
+      - run: pip install requests beautifulsoup4 lxml psycopg2-binary python-dotenv pytest ruff
+      - run: python -m ruff check bronze common silver gold config.py tests
+      - run: python -m pytest -q
