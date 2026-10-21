@@ -134,6 +134,10 @@ Historias: *Un aviso normal, de Bronce a Silver* y *Un aviso con precio por m² 
   sin precio, sin superficie, sin coordenadas, coordenada fuera de la región, conteo imposible, superficie sospechosa, precio
   sospechoso y precio por m² atípico. Incluye el título y la descripción, que usa el modelo, y la `url` de la publicación
   (la usa el mapa, para no leer Silver).
+- **Antigüedad corregida:** si el aviso no trae `antiguedad_anos` o trae un valor imposible (fuera de 0 a 150), Gold la completa
+  con la mediana de los avisos con dato válido en el mismo punto (5 decimales, un edificio) y, si no hay, con la de los avisos a
+  menos de ~150 m (al menos 3). `antiguedad_origen` guarda de dónde salió (`aviso`, `mismo_punto`, `vecinos` o `sin_dato`). Medido
+  dejando un aviso fuera: error mediano de 1 año en el mismo punto y 5,3 años de error medio con vecinos (7,8 con la mediana global).
 - **`gold.dim_estado_aviso_scd2` y `gold.dim_precio_aviso_scd2`**: intervalos de vigencia del estado y del precio de cada aviso
   (con poca historia todavía: se llenan a medida que las revisitas acumulan cambios).
 - **`gold.predicciones`** no se reconstruye: solo recibe filas del modelo.

@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS gold.aviso_entrenamiento (
     superficie_total_m2         NUMERIC,
     superficie_util_m2          NUMERIC,
     antiguedad_anos             INTEGER,
+    antiguedad_origen           TEXT,               -- aviso | mismo_punto | vecinos | sin_dato
     piso_unidad                 INTEGER,
     deptos_por_piso             INTEGER,
     amoblado                    BOOLEAN,
@@ -130,6 +131,7 @@ CREATE TABLE IF NOT EXISTS gold.aviso_entrenamiento (
 ALTER TABLE gold.aviso_entrenamiento ADD COLUMN IF NOT EXISTS titulo TEXT;
 ALTER TABLE gold.aviso_entrenamiento ADD COLUMN IF NOT EXISTS descripcion TEXT;
 ALTER TABLE gold.aviso_entrenamiento ADD COLUMN IF NOT EXISTS url TEXT;
+ALTER TABLE gold.aviso_entrenamiento ADD COLUMN IF NOT EXISTS antiguedad_origen TEXT;
 CREATE INDEX IF NOT EXISTS aviso_entrenamiento_apto_idx ON gold.aviso_entrenamiento (apto_entrenamiento);
 CREATE INDEX IF NOT EXISTS aviso_entrenamiento_comuna_idx ON gold.aviso_entrenamiento (comuna);
 

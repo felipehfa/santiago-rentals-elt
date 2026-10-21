@@ -10,6 +10,11 @@
 --   superficie   la bandera superficie_util_sospechosa viene de Silver (< 12 o > 500 m2)
 --   precio       la bandera precio_sospechoso viene de Silver (> 8.000.000 o < 100.000 CLP)
 --   precio_m2    la bandera precio_m2_atipico viene de Silver (costo por m2 con z robusto > 5 en su comuna)
+--
+-- Antigüedad (decisión del 21-oct-2026): si el aviso no la trae o trae un valor imposible (fuera de 0 a 150 años), se
+-- completa con la mediana de los avisos con dato válido en el mismo punto (5 decimales: un edificio) y, si no hay,
+-- con la de los avisos a menos de ~150 m (al menos 3). Medido con un aviso a la vez: error mediano de 1 año en el mismo
+-- punto; 5,3 años de error medio con vecinos (7,8 con la mediana global). antiguedad_origen dice de dónde salió el valor.
 
 TRUNCATE gold.aviso_entrenamiento;
 
@@ -20,7 +25,7 @@ INSERT INTO gold.aviso_entrenamiento (
     precio_valor, precio_moneda, tiene_rebaja, fecha_precio, precio_clp, gastos_comunes,
     costo_total_clp, costo_total_uf, gastos_comunes_faltante,
     dormitorios, banos, estacionamientos, bodegas, tiene_bodega, superficie_total_m2, superficie_util_m2,
-    antiguedad_anos, piso_unidad, deptos_por_piso,
+    antiguedad_anos, antiguedad_origen, piso_unidad, deptos_por_piso,
     amoblado, admite_mascotas, condominio_cerrado, estacionamiento_visitas, piscina, quincho, conserjeria, ascensor,
     latitud, longitud,
     cantidad_paraderos, distancia_min_m_paraderos, cantidad_estaciones_metro, distancia_min_m_estaciones_metro,
@@ -37,6 +42,30 @@ WITH cambios AS (
 ),
 cambios_precio AS (
     SELECT id_aviso, count(*) - 1 AS n FROM gold.dim_precio_aviso_scd2 GROUP BY id_aviso
+),
+edad_valida AS (
+    SELECT latitud::numeric AS lat, longitud::numeric AS lon, antiguedad_anos AS edad,
+           floor(latitud / 0.0015)::int AS cy, floor(longitud / 0.0018)::int AS cx
+    FROM silver.avisos
+    WHERE latitud IS NOT NULL AND longitud IS NOT NULL AND antiguedad_anos BETWEEN 0 AND 150
+),
+edad_punto AS (
+    SELECT round(lat, 5) AS la, round(lon, 5) AS lo, percentile_cont(0.5) WITHIN GROUP (ORDER BY edad) AS mediana
+    FROM edad_valida GROUP BY 1, 2
+),
+a_completar AS (
+    SELECT id_aviso, latitud::numeric AS lat, longitud::numeric AS lon,
+           floor(latitud / 0.0015)::int AS cy, floor(longitud / 0.0018)::int AS cx
+    FROM silver.avisos
+    WHERE latitud IS NOT NULL AND longitud IS NOT NULL
+      AND (antiguedad_anos IS NULL OR antiguedad_anos NOT BETWEEN 0 AND 150)
+),
+edad_vecinos AS (
+    SELECT c.id_aviso, percentile_cont(0.5) WITHIN GROUP (ORDER BY v.edad) AS mediana
+    FROM a_completar c
+    JOIN edad_valida v ON v.cy BETWEEN c.cy - 1 AND c.cy + 1 AND v.cx BETWEEN c.cx - 1 AND c.cx + 1
+                      AND abs(v.lat - c.lat) < 0.00135 AND abs(v.lon - c.lon) < 0.0016
+    GROUP BY c.id_aviso HAVING count(*) >= 3
 ),
 motivos AS (
     SELECT a.*,
@@ -73,7 +102,13 @@ SELECT
     CASE WHEN m.valor_uf IS NOT NULL AND m.costo_total_clp IS NOT NULL THEN m.costo_total_clp / m.valor_uf END,
     m.gastos_comunes_faltante,
     m.dormitorios, m.banos, m.estacionamientos, m.bodegas, m.tiene_bodega, m.superficie_total_m2, m.superficie_util_m2,
-    m.antiguedad_anos, m.piso_unidad, m.deptos_por_piso,
+    CASE WHEN m.antiguedad_anos BETWEEN 0 AND 150 THEN m.antiguedad_anos
+         ELSE round(coalesce(ep.mediana, ev.mediana))::int END,
+    CASE WHEN m.antiguedad_anos BETWEEN 0 AND 150 THEN 'aviso'
+         WHEN ep.mediana IS NOT NULL THEN 'mismo_punto'
+         WHEN ev.mediana IS NOT NULL THEN 'vecinos'
+         ELSE 'sin_dato' END,
+    m.piso_unidad, m.deptos_por_piso,
     m.amoblado, m.admite_mascotas, m.condominio_cerrado, m.estacionamiento_visitas, m.piscina, m.quincho,
     m.conserjeria, m.ascensor,
     m.latitud, m.longitud,
@@ -87,6 +122,8 @@ SELECT
     m.titulo, m.descripcion, m.url
 FROM motivos m
 LEFT JOIN cambios ON cambios.id_aviso = m.id_aviso
-LEFT JOIN cambios_precio ON cambios_precio.id_aviso = m.id_aviso;
+LEFT JOIN cambios_precio ON cambios_precio.id_aviso = m.id_aviso
+LEFT JOIN edad_punto ep ON ep.la = round(m.latitud::numeric, 5) AND ep.lo = round(m.longitud::numeric, 5)
+LEFT JOIN edad_vecinos ev ON ev.id_aviso = m.id_aviso;
 
 UPDATE gold.aviso_entrenamiento SET construido_en = now();
