@@ -294,7 +294,7 @@ pausado o finalizado se decide en Silver.
 | "Desaparecido" se evalúa por comuna | Una corrida parcial no debe hacer parecer desaparecidos a los avisos de otras comunas |
 | El precio vigente y el estado salen del detalle | La grilla solo aporta una señal barata de que algo cambió |
 | Segmentar por dormitorios, no por precio | El `robots.txt` bloquea `_PriceRange_`, y también superficie, baños y estacionamientos. Cumplirlo cuesta cobertura: "1 dormitorio" en Santiago declara más de 2.016 y el sitio no deja partirlo, y los filtros de 4 o más dormitorios y de estudio no existen (redirigen a la búsqueda sin filtro) |
-| El scraper se identifica | User-Agent con el nombre del proyecto y el contacto (GitHub y LinkedIn), no el de un Chrome. El presupuesto baja a 5.000 visitas por 24 h: el primer 429 llegó con ~7.500 y no se vuelve a buscar el límite |
+| El scraper se identifica | User-Agent con el nombre del proyecto y el contacto (GitHub y LinkedIn), no el de un Chrome. El presupuesto queda en 5.000 visitas por 24 h (se probó 6.000 y 7.000 el 21-oct y llegó un 429 con 6.660 visitas en 24 h y 247 en la última hora): el primer 429 llegó con ~7.500, y con ese margen no se busca el límite |
 | HTML crudo a disco | Reproducibilidad; Supabase gratis tiene 500 MB |
 | Sin conversión de monedas ni de fechas relativas en Bronce | La fecha absoluta se calcula en Silver restando el texto a `scraped_at` |
 
