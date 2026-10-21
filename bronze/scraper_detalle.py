@@ -65,7 +65,7 @@ VISITAS_PARA_RELAJAR = 50          # visitas buenas seguidas tras las que las pa
 MAX_BLOQUEOS_SEGUIDOS = 3           # bloqueos sin ninguna visita buena entre medio => abortar
 # Códigos de salida: el orquestador decide qué hacer según cómo terminó el detalle.
 CODIGOS_SALIDA = {"success": 0, "vacia": 5, "bloqueado": 1, "presupuesto": 4}
-PRESUPUESTO_24H = 1500              # visitas máximas en una ventana móvil de 24 h (--presupuesto-dia)
+PRESUPUESTO_24H = 5000              # visitas máximas en una ventana móvil de 24 h (--presupuesto-dia)
 
 # El sitio, ante tráfico que clasifica como automatizado, puede redirigir CUALQUIER URL a un muro de
 # verificación con status 200 y sin CAPTCHA visible. En el proyecto de Concepción eso marcó ~1.550 avisos

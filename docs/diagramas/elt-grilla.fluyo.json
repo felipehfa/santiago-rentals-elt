@@ -74,7 +74,7 @@
       "y": 20,
       "w": 250,
       "h": 90,
-      "label": "Parte por precio",
+      "label": "Por dormitorios",
       "color": "#6a9fb5",
       "fill": null,
       "border": "solid",
@@ -190,11 +190,11 @@
      {
       "id": 10,
       "shape": "rect",
-      "x": 1320,
+      "x": 1345,
       "y": 20,
       "w": 311,
       "h": 77,
-      "label": "Escalera de rangos; divide\nlos grandes a la mitad",
+      "label": "Filtros de 1, 2 y 3 dormitorios;\nrobots.txt: sin precio",
       "color": "#8f8f8f",
       "fill": "none",
       "border": "dashed",
@@ -349,7 +349,7 @@
       "toSide": null,
       "route": "ortho",
       "waypoints": [],
-      "label": "cada rango",
+      "label": "cada filtro",
       "font": null,
       "bold": false,
       "animated": true,
@@ -515,7 +515,7 @@
      {
       "id": 2,
       "engineVersion": 2,
-      "name": "Santiago: más de 1.800, se parte por precio",
+      "name": "Santiago: más de 1.800, se complementa por dormitorios",
       "nextStepId": 9,
       "steps": [
        {

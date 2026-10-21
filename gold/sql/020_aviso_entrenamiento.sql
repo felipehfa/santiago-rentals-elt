@@ -30,7 +30,7 @@ INSERT INTO gold.aviso_entrenamiento (
     cantidad_centros_comerciales, distancia_min_m_centros_comerciales, cantidad_hospitales, distancia_min_m_hospitales,
     cantidad_clinicas, distancia_min_m_clinicas,
     uv_rsh, rank_nac, c_ig_com, c_ig_reg, c_ig_nac, pob_rsh_uv, hog_uv, p_urbano,
-    titulo, descripcion
+    titulo, descripcion, url
 )
 WITH cambios AS (
     SELECT id_aviso, count(*) - 1 AS n FROM gold.dim_estado_aviso_scd2 GROUP BY id_aviso
@@ -84,7 +84,7 @@ SELECT
     m.cantidad_centros_comerciales, m.distancia_min_m_centros_comerciales, m.cantidad_hospitales,
     m.distancia_min_m_hospitales, m.cantidad_clinicas, m.distancia_min_m_clinicas,
     m.uv_rsh, m.rank_nac, m.c_ig_com, m.c_ig_reg, m.c_ig_nac, m.pob_rsh_uv, m.hog_uv, m.p_urbano,
-    m.titulo, m.descripcion
+    m.titulo, m.descripcion, m.url
 FROM motivos m
 LEFT JOIN cambios ON cambios.id_aviso = m.id_aviso
 LEFT JOIN cambios_precio ON cambios_precio.id_aviso = m.id_aviso;

@@ -44,8 +44,9 @@ Cómo se descubre qué avisos existen (`bronze/scraper_grilla.py`):
 
 1. Para cada comuna de `config.COMUNAS_RM` pide la página 1 y lee el **total declarado** ("N resultados").
 2. El sitio corta cada búsqueda en 2.016 resultados (responde 404 desde la página 43). Si el total supera **1.800**, la búsqueda se
-   parte en rangos de precio: parte de una escalera de rangos y divide a la mitad cualquiera que siga siendo grande. Los bordes se
-   solapan y los duplicados se absorben por ID.
+   complementa con tres búsquedas por dormitorios (1, 2 y 3; el `robots.txt` del sitio impide partir por precio) y con la búsqueda
+   sin filtro recorrida hasta el tope. Los duplicados se absorben por ID. Un filtro que aun así pasa de 2.016 (1 dormitorio en
+   Santiago) deja avisos sin ver, y esa comuna queda con cobertura parcial.
 3. Recorre las páginas de cada búsqueda y guarda el HTML y las tarjetas. Una tarjeta entra a Bronce **solo si cambió** (hash de su
    contenido, sin el `tracking_id` aleatorio de la URL).
 4. Al cerrar cada comuna compara los avisos únicos capturados con el total declarado y registra su **cobertura**: `completa` si
@@ -53,7 +54,7 @@ Cómo se descubre qué avisos existen (`bronze/scraper_grilla.py`):
 5. **Bloqueo.** Con HTTP 403 o 429, o con 3 búsquedas seguidas cuya página 1 viene vacía sin que el sitio diga "0 resultados", la
    corrida se marca `bloqueado`: una respuesta vacía nunca es un éxito.
 
-Historias: *Una comuna chica: sin partir*, *Santiago: más de 1.800, se parte por precio* y *El sitio bloquea la búsqueda*.
+Historias: *Una comuna chica: sin partir*, *Santiago: más de 1.800, se complementa por dormitorios* y *El sitio bloquea la búsqueda*.
 
 ### 3. Cola y reglas del detalle
 
@@ -85,7 +86,7 @@ Cómo se mantienen activos los dos scrapers sin intervención y qué hacen cuand
   del detalle sea larga. Si no hay nada que visitar, espera hasta 30 minutos y vuelve a mirar.
 - **Detalle.** Recorre su cola con un presupuesto de visitas por ventana móvil de 24 horas y pausas aleatorias entre visitas
   (configurables; hoy de 3 a 6 s).
-- **Silver y Gold.** Cada 3 horas, entre dos tandas de detalle (así nunca coinciden con una grilla), reconstruye Silver y luego
+- **Silver y Gold.** Cada hora, entre dos tandas de detalle (así nunca coinciden con una grilla), reconstruye Silver y luego
   Gold desde Bronce. Si falla, reintenta a los 30 minutos; el estado queda en `logs/silver_gold.json`.
 - **Un 429.** El scraper no aborta: espera 30 minutos, duplica las pausas (hasta ×8) y las baja a la mitad cada 50 visitas
   buenas hasta volver a las originales. El ritmo con que termina una tanda se guarda y la siguiente lo retoma. Si 3 bloqueos
@@ -131,10 +132,14 @@ Historias: *Un aviso normal, de Bronce a Silver* y *Un aviso con precio por m² 
 - **`gold.aviso_entrenamiento`**: un aviso es **apto** si no tiene ningún motivo de exclusión. Los motivos se acumulan en
   `motivo_exclusion` para poder revisar qué descarta: proyecto, sin detalle, estado no reconocido, finalizado hace más de 90 días,
   sin precio, sin superficie, sin coordenadas, coordenada fuera de la región, conteo imposible, superficie sospechosa, precio
-  sospechoso y precio por m² atípico. Incluye el título y la descripción, que usa el modelo.
+  sospechoso y precio por m² atípico. Incluye el título y la descripción, que usa el modelo, y la `url` de la publicación
+  (la usa el mapa, para no leer Silver).
 - **`gold.dim_estado_aviso_scd2` y `gold.dim_precio_aviso_scd2`**: intervalos de vigencia del estado y del precio de cada aviso
   (con poca historia todavía: se llenan a medida que las revisitas acumulan cambios).
 - **`gold.predicciones`** no se reconstruye: solo recibe filas del modelo.
+- **`gold.modelo_vigente`** tampoco: el scoring escribe una fila por versión del champion con sus cifras (métricas, datos
+  usados, variables que más pesan) y el mapa las lee para su pestaña "Cómo funciona". El DDL da los permisos a los roles
+  `ml_scoring` (escribe) y `vis_lectura` (lee) si existen.
 
 Historias: *Un aviso apto llega al modelo*, *Un aviso con superficie absurda queda fuera* y *Cada cambio queda con su vigencia*.
 
@@ -152,7 +157,7 @@ Historias: *Un aviso apto llega al modelo*, *Un aviso con superficie absurda que
 | Gold: `gold.aviso_entrenamiento` | Funcionando: 14.947 avisos, 12.597 aptos (1.912 aún sin detalle; el resto, ~440, excluidos por calidad). Incluye el título y la descripción del aviso, que usa el modelo |
 | Gold: `gold.predicciones` | La escribe el scoring por lotes del modelo (rol `ml_scoring`, `INSERT` y `SELECT`): predicción, etiqueta de mercado (oportunidad / precio de mercado / caro), confianza y banda de mercado. `gold.predicciones_vigentes` es la última de cada aviso |
 | Modelo | Funcionando en el repo `santiago-rentals-ml` |
-| Orquestador (`bronze/orquestador.py`) | Funcionando: alterna detalle y grilla con esperas ante un 429. Reconstruye Silver y Gold cada 3 h. Falta la tarea programada de Windows |
+| Orquestador (`bronze/orquestador.py`) | Funcionando: alterna detalle y grilla con esperas ante un 429. Reconstruye Silver y Gold cada hora. Falta la tarea programada de Windows |
 
 Cifras al 18-oct-2026 (cambian con cada corrida):
 
@@ -174,7 +179,7 @@ fuente al modelo:
 
 **Landing (`landing/`).** HTML crudo comprimido, local y fuera de git. Permite volver a parsear sin volver
 a pedir las páginas. La grilla guarda cada página (`landing/<fecha>/<tipo>/<comuna>/pNNN.html.gz`, con una
-subcarpeta `seg_<min>-<max>` cuando hay rango de precio). El detalle guarda el HTML solo cuando entra una
+subcarpeta `seg_<filtro>` cuando hay filtro de dormitorios). El detalle guarda el HTML solo cuando entra una
 observación nueva (`landing/detalle/<fecha>/<id>.html.gz`).
 
 **Bronce (Supabase, schema `bronze`).** Datos tal como vienen del sitio: sin limpiar, sin convertir
@@ -184,7 +189,7 @@ se guardan como `jsonb`.
 | Tabla | Rol |
 |---|---|
 | `runs` | Una fila por ejecución de un scraper (inicio, fin, estado, páginas, filas) |
-| `grilla_paginas` | Una fila por página pedida: URL, HTTP, tarjetas, total declarado, ruta del HTML, rango de precio. Es el log de auditoría |
+| `grilla_paginas` | Una fila por página pedida: URL, HTTP, tarjetas, total declarado, ruta del HTML, filtro de dormitorios. Es el log de auditoría |
 | `grilla_avisos` | Tarjetas de la grilla. Se inserta una fila **solo si cambió** (hash del payload) |
 | `grilla_vistos` | Primera y última vez que un aviso apareció en la grilla (permite detectar desaparecidos) |
 | `grilla_cobertura` | Por comuna y corrida: total declarado, avisos únicos capturados y si quedó `completa` o `parcial` |
@@ -197,7 +202,8 @@ El DDL está versionado en `bronze/sql/` (`001_schema`, `002_detalle`, `003_cobe
 ## Flujo de la grilla (`bronze/scraper_grilla.py`)
 
 1. Para cada comuna de `config.COMUNAS_RM` pide la página 1 y lee el total declarado ("N resultados").
-2. Si el total supera **1.800**, la búsqueda se parte en rangos de precio (`_PriceRange_<min>CLP-<max>CLP`).
+2. Si el total supera **1.800**, la búsqueda se complementa con los filtros de dormitorios que el sitio permite
+   (`/1-dormitorio/`, `/2-dormitorios/`, `/3-dormitorios/`) y con la búsqueda sin filtro hasta el tope.
    El sitio corta cada búsqueda en 2.016 resultados (página 42) y responde 404 desde la 43. Parte de una
    escalera de rangos y divide a la mitad cualquiera que siga siendo grande. Los bordes se solapan y los
    duplicados se absorben por ID.
@@ -265,8 +271,8 @@ pausado o finalizado se decide en Silver.
   reconexiones y el resumen final. El avance exacto está además en `bronze.detalle_intentos`.
 - **Log de la grilla:** `logs/grilla.log` (fuera de git), un resumen y no una línea por página: `INICIO`, una línea
   por comuna (`[ 3/23] providencia  480 de 530 declarados (90,6 %) | INCOMPLETA | 12 págs | 4 min 43 s`),
-  `SEGMENTA` cuando parte por precio, `ALERTA` ante una página 1 vacía, un error de red o un rango que no se
-  puede partir, `ABORTADO` con el motivo y `FIN` con las comunas incompletas. Con `--detalle` agrega una línea
+  `SEGMENTA` cuando complementa por dormitorios, `ALERTA` ante una página 1 vacía, un error de red o un filtro que
+  pasa del tope del sitio, `ABORTADO` con el motivo y `FIN` con las comunas incompletas. Con `--detalle` agrega una línea
   por página para depurar. Los dos scrapers escriben a pantalla y a su archivo fijo; no hay un log por turno.
 - Los **proyectos inmobiliarios** (que la grilla también lista como "Desde $X … N unidades disponibles")
   redirigen a una página de proyecto con otro ID. Se registran como `proyecto` y se excluyen; no sirven para
@@ -283,7 +289,8 @@ pausado o finalizado se decide en Silver.
 | La cola de detalle se deriva con SQL | Sin contadores mutables |
 | "Desaparecido" se evalúa por comuna | Una corrida parcial no debe hacer parecer desaparecidos a los avisos de otras comunas |
 | El precio vigente y el estado salen del detalle | La grilla solo aporta una señal barata de que algo cambió |
-| Segmentar por precio, no por dormitorios | "1 dormitorio" por sí solo declara 2.454, más que el tope de 2.016 |
+| Segmentar por dormitorios, no por precio | El `robots.txt` bloquea `_PriceRange_`, y también superficie, baños y estacionamientos. Cumplirlo cuesta cobertura: "1 dormitorio" en Santiago declara más de 2.016 y el sitio no deja partirlo, y los filtros de 4 o más dormitorios y de estudio no existen (redirigen a la búsqueda sin filtro) |
+| El scraper se identifica | User-Agent con el nombre del proyecto y el contacto (GitHub y LinkedIn), no el de un Chrome. El presupuesto baja a 5.000 visitas por 24 h: el primer 429 llegó con ~7.500 y no se vuelve a buscar el límite |
 | HTML crudo a disco | Reproducibilidad; Supabase gratis tiene 500 MB |
 | Sin conversión de monedas ni de fechas relativas en Bronce | La fecha absoluta se calcula en Silver restando el texto a `scraped_at` |
 
@@ -298,7 +305,7 @@ santiago-rentals-elt/
 ├── bronze/
 │   ├── scraper_grilla.py
 │   ├── scraper_detalle.py
-│   ├── orquestador.py         # alterna detalle y grilla, reconstruye Silver y Gold cada 3 h; espera y reanuda ante un 429
+│   ├── orquestador.py         # alterna detalle y grilla, reconstruye Silver y Gold cada hora; espera y reanuda ante un 429
 │   └── sql/                   # 001_schema, 002_detalle, 003_cobertura
 ├── scripts/
 │   ├── aplicar_ddl.py         # aplica los .sql en orden (idempotente)
@@ -324,14 +331,28 @@ Independencia, Macul, La Florida, Recoleta, Huechuraba, Quinta Normal y Conchal�
 Lo Barnechea, La Reina, Peñalolén, Quilicura, Maipú, Puente Alto, San Bernardo, Cerrillos y Pedro Aguirre Cerda)
 quedaron fuera el 2026-10-19; sus avisos ya cargados siguen en Bronce. Se cambian editando `config.COMUNAS_RM`.
 
+## Uso responsable del portal
+
+Proyecto personal y sin fines comerciales; los datos son de avisos públicos de Portal Inmobiliario. Lo que se hace para no
+abusar del sitio:
+
+- **Respeta su `robots.txt`.** Se revisó el 2026-10-21 contra todas las URLs que pide el scraper: la grilla (`_Desde_`) y el
+  detalle (`_JM`) están permitidos; la partición por precio (`_PriceRange_`) no, y se dejó de usar.
+- **Se identifica.** Su User-Agent lleva el nombre del proyecto y el contacto (GitHub y LinkedIn de su autor).
+- **Ritmo acotado.** Pausas de 3 a 6 s entre peticiones, tope de 5.000 visitas de detalle por 24 h y espera de 30 minutos con
+  menos ritmo ante un 429. Nunca intenta saltarse un bloqueo o el muro de verificación.
+- **Poco dato personal.** No se leen nombres ni contactos de vendedores. El HTML crudo (`landing/`) queda solo en local.
+- **Este repo es privado.** El mapa público (repo `santiago-rentals-vis`) solo muestra datos básicos, con la ubicación
+  aproximada y el enlace a la publicación original.
+
 ## Cómo ejecutar
 
 **Todo el ciclo, sin intervención:** `python bronze/orquestador.py` alterna detalle y grilla (detalle, grilla, detalle…),
-con un presupuesto de 6.000 visitas de detalle por 24 h (`--presupuesto-dia`).
+con un presupuesto de 5.000 visitas de detalle por 24 h (`--presupuesto-dia`).
 El detalle trabaja en tandas de 400 visitas (`--tanda`) y, entre tandas, el orquestador revisa si ya toca la grilla, que corre como máximo cada 6 horas (`--grilla-cada-horas`) aunque la cola del detalle sea larga. Si el detalle termina bloqueado, espera 30, 60 y luego
 120 minutos y lo relanza; si la grilla es bloqueada, espera igual y reanuda solo con las comunas que faltaban. Si se agota
 el presupuesto de 24 h, espera a que se libere. Las pausas entre peticiones son de 6 a 12 s (`--pausa-min/--pausa-max`).
-Cada 3 horas (`--silver-gold-cada-horas`), entre dos tandas, reconstruye Silver y Gold; si falla, reintenta a los 30 minutos.
+Cada hora (`--silver-gold-cada-horas`), entre dos tandas, reconstruye Silver y Gold; si falla, reintenta a los 30 minutos.
 Su registro es `logs/orquestador.log`; para detenerlo con calma se crea el archivo `logs/orquestador.stop`.
 
 Cada scraper por separado:
@@ -372,7 +393,7 @@ terminar ocuparán unos 2 GB de HTML en `landing/` y ~70 MB en Supabase.
    Supabase y el SQL no se conserva en el repo. Los scrapers usan `BD_STRING_SCRAPER`; Silver, Gold y las
    migraciones siguen con `BD_STRING` (rol dueño).
 4. **Silver y Gold** ya existen (ver el estado de arriba). El orquestador (`bronze/orquestador.py`) encadena
-   detalle y grilla y reconstruye Silver y Gold cada 3 h; falta revisar los umbrales de las banderas de calidad y de aptitud, que son provisionales.
+   detalle y grilla y reconstruye Silver y Gold cada hora; falta revisar los umbrales de las banderas de calidad y de aptitud, que son provisionales.
 5. **Validar los SCD2 con historia real**, cuando las revisitas acumulen varios días de cambios.
 6. **Modelo:** vive en el repo `santiago-rentals-ml`. Target decidido: `costo_total_clp`. Las variables que
    dependen del split (`nivel_barrio`, `precio_m2_sector`, imputación de superficie) se ajustan solo con

@@ -86,38 +86,29 @@ def _texto(el) -> Optional[str]:
     return el.get_text(strip=True) if el else None
 
 
-Segmento = tuple[int, int]  # rango de precio en CLP (min, max); max=0 significa "sin tope"
+Segmento = str  # filtro de dormitorios del sitio, tal como va en la URL ("1-dormitorio")
 
 # El sitio corta cada búsqueda en la página 42 (2.016 resultados) con un 404. Una búsqueda que declara más que
-# este umbral se parte en rangos de precio; el margen bajo 2.016 deja espacio para que el mercado crezca.
+# este umbral se complementa con búsquedas por dormitorios; el margen bajo 2.016 deja espacio para que el mercado crezca.
 UMBRAL_SEGMENTAR = 1800
-ESCALERA_PRECIO: list[Segmento] = [(0, 300_000), (300_000, 400_000), (400_000, 500_000),
-                                   (500_000, 700_000), (700_000, 0)]
-PASO_PRECIO = 10_000
+TOPE_SITIO = 2016
+# No se parte por precio: el robots.txt del sitio bloquea `_PriceRange_` (y también superficie, baños y estacionamientos).
+# Los únicos filtros permitidos que sirven son estos tres; "4-dormitorios", "estudio" y similares el sitio los redirige a la
+# búsqueda sin filtrar. Un filtro puede igual pasar de 2.016 (1 dormitorio en Santiago): ahí quedan avisos sin ver.
+SEGMENTOS_DORMITORIOS: list[Segmento] = ["1-dormitorio", "2-dormitorios", "3-dormitorios"]
 
 
 def texto_segmento(segmento: Optional[Segmento]) -> Optional[str]:
-    return f"{segmento[0]}-{segmento[1]}" if segmento else None
+    return segmento
 
 
 def construir_url(tipo: str, comuna: str, pagina: int, segmento: Optional[Segmento] = None) -> str:
-    base = f"{config.BASE_URL}/{config.OPERACION}/{tipo}/{comuna}"
-    filtro = f"_PriceRange_{segmento[0]}CLP-{segmento[1]}CLP" if segmento else ""
+    base = f"{config.BASE_URL}/{config.OPERACION}/{tipo}"
+    base = f"{base}/{segmento}/{comuna}" if segmento else f"{base}/{comuna}"
     if pagina == 1:
-        return f"{base}/{filtro}" if filtro else base
+        return base
     offset = 1 + (pagina - 1) * config.RESULTADOS_POR_PAGINA
-    return f"{base}/_Desde_{offset}_{filtro}_NoIndex_True" if filtro else f"{base}/_Desde_{offset}_NoIndex_True"
-
-
-def dividir_segmento(segmento: Segmento) -> list[Segmento]:
-    """Parte un rango de precio en dos. Los bordes del sitio no son disjuntos (los avisos en UF se convierten
-    a pesos con redondeo), así que hay duplicados entre segmentos; se absorben por ID. [] si ya no se puede partir."""
-    lo, hi = segmento
-    if hi == 0:
-        mid = round(lo * 1.5 / PASO_PRECIO) * PASO_PRECIO
-        return [(lo, mid), (mid, 0)]
-    mid = round((lo + hi) / 2 / PASO_PRECIO) * PASO_PRECIO
-    return [(lo, mid), (mid, hi)] if lo < mid < hi else []
+    return f"{base}/_Desde_{offset}_NoIndex_True"
 
 
 def pedir_html(url: str, reintentos: int = 3) -> tuple[Optional[int], Optional[str]]:
@@ -304,11 +295,11 @@ class Progreso:
 
 def scrapear_busqueda(con, run_id: int, prog: Progreso, comuna: str, tipo: str, segmento: Optional[Segmento],
                       max_paginas: Optional[int], vistos: set, segmentar: bool) -> tuple[Optional[int], bool]:
-    """Recorre las páginas de UNA búsqueda (comuna x tipo, con o sin rango de precio).
+    """Recorre las páginas de UNA búsqueda (comuna x tipo, con o sin filtro de dormitorios).
 
     Devuelve (total declarado, demasiado_grande). Con segmentar=True, una búsqueda que declara más que
     UMBRAL_SEGMENTAR se corta tras la página 1 (que igual se guarda) y devuelve demasiado_grande=True: el
-    llamador la parte en rangos de precio, porque seguir pidiendo páginas toparía con el 404 de la página 43.
+    llamador la complementa con las búsquedas por dormitorios y recorre esta hasta el tope del sitio.
     """
     pagina, tarjetas_busqueda, total = 1, 0, None
     while True:
@@ -359,21 +350,6 @@ def scrapear_busqueda(con, run_id: int, prog: Progreso, comuna: str, tipo: str, 
     return total, False
 
 
-def scrapear_en_segmentos(con, run_id, prog, comuna, tipo, segmento: Segmento, max_paginas, vistos) -> None:
-    """Scrapea un rango de precio; si aún declara demasiado, lo parte a la mitad y sigue con cada mitad."""
-    _, grande = scrapear_busqueda(con, run_id, prog, comuna, tipo, segmento, max_paginas, vistos, segmentar=True)
-    if not grande:
-        return
-    partes = dividir_segmento(segmento)
-    if not partes:
-        log.warning("ALERTA  %s %s: el rango %s ya no se puede partir; se captura hasta el tope del sitio",
-                    comuna, tipo, texto_segmento(segmento))
-        scrapear_busqueda(con, run_id, prog, comuna, tipo, segmento, max_paginas, vistos, segmentar=False)
-        return
-    for parte in partes:
-        scrapear_en_segmentos(con, run_id, prog, comuna, tipo, parte, max_paginas, vistos)
-
-
 def estado_cobertura(total: Optional[int], unicos: int, acotada: bool) -> str:
     """'completa' si se capturó lo que el sitio declara (con tolerancia por avisos que entran y salen
     mientras se recorre). Una corrida acotada con --max-paginas nunca es completa."""
@@ -399,10 +375,17 @@ def scrapear(con, comunas: list[str], tipos: list[str], max_paginas: Optional[in
                 total, grande = scrapear_busqueda(con, run_id, prog, comuna, tipo, None, max_paginas, vistos,
                                                   segmentar=True)
                 if grande:
-                    log.info("SEGMENTA %s: declara %s (> %s), se parte por precio en %d rangos",
-                             _corto(comuna), _miles(total), _miles(UMBRAL_SEGMENTAR), len(ESCALERA_PRECIO))
-                    for segmento in ESCALERA_PRECIO:
-                        scrapear_en_segmentos(con, run_id, prog, comuna, tipo, segmento, max_paginas, vistos)
+                    log.info("SEGMENTA %s: declara %s (> %s), se complementa por dormitorios (%d filtros)",
+                             _corto(comuna), _miles(total), _miles(UMBRAL_SEGMENTAR), len(SEGMENTOS_DORMITORIOS))
+                    for segmento in SEGMENTOS_DORMITORIOS:
+                        total_seg, _ = scrapear_busqueda(con, run_id, prog, comuna, tipo, segmento, max_paginas, vistos,
+                                                         segmentar=False)
+                        if total_seg and total_seg > TOPE_SITIO:
+                            log.warning("ALERTA  %s %s: declara %s (> %s): solo se ven los primeros %s; el robots.txt "
+                                        "no deja partirlo por precio", _corto(comuna), segmento, _miles(total_seg),
+                                        _miles(TOPE_SITIO), _miles(TOPE_SITIO))
+                    # La búsqueda sin filtro también se recorre hasta el tope: trae estudios y 4 o más dormitorios.
+                    scrapear_busqueda(con, run_id, prog, comuna, tipo, None, max_paginas, vistos, segmentar=False)
 
                 cobertura = estado_cobertura(total, len(vistos), acotada=bool(max_paginas))
                 unicos_total += len(vistos)

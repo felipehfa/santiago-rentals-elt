@@ -7,12 +7,12 @@ Ciclo:  tanda de detalle -> (si toca, grilla) -> tanda de detalle -> ...
     Si queda bloqueado, el orquestador espera (la espera crece en cada intento) y vuelve a lanzarlo.
   - Grilla: busca avisos nuevos y cambios en las comunas de config.COMUNAS_RM. Si el sitio la bloquea a mitad de camino,
     espera y reanuda solo con las comunas que faltaban en esa corrida, sin repetir las ya completas.
-  - Silver y Gold: cada `--silver-gold-cada-horas` (3 por defecto) se reconstruyen desde Bronce, entre dos tandas de detalle
+  - Silver y Gold: cada `--silver-gold-cada-horas` (1 por defecto) se reconstruyen desde Bronce, entre dos tandas de detalle
     (así nunca coinciden con una grilla en curso). Si fallan, se reintenta a los 30 minutos. Estado: `logs/silver_gold.json`.
   - La grilla corre como máximo cada `--grilla-cada-horas`, para no cargar el sitio con ~230 páginas seguidas.
   - Si el presupuesto de visitas se agota, espera a que se libere.
 
-Presupuesto: `--presupuesto-dia` (6.000 por defecto, a propósito alto para encontrar el límite del sitio).
+Presupuesto: `--presupuesto-dia` (5.000 por defecto: el primer 429 del sitio llegó con ~7.500 visitas en 24 h, y no se busca más ese límite).
 Pausa entre peticiones: `--pausa-min`/`--pausa-max` (6 y 12 s por defecto) se pasan a los dos scrapers.
 Para detenerlo con calma, crear el archivo `logs/orquestador.stop` (termina el paso en curso y sale).
 Registro: `logs/orquestador.log` (fijo, fuera de git).
@@ -197,8 +197,8 @@ def paso_silver_gold() -> bool:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--grilla-cada-horas", type=float, default=6.0, help="separación mínima entre dos grillas")
-    ap.add_argument("--silver-gold-cada-horas", type=float, default=3.0, help="separación entre reconstrucciones de Silver y Gold")
-    ap.add_argument("--presupuesto-dia", type=int, default=6000, help="visitas de detalle por ventana móvil de 24 h")
+    ap.add_argument("--silver-gold-cada-horas", type=float, default=1.0, help="separación entre reconstrucciones de Silver y Gold")
+    ap.add_argument("--presupuesto-dia", type=int, default=5000, help="visitas de detalle por ventana móvil de 24 h")
     ap.add_argument("--factor-pausa", type=float, default=1.0,
                     help="multiplicador inicial de las pausas del detalle (baja solo con visitas buenas seguidas)")
     ap.add_argument("--pausa-min", type=float, default=6.0)

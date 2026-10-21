@@ -122,12 +122,14 @@ CREATE TABLE IF NOT EXISTS gold.aviso_entrenamiento (
     -- texto del aviso: lo usa el modelo (palabras clave y un modelo de texto); no es una variable por sí mismo
     titulo                      TEXT,
     descripcion                 TEXT,
+    url                         TEXT,               -- enlace a la publicación (lo usa el mapa)
 
     construido_en               TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 -- Si la tabla ya existía, CREATE TABLE IF NOT EXISTS no suma las columnas nuevas; estas sentencias sí.
 ALTER TABLE gold.aviso_entrenamiento ADD COLUMN IF NOT EXISTS titulo TEXT;
 ALTER TABLE gold.aviso_entrenamiento ADD COLUMN IF NOT EXISTS descripcion TEXT;
+ALTER TABLE gold.aviso_entrenamiento ADD COLUMN IF NOT EXISTS url TEXT;
 CREATE INDEX IF NOT EXISTS aviso_entrenamiento_apto_idx ON gold.aviso_entrenamiento (apto_entrenamiento);
 CREATE INDEX IF NOT EXISTS aviso_entrenamiento_comuna_idx ON gold.aviso_entrenamiento (comuna);
 
@@ -170,3 +172,23 @@ CREATE OR REPLACE VIEW gold.predicciones_vigentes AS
     SELECT DISTINCT ON (id_aviso) *
     FROM gold.predicciones
     ORDER BY id_aviso, modelo_version DESC, predicho_en DESC;
+
+-- Cifras del modelo @champion que explica el mapa (pestaña "Cómo funciona"). La escribe el scoring (rol ml_scoring) cuando
+-- ve una versión nueva del champion; la lee el mapa. Una fila por versión; sin dato personal ni de avisos.
+CREATE TABLE IF NOT EXISTS gold.modelo_vigente (
+    modelo_nombre   TEXT NOT NULL,
+    modelo_version  INTEGER NOT NULL,
+    publicado_en    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    cifras          JSONB NOT NULL,
+    PRIMARY KEY (modelo_nombre, modelo_version)
+);
+-- Permisos para los roles de lectura y de scoring, si existen (en otro entorno pueden no estar creados).
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'ml_scoring') THEN
+        GRANT SELECT, INSERT, UPDATE ON gold.modelo_vigente TO ml_scoring;
+    END IF;
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'vis_lectura') THEN
+        GRANT SELECT ON gold.modelo_vigente TO vis_lectura;
+    END IF;
+END $$;
