@@ -38,14 +38,13 @@ COD_COM_ALCANCE = sorted(CODIGOS_COMUNA[c] for c in COMUNAS_RM)
 DELAY_MIN = float(os.environ.get("PAUSA_MIN_S", 3.0))
 DELAY_MAX = float(os.environ.get("PAUSA_MAX_S", 7.0))
 
-# El scraper se identifica y deja un contacto (proyecto personal, sin fines comerciales). Antes usaba el User-Agent de un
-# Chrome; si el sitio rechaza este, hay que decidirlo a conciencia y no volver a disfrazarse sin más.
-USER_AGENT = (
-    "santiago-rentals-research/1.0 (proyecto personal sin fines comerciales; "
-    "contacto: https://github.com/felipehfa , https://www.linkedin.com/in/felipehfa/)"
-)
+# User-Agent de navegador. Se probó uno que se identificaba (nombre del proyecto y contacto) el 21-oct-2026: el portal respondió
+# 200 pero con una versión reducida de la página, sin precio ni estado (bitácora P-25), y el usuario pidió volver a este.
 HEADERS = {
-    "User-Agent": USER_AGENT,
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+    ),
     "Accept-Language": "es-CL,es;q=0.9,en;q=0.8",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
 }

@@ -39,6 +39,8 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
 | P-22 | 19-oct | El scraper de detalle abortó al suspenderse el equipo (conexión a la base cortada) | resuelto (19-oct) |
 | P-23 | 19-oct | La grilla murió con `connection already closed` tras un error de red | resuelto (19-oct) |
 | P-24 | 19-oct | GitHub Actions no puede scrapear el portal | confirmado (19-oct) |
+| P-25 | 22-oct | Con el User-Agent identificado el portal sirve una página sin precio ni estado | abierto (scraper detenido) |
+| P-26 | 22-oct | Silver se detuvo porque la API de UF y dólar no respondió | resuelto |
 
 ---
 
@@ -352,6 +354,44 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
 - **Resolución:** los scrapers siguen locales. En Actions pueden correr Silver, Gold y el modelo, que no tocan el
   portal. No se intenta saltar la verificación. La prueba vive en la rama `prueba-actions` del repo.
 - **Estado:** confirmado.
+
+---
+
+## P-25 · Con el User-Agent identificado el portal sirve una página sin precio ni estado
+
+- **Síntoma:** desde las 14:00 del 21-oct el 100 % de las visitas de detalle (~3.400) quedaron sin `precio_valor` ni
+  `estado_texto`, barrio ni puntos de interés, aunque el resultado figuraba como `ok`. En Gold los avisos `sin_precio`
+  pasaron de 0 a 2.916 y los aptos activos de 14.634 a 12.349, así que el mapa perdió ~2.000 avisos. De madrugada llegaron
+  además 429 seguidos.
+- **Causa:** el 21-oct se cambió el User-Agent a uno que se identifica (nombre del proyecto y contacto). El portal responde 200
+  pero con una versión reducida de la página: el JSON de estado trae `framework` y no `appProps`, de donde salen precio, estado,
+  barrio y puntos de interés (348 KB contra 560 KB). Probado con el mismo aviso: User-Agent identificado, `compatible; +url` y
+  navegador con sufijo del proyecto devuelven la versión reducida; un User-Agent de navegador (con o sin la cabecera `From`)
+  devuelve la completa. La extracción tomaba la respuesta como válida, contra la regla de que una respuesta vacía nunca es éxito.
+- **Resolución:** scraper detenido (`logs/orquestador.stop`) el 22-oct a las 07:05. Pendiente: decidir la política de
+  User-Agent, rechazar como error toda página sin `appProps` (que no se guarde como observación ni cuente como visita buena),
+  y reparar las ~3.400 observaciones sin precio para que Silver las ignore y la cola las vuelva a visitar.
+- **Actualización (22-oct, mediodía):** el usuario indicó que no había autorizado ese cambio y pidió dejarlo como estaba. Se
+  volvió al User-Agent de navegador anterior (`config.py`) y se reanudó el orquestador. No se agregó la cabecera `From` ni
+  la validación de páginas sin `appProps`. Siguen sin precio las ~3.400 observaciones de ayer (Silver las toma como la última
+  visita de cada aviso), a la espera de decidir su reparación.
+- **Reparación (22-oct, con el visto bueno del usuario):** nuevo motivo de cola `sin_precio` en `scraper_detalle.py`, acotado a la
+  ventana mala (21-oct 14:42 a 22-oct 07:05, hora de Chile); sin modificar ningún registro de Bronce. Al volver a visitarlos con el
+  User-Agent restaurado, su última observación trae precio y Silver los recupera. En la cola quedaron 3.537 avisos, con
+  prioridad justo detrás de los nuevos.
+- **Estado:** mitigado; reparación en curso (se completa a medida que el scraper la recorre, dentro del tope de 5.000 visitas por 24 h).
+
+---
+
+## P-26 · Silver se detuvo porque la API de UF y dólar no respondió
+
+- **Síntoma:** a las 06:00 del 22-oct `construir_silver.py` falló con `ReadTimeout` de mindicador.cl; Gold quedó 4,6 h sin
+  reconstruirse (el orquestador reintenta entre tandas de detalle, y la tanda en curso estaba bloqueada por 429).
+- **Causa:** `cargar_indicadores` hacía una sola llamada de 30 s y cualquier fallo de red abortaba toda la reconstrucción.
+- **Resolución:** `silver/construir_silver.py` reintenta 3 veces y, si la API sigue caída, sigue con los valores ya guardados.
+  `construir_avisos` ya aborta si algún precio en UF o USD queda sin indicador, así que no se calcula nada con un valor
+  equivocado. El vigilante del repo del mapa debía avisar al cruzar las 3 horas (no se comprobó que haya llegado el correo).
+- **Estado:** resuelto.
 
 ---
 

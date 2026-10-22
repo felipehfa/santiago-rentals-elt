@@ -331,6 +331,10 @@ def visitar(url: str, id_aviso: str, referer: str) -> dict:
 
 # ------------------------------------------------------------------ cola y persistencia
 
+# Ventana de las visitas sin precio ni estado (21-oct 14:42 a 22-oct 07:05, hora de Chile): ver P-25 en la bitácora.
+SIN_PRECIO_DESDE = "2026-10-21 17:42:00+00"
+SIN_PRECIO_HASTA = "2026-10-22 10:06:00+00"
+
 SQL_COLA = """
 -- Por comuna: una corrida de grilla que solo cubrió algunas comunas (o que quedó parcial) no debe hacer
 -- parecer "desaparecidos" a los avisos de las demás.
@@ -342,7 +346,7 @@ fallos AS (SELECT i.id_aviso, count(*) AS n, max(i.scraped_at) AS ult_fallo
            FROM bronze.detalle_intentos i LEFT JOIN ok ON ok.id_aviso = i.id_aviso
            WHERE i.resultado IN ('error', 'no_encontrado') AND (ok.ult_ok IS NULL OR i.scraped_at > ok.ult_ok)
            GROUP BY i.id_aviso),
-det AS (SELECT DISTINCT ON (id_aviso) id_aviso, estado_texto, scraped_at AS det_en,
+det AS (SELECT DISTINCT ON (id_aviso) id_aviso, estado_texto, precio_valor, scraped_at AS det_en,
                payload->>'fecha_publicacion_texto' AS txt_pub
         FROM bronze.detalle_avisos ORDER BY id_aviso, scraped_at DESC),
 -- Edad de la publicación hoy: lo que decía el texto ("hace 13 días", "hace 2 meses", "esta semana", "hoy") cuando se
@@ -366,6 +370,11 @@ cola AS (
          extract(epoch FROM now() - ok.ult_ok) / 86400.0 / tr.interv AS vencido,
          CASE
            WHEN ok.ult_ok IS NULL THEN 'nuevo'
+           -- Reparación única (bitácora P-25): visitas hechas con el User-Agent que el portal respondía con una página sin
+           -- precio ni estado. Se acota a esa ventana: al volver a visitarlas quedan fuera, y un aviso sin precio por otra
+           -- causa no se revisita para siempre.
+           WHEN det.precio_valor IS NULL AND det.estado_texto IS NULL
+                AND det.det_en BETWEEN %(sp_desde)s AND %(sp_hasta)s THEN 'sin_precio'
            WHEN gv.ultimo_run_id < cob.rid AND ok.ult_ok < now() - make_interval(days => %(dias_desap)s)
                 THEN 'desaparecido'
            WHEN card.ult_card > ok.ult_ok THEN 'tarjeta_cambio'
@@ -389,7 +398,7 @@ cola AS (
 )
 SELECT id_aviso, url, comuna, tipo_propiedad, motivo FROM cola
 WHERE motivo = ANY(%(motivos)s)
-ORDER BY CASE motivo WHEN 'nuevo' THEN 1 WHEN 'desaparecido' THEN 2 WHEN 'tarjeta_cambio' THEN 3 ELSE 4 END,
+ORDER BY CASE motivo WHEN 'nuevo' THEN 1 WHEN 'sin_precio' THEN 2 WHEN 'desaparecido' THEN 3 WHEN 'tarjeta_cambio' THEN 4 ELSE 5 END,
          CASE WHEN motivo = 'rotacion' THEN -vencido ELSE 0 END,  -- en la rotación, primero el más atrasado respecto de su intervalo
          ult_ok NULLS FIRST, id_aviso DESC
 LIMIT %(limite)s
@@ -400,6 +409,7 @@ def obtener_cola(con, limite: int, motivos: list[str], comunas: list[str]) -> li
     with con.cursor() as cur:
         cur.execute(SQL_COLA, {"dias_desap": DIAS_ENTRE_VISITAS_DESAPARECIDO,
                                **{f"r{i}": d for i, d in enumerate(DIAS_ROTACION_TRAMOS)},
+                               "sp_desde": SIN_PRECIO_DESDE, "sp_hasta": SIN_PRECIO_HASTA,
                                "max_fallos": MAX_FALLOS_POR_AVISO, "horas_reint": HORAS_ENTRE_REINTENTOS,
                                "motivos": motivos, "comunas": comunas, "limite": limite})
         cols = [c[0] for c in cur.description]
@@ -592,7 +602,7 @@ def ejecutar(db: ConexionResiliente, limite: int, motivos: list[str], comunas: l
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--limite", type=int, default=300, help="máximo de avisos a visitar en esta corrida")
-    ap.add_argument("--motivos", nargs="+", default=["nuevo", "desaparecido", "tarjeta_cambio", "rotacion"])
+    ap.add_argument("--motivos", nargs="+", default=["nuevo", "sin_precio", "desaparecido", "tarjeta_cambio", "rotacion"])
     ap.add_argument("--comunas", nargs="+", default=config.COMUNAS_RM, help="solo avisos de estas comunas")
     ap.add_argument("--factor-pausa", type=float, default=1.0,
                     help="multiplicador inicial de las pausas; baja solo tras visitas buenas seguidas")

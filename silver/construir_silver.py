@@ -8,6 +8,7 @@ Uso:
     python silver/construir_silver.py
 """
 import logging
+import time
 import sys
 from datetime import date
 from pathlib import Path
@@ -35,6 +36,19 @@ def aplicar_ddl(con) -> None:
     log.info("DDL de silver aplicado")
 
 
+def _pedir(url: str, intentos: int = 3):
+    """GET con reintentos: la API de indicadores tarda o se cae de vez en cuando."""
+    for intento in range(1, intentos + 1):
+        try:
+            resp = requests.get(url, timeout=30)
+            resp.raise_for_status()
+            return resp
+        except requests.RequestException:
+            if intento == intentos:
+                raise
+            time.sleep(5 * intento)
+
+
 def cargar_indicadores(con) -> None:
     """Trae UF y dólar de los años que cubren las observaciones de Bronce. Una llamada por indicador y año;
     la UF trae el año completo, incluidos días futuros ya publicados."""
@@ -44,8 +58,14 @@ def cargar_indicadores(con) -> None:
 
     for indicador in INDICADORES:
         for anio in range(primer_dia.year, date.today().year + 1):
-            resp = requests.get(API_INDICADOR.format(indicador=indicador, anio=anio), timeout=30)
-            resp.raise_for_status()
+            try:
+                resp = _pedir(API_INDICADOR.format(indicador=indicador, anio=anio))
+            except requests.RequestException as e:
+                # La API gratuita a veces no responde. No se detiene Silver por eso: los valores ya cargados siguen en la
+                # tabla y construir_avisos aborta si a algún precio en UF o USD le falta su indicador.
+                log.warning("mindicador.cl no respondió para %s %d (%s); se usan los valores ya guardados",
+                            indicador, anio, type(e).__name__)
+                continue
             filas = [(indicador, p["fecha"][:10], p["valor"]) for p in resp.json().get("serie", [])]
             if not filas:
                 raise RuntimeError(f"mindicador.cl no devolvió datos de {indicador} para {anio}")

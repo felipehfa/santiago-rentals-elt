@@ -234,6 +234,10 @@ y se ordena por prioridad:
 | 3 | `tarjeta_cambio` | Su tarjeta de la grilla cambió desde la última visita |
 | 4 | `rotacion` | Pasó su intervalo de revisita según la antigüedad del aviso (1, 2, 4, 7 o 14 días) |
 
+**Reparación única (P-25):** el motivo `sin_precio` va justo después de `nuevo` y re-visita los avisos cuya última visita se hizo entre el
+21-oct 14:42 y el 22-oct 07:05 (hora de Chile) y no trajo precio ni estado, porque el portal sirvió una página reducida a un
+User-Agent que se identificaba. Está acotado a esa ventana, así que al volver a visitarlos salen de la cola y no hay bucle.
+
 Quedan fuera de la cola los avisos cuyo último estado contiene "finaliz" (terminal; un pausado sí se
 revisa), los que ya se clasificaron como `proyecto`, y los que acumulan 5 fallos seguidos o fallaron hace
 menos de 12 horas.
@@ -294,7 +298,7 @@ pausado o finalizado se decide en Silver.
 | "Desaparecido" se evalúa por comuna | Una corrida parcial no debe hacer parecer desaparecidos a los avisos de otras comunas |
 | El precio vigente y el estado salen del detalle | La grilla solo aporta una señal barata de que algo cambió |
 | Segmentar por dormitorios, no por precio | El `robots.txt` bloquea `_PriceRange_`, y también superficie, baños y estacionamientos. Cumplirlo cuesta cobertura: "1 dormitorio" en Santiago declara más de 2.016 y el sitio no deja partirlo, y los filtros de 4 o más dormitorios y de estudio no existen (redirigen a la búsqueda sin filtro) |
-| El scraper se identifica | User-Agent con el nombre del proyecto y el contacto (GitHub y LinkedIn), no el de un Chrome. El presupuesto queda en 5.000 visitas por 24 h (se probó 6.000 y 7.000 el 21-oct y llegó un 429 con 6.660 visitas en 24 h y 247 en la última hora): el primer 429 llegó con ~7.500, y con ese margen no se busca el límite |
+| User-Agent y ritmo | User-Agent de navegador: se probó uno que se identificaba (21-oct) y el portal sirvió una página sin precio ni estado (bitácora P-25), así que se volvió al anterior. El presupuesto queda en 5.000 visitas por 24 h (se probó 6.000 y 7.000 el 21-oct y llegó un 429 con 6.660 visitas en 24 h y 247 en la última hora): el primer 429 llegó con ~7.500, y con ese margen no se busca el límite |
 | HTML crudo a disco | Reproducibilidad; Supabase gratis tiene 500 MB |
 | Sin conversión de monedas ni de fechas relativas en Bronce | La fecha absoluta se calcula en Silver restando el texto a `scraped_at` |
 
@@ -346,7 +350,7 @@ abusar del sitio:
 
 - **Respeta su `robots.txt`.** Se revisó el 2026-10-21 contra todas las URLs que pide el scraper: la grilla (`_Desde_`) y el
   detalle (`_JM`) están permitidos; la partición por precio (`_PriceRange_`) no, y se dejó de usar.
-- **Se identifica.** Su User-Agent lleva el nombre del proyecto y el contacto (GitHub y LinkedIn de su autor).
+- **User-Agent de navegador.** Uno que se identificaba con el proyecto y su contacto recibió del portal una página reducida, sin precio ni estado (bitácora P-25).
 - **Ritmo acotado.** Pausas de 3 a 6 s entre peticiones, tope de 5.000 visitas de detalle por 24 h y espera de 30 minutos con
   menos ritmo ante un 429. Nunca intenta saltarse un bloqueo o el muro de verificación.
 - **Poco dato personal.** No se leen nombres ni contactos de vendedores. El HTML crudo (`landing/`) queda solo en local.
@@ -402,7 +406,7 @@ suspensión del equipo sigue siendo manual. Quitar la tarea: `Unregister-Schedul
 
 `python -m pytest -q` (19 pruebas, menos de un segundo) cubre con HTML sintético la extracción del detalle (campos, JSON de la
 página, precio, estado, hash sin campos volátiles), la grilla (URLs sin los filtros que el robots.txt bloquea, tarjetas,
-cobertura) y cuándo toca reconstruir Silver y Gold. También fija dos acuerdos de uso responsable: el User-Agent con contacto y el
+cobertura) y cuándo toca reconstruir Silver y Gold. También fija dos acuerdos de uso responsable: el User-Agent de navegador y el
 tope de 5.000 visitas por 24 h. El workflow `ci` corre ruff (sintaxis y pyflakes) y pytest en cada push. No hay pruebas del SQL de
 Silver y Gold: necesitarían una base Postgres de prueba. La primera carga completa del
 detalle son unos 15.000 avisos: con el ritmo medido (~8,7 visitas por minuto) son unas 29 horas. Al

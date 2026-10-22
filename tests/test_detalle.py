@@ -56,7 +56,6 @@ def test_hash_ignora_campos_volatiles():
 
 
 def test_reglas_de_uso_responsable():
-    """Acuerdos del 21-oct-2026: el scraper se identifica con contacto y el presupuesto diario tiene tope."""
-    assert "github.com/felipehfa" in config.USER_AGENT and "linkedin.com/in/felipehfa" in config.USER_AGENT
-    assert config.HEADERS["User-Agent"] == config.USER_AGENT
+    """El User-Agent es de navegador (el identificado recibe una página sin precio, P-25) y el presupuesto diario tiene tope."""
+    assert config.HEADERS["User-Agent"].startswith("Mozilla/5.0")
     assert d.PRESUPUESTO_24H <= 5000
