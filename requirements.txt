@@ -4,7 +4,7 @@ beautifulsoup4==4.15.0
 lxml==6.1.1
 psycopg2-binary==2.9.12
 python-dotenv==1.2.2
-numpy==2.4.6
+numpy==2.5.4
 shapely==2.1.2
 geopandas==1.1.4
 pyogrio==0.13.0
