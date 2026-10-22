@@ -159,7 +159,7 @@ Historias: *Un aviso apto llega al modelo*, *Un aviso con superficie absurda que
 | Nivel socioeconómico (IGVUST) | Funcionando: 1.369 Unidades Vecinales de la RM en Bronce; los 1.194 avisos con coordenadas cayeron dentro de una |
 | Gold: SCD2 de estado y de precio | Funcionando; sin historia real todavía (1 intervalo por aviso). Probado con un historial simulado |
 | Gold: `gold.aviso_entrenamiento` | Funcionando: 14.947 avisos, 12.597 aptos (1.912 aún sin detalle; el resto, ~440, excluidos por calidad). Incluye el título y la descripción del aviso, que usa el modelo |
-| Gold: `gold.predicciones` | La escribe el scoring por lotes del modelo (rol `ml_scoring`, `INSERT` y `SELECT`): predicción, etiqueta de mercado (oportunidad / precio de mercado / caro), confianza y banda de mercado. `gold.predicciones_vigentes` es la última de cada aviso |
+| Gold: `gold.predicciones` | La escribe el scoring por lotes del modelo (rol `ml_scoring`, `INSERT` y `SELECT`): predicción, etiqueta de mercado (oportunidad / precio de mercado / caro) y banda de mercado. `gold.predicciones_vigentes` es la última de cada aviso |
 | Modelo | Funcionando en el repo `santiago-rentals-ml` |
 | Orquestador (`bronze/orquestador.py`) | Funcionando: alterna detalle y grilla con esperas ante un 429. Reconstruye Silver y Gold cada hora. Falta la tarea programada de Windows |
 

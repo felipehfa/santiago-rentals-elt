@@ -159,15 +159,25 @@ CREATE TABLE IF NOT EXISTS gold.predicciones (
 );
 CREATE INDEX IF NOT EXISTS predicciones_aviso_idx ON gold.predicciones (id_aviso, predicho_en);
 
--- Etiquetado de mercado (oportunidad / precio de mercado / caro) y confianza de la estimación. Se agregan después de crear
+-- Etiquetado de mercado (oportunidad / precio de mercado / caro). Se agregan después de crear
 -- la tabla, con ALTER, para no perder las predicciones ya guardadas: las filas anteriores quedan con estos campos en NULL.
 ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS costo_total_publicado_clp NUMERIC;  -- lo que cuesta el aviso (arriendo + gastos comunes)
-ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS cv_ensamble NUMERIC;                -- desviación / media de las 10 predicciones del ensamble
-ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS nivel_confianza TEXT;              -- alta confianza | confianza media | baja confianza
 ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS z_robusto NUMERIC;                  -- error normalizado por decil de costo (mediana / MAD)
 ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS etiqueta TEXT;                     -- oportunidad | precio_de_mercado | caro
 ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS banda_inferior_clp NUMERIC;        -- rango de costo total que sería precio de mercado
 ALTER TABLE gold.predicciones ADD COLUMN IF NOT EXISTS banda_superior_clp NUMERIC;
+
+-- Migración del 21-oct-2026: se quitó el nivel de confianza (cv_ensamble y nivel_confianza). La vista depende de todas las
+-- columnas de la tabla (SELECT *), así que se borra antes y se recrea justo abajo; esto solo ocurre mientras las columnas existan.
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'gold' AND table_name = 'predicciones'
+               AND column_name IN ('cv_ensamble', 'nivel_confianza')) THEN
+        DROP VIEW IF EXISTS gold.predicciones_vigentes;
+        ALTER TABLE gold.predicciones DROP COLUMN IF EXISTS cv_ensamble;
+        ALTER TABLE gold.predicciones DROP COLUMN IF EXISTS nivel_confianza;
+    END IF;
+END $$;
 
 -- La predicción vigente de cada aviso: la de la versión más nueva del modelo y, dentro de ella, la más reciente.
 CREATE OR REPLACE VIEW gold.predicciones_vigentes AS
@@ -192,5 +202,6 @@ BEGIN
     END IF;
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'vis_lectura') THEN
         GRANT SELECT ON gold.modelo_vigente TO vis_lectura;
+        GRANT SELECT ON gold.predicciones_vigentes TO vis_lectura;   -- se pierde si la vista se recrea
     END IF;
 END $$;

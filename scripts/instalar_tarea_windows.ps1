@@ -9,8 +9,9 @@ Quitarla:             Unregister-ScheduledTask -TaskName SantiagoRentalsOrquesta
 $nombre = "SantiagoRentalsOrquestador"
 $script = Join-Path $PSScriptRoot "vigilar_orquestador.ps1"
 
-$accion = New-ScheduledTaskAction -Execute "powershell.exe" `
-    -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$script`""
+# conhost --headless evita el parpadeo de la ventana de consola cada vez que corre la tarea (-WindowStyle Hidden no lo evita).
+$accion = New-ScheduledTaskAction -Execute "conhost.exe" `
+    -Argument "--headless powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$script`""
 $alIniciar = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
 $cada10min = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 10)
 $ajustes = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
