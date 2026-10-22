@@ -26,7 +26,8 @@ def conectar(variable: str = "BD_STRING") -> "psycopg2.extensions.connection":
         bd_string = os.environ.get("BD_STRING")
     if not bd_string:
         raise RuntimeError(f"Falta {variable} (definirla en .env)")
-    return psycopg2.connect(bd_string, connect_timeout=15)
+    # sslmode=require: sin él psycopg2 usa "prefer" y aceptaría una conexión sin cifrar si se la ofrecen.
+    return psycopg2.connect(bd_string, connect_timeout=15, sslmode="require")
 
 
 class ConexionResiliente:

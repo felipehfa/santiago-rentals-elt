@@ -379,6 +379,9 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
   ventana mala (21-oct 14:42 a 22-oct 07:05, hora de Chile); sin modificar ningún registro de Bronce. Al volver a visitarlos con el
   User-Agent restaurado, su última observación trae precio y Silver los recupera. En la cola quedaron 3.537 avisos, con
   prioridad justo detrás de los nuevos.
+- **Prevención (22-oct, tarde):** `visitar()` marca como `error` toda página sin `appProps`: no se guarda como observación y,
+  si se repite 8 veces seguidas, la corrida lo trata como un bloqueo (espera y baja el ritmo). El vigilante del mapa alerta si más
+  del 5 % de Gold queda `sin_precio`. Con eso, lo del 21-oct se habría frenado en minutos y avisado en horas.
 - **Estado:** mitigado; reparación en curso (se completa a medida que el scraper la recorre, dentro del tope de 5.000 visitas por 24 h).
 
 ---

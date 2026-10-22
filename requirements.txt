@@ -1,9 +1,10 @@
-requests
-beautifulsoup4
-lxml
-psycopg2-binary
-python-dotenv
-numpy
-shapely
-geopandas
-pyogrio
+# Versiones fijas: las del entorno conda data-science con que corre el scraper (22-oct-2026). Dependabot propone las nuevas.
+requests==2.34.2
+beautifulsoup4==4.15.0
+lxml==6.1.1
+psycopg2-binary==2.9.12
+python-dotenv==1.2.2
+numpy==2.4.6
+shapely==2.1.2
+geopandas==1.1.4
+pyogrio==0.13.0

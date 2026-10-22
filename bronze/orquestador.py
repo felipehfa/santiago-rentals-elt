@@ -7,8 +7,8 @@ Ciclo:  tanda de detalle -> (si toca, grilla) -> tanda de detalle -> ...
     Si queda bloqueado, el orquestador espera (la espera crece en cada intento) y vuelve a lanzarlo.
   - Grilla: busca avisos nuevos y cambios en las comunas de config.COMUNAS_RM. Si el sitio la bloquea a mitad de camino,
     espera y reanuda solo con las comunas que faltaban en esa corrida, sin repetir las ya completas.
-  - Silver y Gold: cada `--silver-gold-cada-horas` (1 por defecto) se reconstruyen desde Bronce, entre dos tandas de detalle
-    (así nunca coinciden con una grilla en curso). Si fallan, se reintenta a los 30 minutos. Estado: `logs/silver_gold.json`.
+  - Silver y Gold: cada `--silver-gold-cada-horas` (1 por defecto) se reconstruyen desde Bronce, entre tandas y también
+    mientras corre una tanda de detalle (que puede pasar horas esperando por 429); nunca durante una grilla. Si fallan, se reintenta a los 30 minutos. Estado: `logs/silver_gold.json`.
   - La grilla corre como máximo cada `--grilla-cada-horas`, para no cargar el sitio con ~230 páginas seguidas.
   - Si el presupuesto de visitas se agota, espera a que se libere.
 
@@ -49,6 +49,9 @@ ESPERA_GRILLA_BLOQUEADA_S = (30 * 60, 60 * 60, 120 * 60)
 ESPERA_SIN_TRABAJO_S = 30 * 60  # sin nada que visitar o sin presupuesto: se revisa de nuevo cada tanto
 ESPERA_GRILLA_FALLIDA_S = 2 * 60 * 60  # tras agotar las reanudaciones, antes de volver a intentar la grilla
 REINTENTO_SILVER_GOLD_S = 30 * 60  # tras un fallo de Silver o Gold
+# Cada cuánto se revisa, mientras corre una tanda de detalle, si toca reconstruir Silver y Gold. Una tanda puede pasar horas
+# esperando por 429 seguidos y Gold no debe quedar atrasado por eso (P-26).
+REVISION_DURANTE_DETALLE_S = 60
 MAX_REINTENTOS_GRILLA = 6   # reanudaciones seguidas de una misma grilla antes de dejarla para el próximo ciclo
 
 COD_DETALLE_PRESUPUESTO, COD_DETALLE_VACIA = 4, 5  # ver CODIGOS_SALIDA en scraper_detalle.py
@@ -72,11 +75,22 @@ def esperar(segundos: int, motivo: str) -> bool:
     return True
 
 
-def correr(script: str, *args: str, pausa: tuple[float, float]) -> int:
+def esperar_proceso(proc, durante=None, cada_s: float = REVISION_DURANTE_DETALLE_S) -> int:
+    """Espera a que termine `proc` y, mientras tanto, llama a `durante()` cada `cada_s` segundos."""
+    while proc.poll() is None:
+        if durante is not None:
+            durante()
+        if proc.poll() is None:
+            time.sleep(cada_s)
+    return proc.returncode
+
+
+def correr(script: str, *args: str, pausa: tuple[float, float], durante=None) -> int:
+    """Lanza un scraper y espera a que termine. `durante` (opcional) se llama a intervalos mientras corre."""
     entorno = {**os.environ, "PYTHONPATH": str(RAIZ), "PAUSA_MIN_S": str(pausa[0]), "PAUSA_MAX_S": str(pausa[1])}
     comando = [sys.executable, str(RAIZ / "bronze" / script), *args]
     log.info("Lanza %s %s", script, " ".join(args))
-    return subprocess.run(comando, cwd=RAIZ, env=entorno, check=False).returncode
+    return esperar_proceso(subprocess.Popen(comando, cwd=RAIZ, env=entorno), durante)
 
 
 # ------------------------------------------------------------------ consultas a la base
@@ -108,13 +122,19 @@ def comunas_cubiertas(db: ConexionResiliente, run_id: int) -> set[str]:
 
 # ------------------------------------------------------------------ pasos
 
-def paso_detalle(pausa, presupuesto: int, factor: float, tanda: int) -> str:
+def paso_detalle(pausa, presupuesto: int, factor: float, tanda: int, silver_gold_cada_horas: float = 1.0) -> str:
     """Corre una tanda del detalle (hasta `tanda` visitas). Devuelve 'listo' (puede quedar más cola), 'vacia' (no había
-    nada que visitar), 'presupuesto' (agotado) o 'parar'. Las tandas cortas dejan a la grilla entrar a su hora."""
+    nada que visitar), 'presupuesto' (agotado) o 'parar'. Las tandas cortas dejan a la grilla entrar a su hora.
+    Mientras la tanda corre (incluidas sus esperas por 429), Silver y Gold se siguen reconstruyendo a su hora: leen Bronce
+    con una instantánea fija (REPEATABLE READ), así que las visitas en curso no los dejan inconsistentes."""
+    def silver_gold_a_su_hora():
+        if toca_silver_gold(silver_gold_cada_horas):
+            paso_silver_gold()
+
     intento = 0
     while True:
         codigo = correr("scraper_detalle.py", "--limite", str(tanda), "--presupuesto-dia", str(presupuesto),
-                        "--factor-pausa", str(factor), pausa=pausa)
+                        "--factor-pausa", str(factor), pausa=pausa, durante=silver_gold_a_su_hora)
         if codigo == 0:
             return "listo"
         if codigo == COD_DETALLE_VACIA:
@@ -216,7 +236,7 @@ def main() -> int:
         log.info("INICIO orquestador | %d comunas | pausas %.0f-%.0f s | grilla cada %.0f h", len(config.COMUNAS_RM),
                  *pausa, args.grilla_cada_horas)
         while not hay_orden_de_parar():
-            resultado = paso_detalle(pausa, args.presupuesto_dia, args.factor_pausa, args.tanda)
+            resultado = paso_detalle(pausa, args.presupuesto_dia, args.factor_pausa, args.tanda, args.silver_gold_cada_horas)
             if resultado == "parar":
                 break
 

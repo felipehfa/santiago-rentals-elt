@@ -65,6 +65,8 @@ VISITAS_PARA_RELAJAR = 50          # visitas buenas seguidas tras las que las pa
 MAX_BLOQUEOS_SEGUIDOS = 3           # bloqueos sin ninguna visita buena entre medio => abortar
 # Códigos de salida: el orquestador decide qué hacer según cómo terminó el detalle.
 CODIGOS_SALIDA = {"success": 0, "vacia": 5, "bloqueado": 1, "presupuesto": 4}
+# Con menos visitas disponibles no se lanza una tanda: evita tandas de 5 o 10 visitas cada dos minutos al borde del tope.
+MIN_VISITAS_TANDA = 50
 PRESUPUESTO_24H = 5000              # visitas máximas en una ventana móvil de 24 h (--presupuesto-dia)
 
 # El sitio, ante tráfico que clasifica como automatizado, puede redirigir CUALQUIER URL a un muro de
@@ -325,6 +327,11 @@ def visitar(url: str, id_aviso: str, referer: str) -> dict:
         # Puede ser un aviso eliminado, pero también cualquier página anómala: no se concluye nada acá.
         return {**base, "resultado": "no_encontrado", "detalle": "la página no corresponde al aviso",
                 "html": resp.text}
+    # Una respuesta vacía nunca es éxito (P-25): el portal puede servir una versión reducida de la página, con status 200
+    # y el aviso correcto, pero sin el estado de la aplicación (`appProps`) donde vienen precio, estado, barrio y puntos de
+    # interés. Se toma como fallo: no se guarda como observación y, si se repite, frena la corrida como un bloqueo.
+    if not _componentes(extraer_json_pagina(resp.text)):
+        return {**base, "resultado": "error", "detalle": "página sin datos del aviso (sin appProps)"}
     return {**base, "resultado": "ok", "detalle": None, "html": resp.text,
             "canonical": canonical, "og_url": og_url}
 
@@ -510,8 +517,9 @@ def ejecutar(db: ConexionResiliente, limite: int, motivos: list[str], comunas: l
     hechas = db.ejecutar(visitas_ultimas_24h)
     disponible = max(presupuesto - hechas, 0)
     log.info("Presupuesto 24 h: %d de %d usadas, quedan %d", hechas, presupuesto, disponible)
-    if not disponible:
-        log.info("Presupuesto de 24 h agotado: no se visita nada")
+    if disponible < min(MIN_VISITAS_TANDA, limite):
+        log.info("Presupuesto de 24 h agotado (quedan %d, el mínimo por tanda es %d): no se visita nada",
+                 disponible, min(MIN_VISITAS_TANDA, limite))
         return "presupuesto", 0
     cola = db.ejecutar(obtener_cola, min(limite, disponible), motivos, comunas)
     por_motivo = {m: sum(1 for c in cola if c["motivo"] == m) for m in motivos}

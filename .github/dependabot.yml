@@ -1,0 +1,11 @@
+# Dependabot propone por PR las actualizaciones (las Actions están fijadas por commit; él mantiene el hash al día).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly

@@ -86,8 +86,8 @@ Cómo se mantienen activos los dos scrapers sin intervención y qué hacen cuand
   del detalle sea larga. Si no hay nada que visitar, espera hasta 30 minutos y vuelve a mirar.
 - **Detalle.** Recorre su cola con un presupuesto de visitas por ventana móvil de 24 horas y pausas aleatorias entre visitas
   (configurables; hoy de 3 a 6 s).
-- **Silver y Gold.** Cada hora, entre dos tandas de detalle (así nunca coinciden con una grilla), reconstruye Silver y luego
-  Gold desde Bronce. Si falla, reintenta a los 30 minutos; el estado queda en `logs/silver_gold.json`.
+- **Silver y Gold.** Cada hora reconstruye Silver y luego Gold desde Bronce, entre tandas y también mientras corre una tanda
+  de detalle (que puede pasar horas esperando por 429; ver P-26); nunca durante una grilla. Si falla, reintenta a los 30 minutos; el estado queda en `logs/silver_gold.json`.
 - **Un 429.** El scraper no aborta: espera 30 minutos, duplica las pausas (hasta ×8) y las baja a la mitad cada 50 visitas
   buenas hasta volver a las originales. El ritmo con que termina una tanda se guarda y la siguiente lo retoma. Si 3 bloqueos
   seguidos no dejan avanzar, aborta y el orquestador espera 30, 60 o 120 minutos antes de relanzarlo.
@@ -351,6 +351,8 @@ abusar del sitio:
 - **Respeta su `robots.txt`.** Se revisó el 2026-10-21 contra todas las URLs que pide el scraper: la grilla (`_Desde_`) y el
   detalle (`_JM`) están permitidos; la partición por precio (`_PriceRange_`) no, y se dejó de usar.
 - **User-Agent de navegador.** Uno que se identificaba con el proyecto y su contacto recibió del portal una página reducida, sin precio ni estado (bitácora P-25).
+- **Páginas incompletas = error.** Si el portal responde una página sin los datos del aviso (`appProps`), la visita cuenta como
+  fallo: no se guarda y, si se repite, frena la corrida como un bloqueo (P-25).
 - **Ritmo acotado.** Pausas de 3 a 6 s entre peticiones, tope de 5.000 visitas de detalle por 24 h y espera de 30 minutos con
   menos ritmo ante un 429. Nunca intenta saltarse un bloqueo o el muro de verificación.
 - **Poco dato personal.** No se leen nombres ni contactos de vendedores. El HTML crudo (`landing/`) queda solo en local.
@@ -364,7 +366,8 @@ con un presupuesto de 5.000 visitas de detalle por 24 h (`--presupuesto-dia`).
 El detalle trabaja en tandas de 400 visitas (`--tanda`) y, entre tandas, el orquestador revisa si ya toca la grilla, que corre como máximo cada 6 horas (`--grilla-cada-horas`) aunque la cola del detalle sea larga. Si el detalle termina bloqueado, espera 30, 60 y luego
 120 minutos y lo relanza; si la grilla es bloqueada, espera igual y reanuda solo con las comunas que faltaban. Si se agota
 el presupuesto de 24 h, espera a que se libere. Las pausas entre peticiones son de 6 a 12 s (`--pausa-min/--pausa-max`).
-Cada hora (`--silver-gold-cada-horas`), entre dos tandas, reconstruye Silver y Gold; si falla, reintenta a los 30 minutos.
+Cada hora (`--silver-gold-cada-horas`) reconstruye Silver y Gold, también durante una tanda de detalle; si falla, reintenta
+a los 30 minutos. Con menos de 50 visitas disponibles en el presupuesto no lanza una tanda (espera a que se libere).
 Su registro es `logs/orquestador.log`; para detenerlo con calma se crea el archivo `logs/orquestador.stop`.
 
 Cada scraper por separado:
@@ -391,7 +394,9 @@ python gold/construir_gold.py                              # reconstruye Gold de
 ```
 
 Todo es **reanudable**: si una corrida se corta, volver a lanzar el mismo comando retoma desde la cola. El
-PC debe quedar encendido y sin suspenderse durante las corridas largas.
+PC debe quedar encendido y sin suspenderse durante las corridas largas. La primera carga completa del detalle son unos 15.000
+avisos: con el ritmo medido (~8,7 visitas por minuto) son unas 29 horas. Al terminar ocuparán unos 2 GB de HTML en `landing/` y
+~70 MB en Supabase.
 
 **Mantenerlo corriendo sin depender de una sesión abierta.** `scripts/instalar_tarea_windows.ps1` (una sola vez) registra la
 tarea `SantiagoRentalsOrquestador`: al iniciar sesión y cada 10 minutos ejecuta `scripts/vigilar_orquestador.ps1`, que lanza el
@@ -400,17 +405,18 @@ crear `logs/orquestador.stop` (la tarea no lo relanza mientras el archivo exista
 suspensión del equipo sigue siendo manual. Quitar la tarea: `Unregister-ScheduledTask -TaskName SantiagoRentalsOrquestador`.
 
 **Alertas.** El repo del mapa tiene un workflow `vigilante` que corre cada hora en GitHub y falla (con correo) si Gold lleva más de
-3 horas sin reconstruirse o si el scoring se atrasó; avisa aunque el notebook esté apagado (ver el README de `santiago-rentals-vis`).
+3 horas sin reconstruirse, si el scoring se atrasó o si más del 5 % de Gold quedó sin precio aunque se visitó su detalle (el
+síntoma de P-25); avisa aunque el notebook esté apagado (ver el README de `santiago-rentals-vis`).
 
 ## Pruebas y CI
 
-`python -m pytest -q` (19 pruebas, menos de un segundo) cubre con HTML sintético la extracción del detalle (campos, JSON de la
-página, precio, estado, hash sin campos volátiles), la grilla (URLs sin los filtros que el robots.txt bloquea, tarjetas,
-cobertura) y cuándo toca reconstruir Silver y Gold. También fija dos acuerdos de uso responsable: el User-Agent de navegador y el
-tope de 5.000 visitas por 24 h. El workflow `ci` corre ruff (sintaxis y pyflakes) y pytest en cada push. No hay pruebas del SQL de
-Silver y Gold: necesitarían una base Postgres de prueba. La primera carga completa del
-detalle son unos 15.000 avisos: con el ritmo medido (~8,7 visitas por minuto) son unas 29 horas. Al
-terminar ocuparán unos 2 GB de HTML en `landing/` y ~70 MB en Supabase.
+`python -m pytest -q` (23 pruebas, menos de un segundo) cubre con HTML sintético la extracción del detalle (campos, JSON de la
+página, precio, estado, hash sin campos volátiles, y que una página sin datos del aviso sea un error y no un éxito), la grilla
+(URLs sin los filtros que el robots.txt bloquea, tarjetas, cobertura), la tanda mínima, cuándo toca reconstruir Silver y Gold y
+que se revise también durante una tanda. Fija además dos acuerdos de uso responsable: el User-Agent de navegador y el tope de 5.000
+visitas por 24 h. El workflow `ci` corre ruff (sintaxis y pyflakes) y pytest en cada push, con las versiones fijas de
+`requirements.txt`; Dependabot (`.github/dependabot.yml`) propone las actualizaciones y mantiene al día las Actions, que están
+fijadas por commit. No hay pruebas del SQL de Silver y Gold: necesitan una base Postgres de prueba (pendiente).
 
 ## Lo que falta
 

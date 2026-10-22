@@ -42,3 +42,19 @@ def test_estado_ilegible_toca(monkeypatch):
 
 def test_presupuesto_por_defecto_es_el_acordado():
     assert scraper_detalle.PRESUPUESTO_24H == 5000
+
+
+def test_mientras_corre_el_detalle_se_revisa_silver_y_gold():
+    class Proc:
+        def __init__(self):
+            self.vueltas, self.returncode = 0, None
+
+        def poll(self):
+            self.vueltas += 1
+            if self.vueltas > 5:
+                self.returncode = 0
+            return self.returncode
+
+    llamadas = []
+    assert o.esperar_proceso(Proc(), durante=lambda: llamadas.append(1), cada_s=0) == 0
+    assert len(llamadas) >= 2

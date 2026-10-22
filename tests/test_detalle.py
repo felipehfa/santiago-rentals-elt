@@ -59,3 +59,36 @@ def test_reglas_de_uso_responsable():
     """El User-Agent es de navegador (el identificado recibe una página sin precio, P-25) y el presupuesto diario tiene tope."""
     assert config.HEADERS["User-Agent"].startswith("Mozilla/5.0")
     assert d.PRESUPUESTO_24H <= 5000
+
+
+class _Resp:
+    def __init__(self, texto, url="https://www.portalinmobiliario.com/MLC-1-depto-_JM", status=200):
+        self.text, self.url, self.status_code = texto, url, status
+
+
+def _pagina(con_app_props: bool) -> str:
+    estado = '{"appProps":{"pageProps":{"initialState":{"components":{"price":{"price":{"value":1}}}}}}}' if con_app_props \
+        else '{"framework":{}}'
+    url = "https://www.portalinmobiliario.com/MLC-1-depto-_JM"
+    return (f'<html><head><link rel="canonical" href="{url}"><meta property="og:url" content="{url}"></head><body>'
+            f"<script>_n.ctx.r={estado};_n.ctx.r.assets.manifest={{}}</script></body></html>")
+
+
+def test_pagina_completa_es_ok(monkeypatch):
+    monkeypatch.setattr(d.requests, "get", lambda *a, **k: _Resp(_pagina(True)))
+    assert d.visitar("u", "MLC-1", "r")["resultado"] == "ok"
+
+
+def test_pagina_reducida_sin_app_props_es_error(monkeypatch):
+    """P-25: con ciertos User-Agent el portal responde 200 con el aviso correcto pero sin datos."""
+    monkeypatch.setattr(d.requests, "get", lambda *a, **k: _Resp(_pagina(False)))
+    r = d.visitar("u", "MLC-1", "r")
+    assert r["resultado"] == "error" and "appProps" in r["detalle"]
+
+
+def test_no_lanza_tandas_minusculas_al_borde_del_presupuesto():
+    class BD:
+        def ejecutar(self, fn, *a):
+            assert fn is d.visitas_ultimas_24h, "no debe armar la cola ni visitar"
+            return 4990
+    assert d.ejecutar(BD(), 400, ["nuevo"], ["x"], presupuesto=5000) == ("presupuesto", 0)
