@@ -93,6 +93,9 @@ def construir_avisos(con) -> int:
             # Una sola instantánea de Bronce para ambas tablas: los scrapers siguen insertando mientras se
             # construye Silver, y con el aislamiento por defecto cada sentencia vería datos distintos.
             cur.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
+            # La base corta toda sentencia a los 2 min, y la de avisos (distancias a POIs) ya tarda eso: el 23-oct falló 5 de
+            # 10 veces (bitácora P-27). Solo para esta transacción.
+            cur.execute("SET LOCAL statement_timeout = '10min'")
             cur.execute((RUTA_SQL / "010_construir_avisos.sql").read_text(encoding="utf-8"))
             asignar_uv(cur, config.COD_COM_ALCANCE)  # necesita las coordenadas que acaba de dejar 010
             cur.execute((RUTA_SQL / "030_unidad_vecinal.sql").read_text(encoding="utf-8"))

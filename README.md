@@ -87,7 +87,9 @@ Cómo se mantienen activos los dos scrapers sin intervención y qué hacen cuand
 - **Detalle.** Recorre su cola con un presupuesto de visitas por ventana móvil de 24 horas y pausas aleatorias entre visitas
   (configurables; hoy de 3 a 6 s).
 - **Silver y Gold.** Cada hora reconstruye Silver y luego Gold desde Bronce, entre tandas y también mientras corre una tanda
-  de detalle (que puede pasar horas esperando por 429; ver P-26); nunca durante una grilla. Si falla, reintenta a los 30 minutos; el estado queda en `logs/silver_gold.json`.
+  de detalle (que puede pasar horas esperando por 429; ver P-26); nunca durante una grilla. Si falla, reintenta a los 30 minutos; el estado queda en `logs/silver_gold.json`
+  y el error de Silver, en `silver.construcciones.detalle` (P-27: la base corta las sentencias a los 2 minutos, y Silver sube ese
+  límite a 10 solo para su transacción).
 - **Un 429.** El scraper no aborta: espera 30 minutos, duplica las pausas (hasta ×8) y las baja a la mitad cada 50 visitas
   buenas hasta volver a las originales. El ritmo con que termina una tanda se guarda y la siguiente lo retoma. Si 3 bloqueos
   seguidos no dejan avanzar, aborta y el orquestador espera 30, 60 o 120 minutos antes de relanzarlo.

@@ -396,6 +396,17 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
   equivocado. El vigilante del repo del mapa debía avisar al cruzar las 3 horas (no se comprobó que haya llegado el correo).
 - **Estado:** resuelto.
 
+## P-27 · Silver fallaba la mitad de las veces por el límite de 2 minutos por sentencia
+
+- **Síntoma:** el 23-oct `construir_silver.py` falló 5 de 10 veces (03:39, 04:36, 05:08, 08:13 y 10:11); Gold quedaba hasta
+  1 h más atrasado. El log del orquestador solo decía "falló": la salida de Silver no se guarda (corre sin consola).
+- **Causa:** la base tiene `statement_timeout = 2min` y la sentencia que construye `silver.avisos` (con las distancias a POIs,
+  `poi_distancias`) ya tarda alrededor de eso con ~18.400 avisos. El error quedó en `silver.construcciones.detalle`
+  (`canceling statement due to statement timeout`), que es donde mirar primero cuando Silver falla.
+- **Resolución:** `construir_avisos` sube el límite a 10 minutos solo para su transacción (`SET LOCAL statement_timeout`).
+- **Pendiente:** acelerar el cálculo de distancias (por ejemplo, con un índice espacial) para no depender del límite.
+- **Estado:** mitigado.
+
 ---
 
 ## Cómo agregar una entrada
