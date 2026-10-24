@@ -343,7 +343,8 @@ santiago-rentals-elt/
 Se scrapean 12 comunas centrales o de interés: Santiago, Ñuñoa, Providencia, Estación Central, San Miguel,
 Independencia, Macul, La Florida, Recoleta, Huechuraba, Quinta Normal y Conchalí. Las otras 11 (Las Condes, Vitacura,
 Lo Barnechea, La Reina, Peñalolén, Quilicura, Maipú, Puente Alto, San Bernardo, Cerrillos y Pedro Aguirre Cerda)
-quedaron fuera el 2026-10-19; sus avisos ya cargados siguen en Bronce. Se cambian editando `config.COMUNAS_RM`.
+quedaron fuera el 2026-10-19, y sus datos se borraron de la base y de `landing/` el 2026-10-24 (P-28). Se cambian editando
+`config.COMUNAS_RM`; si una comuna sale de la lista, Silver marca sus avisos con `fuera_de_alcance`.
 
 ## Uso responsable del portal
 

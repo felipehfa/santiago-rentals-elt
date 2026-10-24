@@ -12,8 +12,8 @@ RESULTADOS_POR_PAGINA = 48  # tamaño real de página del sitio
 
 # Slugs en formato "comuna-metropolitana". Verificados con scripts/spike_slugs.py (todos responden 200).
 # Solo las comunas centrales o de interés. Quedaron fuera (2026-10-19): Las Condes, Vitacura, Lo Barnechea, La Reina,
-# Peñalolén, Quilicura, Maipú, Puente Alto, San Bernardo, Cerrillos y Pedro Aguirre Cerda. Sus avisos ya cargados
-# siguen en Bronce; para volver a scrapearlas basta agregar el slug acá.
+# Peñalolén, Quilicura, Maipú, Puente Alto, San Bernardo, Cerrillos y Pedro Aguirre Cerda. Sus avisos se borraron de
+# la base y de landing/ el 2026-10-24 (bitácora P-28); para volver a scrapearlas basta agregar el slug acá (parten de cero).
 COMUNAS_RM = [
     "santiago-metropolitana", "nunoa-metropolitana", "providencia-metropolitana",
     "estacion-central-metropolitana", "san-miguel-metropolitana", "independencia-metropolitana",

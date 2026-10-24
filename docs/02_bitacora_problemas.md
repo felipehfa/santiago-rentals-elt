@@ -407,6 +407,21 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
 - **Pendiente:** acelerar el cálculo de distancias (por ejemplo, con un índice espacial) para no depender del límite.
 - **Estado:** mitigado.
 
+## P-28 · Datos de comunas fuera de alcance que ya no se actualizaban
+
+- **Síntoma:** 3.252 avisos de las 11 comunas que salieron de `config.COMUNAS_RM` el 19-oct seguían en Bronce, Silver y Gold
+  (2.990 aptos) sin actualizarse; confundían los conteos (por ejemplo, "avisos de la grilla sin detalle").
+- **Prueba previa:** el modelo ML ya las excluía (`datos.comunas_excluidas`). Una prueba local con el pipeline completo (selección
+  de variables, Optuna y ensamble) sobre el mismo test mostró que incluirlas no mejora: el modelo solo con las 12 comunas tuvo
+  MAE 1,1 % menor (IC95 −1,5 % a +3,8 %, no significativo) y fue mucho mejor en Huechuraba, donde los precios del sector
+  oriente empujaban las estimaciones hacia arriba.
+- **Resolución (24-oct, a pedido del usuario):** se borraron, en una transacción, los avisos que solo aparecieron en esas comunas
+  (31.942 filas de Bronce, Silver y Gold; ninguna predicción) y las filas de cobertura y páginas de la grilla de esas comunas.
+  En `landing/` se borraron 3.222 archivos (435 MB). Se conservó `bronze.igvust_uv` (polígonos de referencia de toda la región)
+  y el único aviso que también apareció en una comuna considerada. Silver marca `fuera_de_alcance` por si otra comuna sale de la
+  lista. Es irreversible: si una comuna vuelve, se scrapea desde cero.
+- **Estado:** resuelto.
+
 ---
 
 ## Cómo agregar una entrada

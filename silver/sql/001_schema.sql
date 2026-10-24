@@ -114,7 +114,8 @@ CREATE TABLE IF NOT EXISTS silver.avisos (
     primera_vez_visto           TIMESTAMPTZ,
     ultima_vez_visto            TIMESTAMPTZ,
     fuera_de_grilla             BOOLEAN,        -- no apareció en la última corrida completa de su comuna
-    es_proyecto                 BOOLEAN NOT NULL,
+    fuera_de_alcance            BOOLEAN,        -- su comuna ya no se scrapea (no está en config.COMUNAS_RM): no se actualiza
+    es_proyecto                BOOLEAN NOT NULL,
     tiene_detalle               BOOLEAN NOT NULL,
     ultima_visita_detalle       TIMESTAMPTZ,
 
@@ -219,6 +220,7 @@ ALTER TABLE silver.avisos ADD COLUMN IF NOT EXISTS pob_rsh_uv NUMERIC;
 ALTER TABLE silver.avisos ADD COLUMN IF NOT EXISTS hog_uv NUMERIC;
 ALTER TABLE silver.avisos ADD COLUMN IF NOT EXISTS p_urbano NUMERIC;
 ALTER TABLE silver.avisos ADD COLUMN IF NOT EXISTS uv_sin_poligono BOOLEAN;
+ALTER TABLE silver.avisos ADD COLUMN IF NOT EXISTS fuera_de_alcance BOOLEAN;
 
 -- Unidad Vecinal que contiene a cada aviso (cruce punto-en-polígono; lo calcula silver/asignar_uv.py).
 CREATE TABLE IF NOT EXISTS silver.aviso_uv (

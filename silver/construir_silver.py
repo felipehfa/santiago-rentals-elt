@@ -97,6 +97,8 @@ def construir_avisos(con) -> int:
             # 10 veces (bitácora P-27). Solo para esta transacción.
             cur.execute("SET LOCAL statement_timeout = '10min'")
             cur.execute((RUTA_SQL / "010_construir_avisos.sql").read_text(encoding="utf-8"))
+            # Avisos de comunas que salieron de config.COMUNAS_RM: quedan en Bronce hasta borrarlos, pero ya no se actualizan.
+            cur.execute("UPDATE silver.avisos SET fuera_de_alcance = NOT (comuna = ANY(%s))", (config.COMUNAS_RM,))
             asignar_uv(cur, config.COD_COM_ALCANCE)  # necesita las coordenadas que acaba de dejar 010
             cur.execute((RUTA_SQL / "030_unidad_vecinal.sql").read_text(encoding="utf-8"))
             cur.execute((RUTA_SQL / "020_construir_observaciones.sql").read_text(encoding="utf-8"))
@@ -128,6 +130,7 @@ def resumen(con) -> None:
         "con detalle": "SELECT count(*) FROM silver.avisos WHERE tiene_detalle",
         "proyectos": "SELECT count(*) FROM silver.avisos WHERE es_proyecto",
         "fuera de grilla": "SELECT count(*) FROM silver.avisos WHERE fuera_de_grilla",
+        "fuera de alcance": "SELECT count(*) FROM silver.avisos WHERE fuera_de_alcance",
         "con unidad vecinal": "SELECT count(*) FROM silver.avisos WHERE uv_rsh IS NOT NULL",
         "sin polígono": "SELECT count(*) FROM silver.avisos WHERE uv_sin_poligono",
         "observaciones": "SELECT count(*) FROM silver.aviso_observaciones",
