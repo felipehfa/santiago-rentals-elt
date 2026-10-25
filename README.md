@@ -480,3 +480,7 @@ el sitio: leen lo que Bronce dejó. La única llamada externa fuera de Bronce es
 - `landing/` y `logs/` quedan fuera de git por el `.gitignore` de esta carpeta, pero ocupan espacio en disco
   y no deben ir a una carpeta sincronizada.
 - El `.env` con `BD_STRING` no se versiona; en el repo nuevo hay que volver a crearlo a mano (lleva `BD_STRING` y `BD_STRING_SCRAPER`, connection strings del Session pooler).
+
+## Licencia
+
+[MIT](LICENSE).
