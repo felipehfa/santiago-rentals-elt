@@ -9,3 +9,7 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # numpy 2.5+ exige Python 3.12, y el scraper corre local en 3.11 (entorno data-science). Quitar al pasar a 3.12.
+      - dependency-name: numpy
+        versions: [">=2.5"]
