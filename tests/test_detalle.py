@@ -55,6 +55,16 @@ def test_hash_ignora_campos_volatiles():
     assert d.hash_observacion(a) != d.hash_observacion({"precio": "460.000"})
 
 
+def test_hash_ignora_fecha_de_plantilla_en_descripcion():
+    a = {"descripcion": "Linda propiedad. Sigue disponible, fue publicada el 19 de Octubre. Si te interesa, escribe."}
+    b = {"descripcion": "Linda propiedad. Sigue disponible, fue publicada el 24 de Octubre. Si te interesa, escribe."}
+    assert d.hash_observacion(a) == d.hash_observacion(b)
+    assert d.hash_observacion(a) != d.hash_observacion({"descripcion": "Linda propiedad. Arrendada."})
+    # sin la frase, el hash es el mismo que antes del cambio (no genera observaciones nuevas)
+    sin = {"precio": "450.000", "descripcion": "Depto luminoso"}
+    assert d.hash_observacion(sin) == d.hashlib.sha256(d.json.dumps(sin, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+
 def test_reglas_de_uso_responsable():
     """El User-Agent es de navegador (el identificado recibe una página sin precio, P-25) y el presupuesto diario tiene tope."""
     assert config.HEADERS["User-Agent"].startswith("Mozilla/5.0")

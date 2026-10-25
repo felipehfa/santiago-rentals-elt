@@ -46,8 +46,10 @@ log = logging.getLogger("detalle")
 
 # Rotación escalonada por antigüedad de la publicación: cada cuántos días se vuelve a visitar un aviso activo según tenga
 # hasta 14, 30, 60, 120 o más de 120 días. Los recientes cambian más (bajan de precio o se arriendan en pocos días).
-# Se pusieron frecuentes a propósito para buscar el límite del sitio; el 429 adaptativo protege. Sin fecha = como reciente.
-DIAS_ROTACION_TRAMOS = (1, 2, 4, 7, 14)
+# Sin fecha = como reciente. Eran (1, 2, 4, 7, 14): pedían ~6.200 visitas diarias de rotación y caben ~3.200, así que la cola
+# nunca se vaciaba y los avisos de más de 60 días no se revisaban nunca; solo el 10 % de esas visitas encontraba un cambio real
+# (casi todo, avisos finalizados; los cambios de precio los detecta la tarjeta de la grilla). Bitácora P-29 (24-oct).
+DIAS_ROTACION_TRAMOS = (2, 4, 7, 14, 30)
 DIAS_ENTRE_VISITAS_DESAPARECIDO = 2
 CADA_N_VISITAS_AVANCE = 50          # cada cuántas visitas se escribe una línea de avance
 MAX_FALLOS_POR_AVISO = 5          # error/no_encontrado consecutivos antes de dejar de insistir en un aviso
@@ -285,8 +287,16 @@ def extraer_campos(html: str, estado: Optional[dict]) -> dict:
     return campos
 
 
+# Plantilla de un corredor que reescribe la fecha sola ("...sigue disponible, fue publicada el 19 de Octubre."): sin esto, cada
+# revisita contaba como cambio (~410 observaciones falsas en 3 días, P-29). Solo se quita para el hash; la descripción se guarda
+# completa. Un aviso sin esa frase da el mismo hash que antes.
+RE_FECHA_PLANTILLA = re.compile(r"fue publicada el \d{1,2} de [a-záéíóúñ]+", re.IGNORECASE)
+
+
 def hash_observacion(obs: dict) -> str:
     estable = {k: v for k, v in obs.items() if k not in CAMPOS_VOLATILES}
+    if isinstance(estable.get("descripcion"), str):
+        estable["descripcion"] = RE_FECHA_PLANTILLA.sub("fue publicada el …", estable["descripcion"])
     return hashlib.sha256(json.dumps(estable, sort_keys=True, ensure_ascii=False, default=str).encode()).hexdigest()
 
 

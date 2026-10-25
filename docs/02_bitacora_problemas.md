@@ -422,6 +422,24 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
   lista. Es irreversible: si una comuna vuelve, se scrapea desde cero.
 - **Estado:** resuelto.
 
+## P-29 · La rotación gastaba el presupuesto en avisos que no cambiaban
+
+- **Síntoma:** desde que la grilla quedó al día, ~75 % de las visitas diarias eran de `rotacion` y pocas traían algo nuevo
+  (por ejemplo, 11 de 50 en una tanda del 24-oct).
+- **Análisis (revisitas del 22 al 24-oct, sin la ventana de P-25):**
+  - Rendimiento por motivo: `desaparecido` encontró un cambio en el 90 % de las 820 visitas (casi todo, finalizados);
+    `tarjeta_cambio` en el 43 % de 1.810 (484 cambios de precio); `rotacion` en el 21 % de 3.643, pero solo el 10 % era real.
+  - En la rotación: 79 % sin cambio; 11 % ruido (una plantilla de corredor reescribe "fue publicada el 19 de Octubre" con la fecha
+    del día); 7 % pasó a finalizado o pausado (83 de esos 259 ya habían salido de la grilla); 3 % otros cambios reales;
+    0,2 % precio. Los cambios de precio los detecta la tarjeta de la grilla, y un finalizado no se pierde por revisar menos: solo
+    se detecta más tarde. Visitar cada 2 o cada 5-7 días encontró cambios reales en la misma proporción (9-12 %).
+  - Los intervalos (1, 2, 4, 7, 14 días) pedían ~6.200 visitas diarias de rotación sobre ~12.500 avisos activos, y caben ~3.200
+    (de 5.000, ~1.800 van a lo que trae la grilla). La cola nunca se vaciaba (3.948 vencidos) y, como va primero el más
+    atrasado respecto de su intervalo, los de 1 día ganaban siempre: los 2.500 avisos de más de 60 días no se habían revisitado.
+- **Resolución:** `DIAS_ROTACION_TRAMOS = (2, 4, 7, 14, 30)` (~3.160 visitas diarias con todo al día) y el hash del detalle ignora la
+  frase de fecha de esa plantilla (`RE_FECHA_PLANTILLA`; los avisos sin la frase dan el mismo hash que antes).
+- **Estado:** resuelto; revisar en unos días que la cola de rotación se vacíe y el rendimiento real por visita.
+
 ---
 
 ## Cómo agregar una entrada

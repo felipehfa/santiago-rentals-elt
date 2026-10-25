@@ -234,7 +234,7 @@
       "y": 650,
       "w": 460,
       "h": 77,
-      "label": "Edad ≤ 14, 30, 60, 120 o más días:\nvuelve cada 1, 2, 4, 7 o 14 días",
+      "label": "Edad ≤ 14, 30, 60, 120 o más días:\nvuelve cada 2, 4, 7, 14 o 30 días",
       "color": "#8f8f8f",
       "fill": "none",
       "border": "dashed",

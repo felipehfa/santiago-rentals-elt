@@ -68,7 +68,7 @@ Qué avisos visita el detalle y en qué orden (`bronze/scraper_detalle.py`). La 
 | 1 | `nuevo` | Nunca se visitó con éxito |
 | 2 | `desaparecido` | No apareció en la última corrida **completa de su comuna** y su última visita exitosa es de hace más de 2 días |
 | 3 | `tarjeta_cambio` | Su tarjeta de la grilla cambió desde la última visita |
-| 4 | `rotacion` | Pasó su intervalo de revisita, que depende de la antigüedad: cada 1, 2, 4, 7 o 14 días para avisos de hasta 14, 30, 60, 120 o más días |
+| 4 | `rotacion` | Pasó su intervalo de revisita, que depende de la antigüedad: cada 2, 4, 7, 14 o 30 días para avisos de hasta 14, 30, 60, 120 o más días |
 
 Quedan **fuera**: los finalizados (terminal; un pausado sí se revisa), los ya clasificados como `proyecto`, los avisos de otras
 comunas y los que acumulan 5 fallos o fallaron hace menos de 12 horas. Cada visita termina en `ok` (se guarda una observación si
@@ -251,7 +251,7 @@ y se ordena por prioridad:
 | 1 | `nuevo` | Nunca se visitó con éxito (más recientes primero) |
 | 2 | `desaparecido` | No apareció en la última corrida **completa de su comuna** y su última visita exitosa es de hace más de 2 días |
 | 3 | `tarjeta_cambio` | Su tarjeta de la grilla cambió desde la última visita |
-| 4 | `rotacion` | Pasó su intervalo de revisita según la antigüedad del aviso (1, 2, 4, 7 o 14 días) |
+| 4 | `rotacion` | Pasó su intervalo de revisita según la antigüedad del aviso (2, 4, 7, 14 o 30 días) |
 
 **Reparación única (P-25):** el motivo `sin_precio` va justo después de `nuevo` y re-visita los avisos cuya última visita se hizo entre el
 21-oct 14:42 y el 22-oct 07:05 (hora de Chile) y no trajo precio ni estado, porque el portal sirvió una página reducida a un
@@ -283,11 +283,13 @@ pausado o finalizado se decide en Silver.
   originales. Solo aborta como `bloqueado` si 3 bloqueos seguidos no dejan avanzar ninguna visita.
   El factor de pausa con que termina cada tanda se guarda en `logs/detalle_ritmo.json` y la tanda siguiente lo retoma (si
   fue hace menos de 2 horas), así la recuperación tras un 429 continúa entre tandas en vez de reiniciarse al ritmo base.
-- **Rotación escalonada por antigüedad:** un aviso activo se vuelve a visitar cada 1, 2, 4, 7 o 14 días según tenga
+- **Rotación escalonada por antigüedad:** un aviso activo se vuelve a visitar cada 2, 4, 7, 14 o 30 días según tenga
   hasta 14, 30, 60, 120 o más días de publicado (`DIAS_ROTACION_TRAMOS`). La edad sale del texto de Bronce ("hace 13 días",
   "esta semana"…) más los días transcurridos; sin fecha cuenta como reciente. En la rotación va primero el más atrasado
-  respecto de su intervalo. Son unas 5.500 visitas por día si todo estuviera al día: se puso alto a propósito para
-  buscar el límite del sitio, y cada bloqueo registra cuántas visitas hubo en la última hora y en 24 h.
+  respecto de su intervalo. Son unas 3.200 visitas por día con todo al día, lo que cabe en el presupuesto junto a lo que
+  trae la grilla. Hasta el 24-oct eran 1, 2, 4, 7 y 14 días (~6.200 diarias): la cola nunca se vaciaba, los avisos de más de
+  60 días no se revisaban y solo el 10 % de las visitas de rotación encontraba un cambio real (P-29). Para el hash del
+  detalle se ignora la frase "fue publicada el N de Mes" de una plantilla de corredor que cambia sola.
 - **Presupuesto de visitas:** `--presupuesto-dia` (1.500 por defecto) limita las visitas de una ventana móvil de 24 h,
   contando todas las corridas. La rotación recorre primero lo visitado hace más tiempo, así que con presupuesto
   limitado el ciclo completo se reparte sin dejar avisos sin revisar.

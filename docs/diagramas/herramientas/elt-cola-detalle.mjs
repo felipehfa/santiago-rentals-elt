@@ -20,7 +20,7 @@ await construir({
     { key: "reintento", shape: "rect", label: "Reintenta en 12 h", color: "Cache", x: 1120, y: 350, w: 290, h: 90 },
     { key: "espera", shape: "rect", label: "429: espera 30 min", color: "Alerta", x: 1120, y: 520, w: 290, h: 90 },
     nota("n_excl", 10, 470, 280, 110, "Fuera de la cola:\nfinalizados, proyectos,\n5 fallos y otras comunas"),
-    nota("n_rot", 330, 650, 400, 70, "Edad ≤ 14, 30, 60, 120 o más días:\nvuelve cada 1, 2, 4, 7 o 14 días"),
+    nota("n_rot", 330, 650, 400, 70, "Edad ≤ 14, 30, 60, 120 o más días:\nvuelve cada 2, 4, 7, 14 o 30 días"),
     nota("n_obs", 1420, 30, 250, 70, "Solo si el aviso cambió"),
     nota("n_esp", 1110, 650, 330, 70, "Pausas ×2 (hasta ×8); a la\nmitad cada 50 visitas buenas"),
   ],
