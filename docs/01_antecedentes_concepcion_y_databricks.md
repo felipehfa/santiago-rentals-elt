@@ -259,6 +259,13 @@ reglas que Silver tendrá que decidir si repite, ajusta o descarta para la Regi�
 
 ### 4.3 Imputaciones
 
+> **Dónde se imputa en `santiago-rentals`.** Esta tabla describe lo que hacían Concepción y Databricks. En Santiago **Silver no
+> imputa** (conserva lo que dijo la fuente y marca anomalías, ver P-18 de la bitácora) y las imputaciones que sirven al modelo
+> se hacen en **Gold**. El caso implementado es la antigüedad (decisión del 21-oct-2026, `gold/sql/020_aviso_entrenamiento.sql`):
+> si el aviso no la trae o trae un valor fuera de 0 a 150 años, se completa con la mediana de los avisos con dato válido en el
+> mismo punto (5 decimales, un edificio) y, si no hay, con la de los avisos a menos de ~150 m (al menos 3). La columna
+> `antiguedad_origen` guarda de dónde salió el valor (`aviso`, `mismo_punto`, `vecinos` o `sin_dato`).
+
 | Variable | Método |
 |---|---|
 | Amenities sin dato (`piscina`, `quincho`, `conserjería`, `ascensor`, `bodegas`, `gastos_comunes`) | 0 (ausencia = no tiene) |
@@ -433,4 +440,5 @@ capturado.
 | Defensa de bloqueo | Agregada tras dos incidentes | Copiada de Concepción | Desde el diseño: muro, CAPTCHA, página 1 vacía, fallos seguidos |
 | Casas | Se scrapean sin puntuar | No | No se scrapean |
 | Proyectos inmobiliarios | No tratados | No tratados | Detectados (`proyecto`) y excluidos de la cola |
+| Imputación de la antigüedad | Cascada en la ingeniería de variables | En Plata | **En Gold** (21-oct-2026): mismo punto y luego vecinos a ~150 m; Silver no imputa y `antiguedad_origen` guarda el origen del valor |
 | Meta | Dashboard y producción | Producción | Datos limpios en Gold para **entrenar** un modelo |

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1717" height="763" viewBox="-172.50 3.50 1716.50 763.00">
+<rect x="-172.5" y="3.5" width="1716.5" height="763" fill="#ffffff"/>
+<path d="M 225.00 215.00 L 197.00 215.00 L 180.00 215.00 L 163.00 215.00 L 146.20 215.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 138.00 215.00 L 149.00 211.00 L 146.20 215.00 L 149.00 219.00 Z" fill="#888888"/>
+<rect x="151.86" y="199.70" width="56.28" height="30.60" fill="#ffffff"/>
+<text x="180.00" y="215.00" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">visita</text>
+<path d="M 340.00 260.00 L 340.00 288.00 L 340.00 325.00 L 340.00 362.00 L 340.00 378.80" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 340.00 387.00 L 336.00 376.00 L 340.00 378.80 L 344.00 376.00 Z" fill="#888888"/>
+<rect x="307.99" y="309.70" width="64.02" height="30.60" fill="#ffffff"/>
+<text x="340.00" y="325.00" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">HTML</text>
+<path d="M 455.00 211.81 L 483.00 211.81 L 523.06 211.81 Q 525.00 211.81 525.00 209.86 L 525.00 209.86 Q 525.00 207.92 526.94 207.92 L 567.00 207.92 L 583.80 207.92" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 592.00 207.92 L 581.00 211.92 L 583.80 207.92 L 581.00 203.92 Z" fill="#888888"/>
+<rect x="487.95" y="194.56" width="74.10" height="30.60" fill="#ffffff"/>
+<text x="525.00" y="209.86" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">campos</text>
+<path d="M 805.00 205.00 L 833.00 205.00 L 870.00 205.00 L 907.00 205.00 L 923.80 205.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 932.00 205.00 L 921.00 209.00 L 923.80 205.00 L 921.00 201.00 Z" fill="#888888"/>
+<rect x="849.24" y="189.70" width="41.52" height="30.60" fill="#ffffff"/>
+<text x="870.00" y="205.00" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">tipa</text>
+<path d="M 932.13 400.00 L 932.13 372.00 L 932.13 338.00 Q 932.13 330.00 940.13 330.00 L 1001.57 330.00 Q 1009.57 330.00 1009.57 322.00 L 1009.57 288.00 L 1009.57 271.20" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 1009.57 263.00 L 1013.57 274.00 L 1009.57 271.20 L 1005.57 274.00 Z" fill="#888888"/>
+<rect x="927.59" y="314.70" width="86.52" height="30.60" fill="#ffffff"/>
+<text x="970.85" y="330.00" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">UF, dólar</text>
+<path d="M 1114.68 400.00 L 1114.68 372.00 L 1114.68 338.00 Q 1114.68 330.00 1106.68 330.00 L 1069.06 330.00 Q 1061.06 330.00 1061.06 322.00 L 1061.06 288.00 L 1061.06 271.20" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 1061.06 263.00 L 1065.06 274.00 L 1061.06 271.20 L 1057.06 274.00 Z" fill="#888888"/>
+<rect x="1069.63" y="314.70" width="36.48" height="30.60" fill="#ffffff"/>
+<text x="1087.87" y="330.00" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">UV</text>
+<path d="M 1145.00 205.00 L 1173.00 205.00 L 1210.00 205.00 L 1247.00 205.00 L 1263.80 205.00" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 1272.00 205.00 L 1261.00 209.00 L 1263.80 205.00 L 1261.00 201.00 Z" fill="#888888"/>
+<rect x="1182.58" y="189.70" width="54.84" height="30.60" fill="#ffffff"/>
+<text x="1210.00" y="205.00" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">aptos</text>
+<path d="M 1380.00 260.00 L 1380.00 288.00 L 1380.00 307.50 L 1380.00 327.00 L 1380.00 343.80" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 1380.00 352.00 L 1376.00 341.00 L 1380.00 343.80 L 1384.00 341.00 Z" fill="#888888"/>
+<rect x="1352.58" y="292.20" width="54.84" height="30.60" fill="#ffffff"/>
+<text x="1380.00" y="307.50" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">datos</text>
+<path d="M 1380.00 445.00 L 1380.00 473.00 L 1380.00 477.50 L 1380.00 482.00 L 1380.00 498.80" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 1380.00 507.00 L 1376.00 496.00 L 1380.00 498.80 L 1384.00 496.00 Z" fill="#888888"/>
+<rect x="1340.70" y="462.20" width="78.60" height="30.60" fill="#ffffff"/>
+<text x="1380.00" y="477.50" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">INSERT</text>
+<path d="M 1265.00 565.07 L 1237.00 565.07 L 1212.43 565.07 Q 1210.00 565.07 1210.00 567.50 L 1210.00 567.50 Q 1210.00 569.93 1207.57 569.93 L 1183.00 569.93 L 1166.20 569.93" fill="none" stroke="#888888" stroke-width="1.5" stroke-linejoin="round"/>
+<path d="M 1158.00 569.93 L 1169.00 565.93 L 1166.20 569.93 L 1169.00 573.93 Z" fill="#888888"/>
+<rect x="1172.50" y="552.20" width="75.00" height="30.60" fill="#ffffff"/>
+<text x="1210.00" y="567.50" font-family="Georgia, serif" font-size="18" fill="#444444" text-anchor="middle" dominant-baseline="middle">etiqueta</text>
+<g id="node-1">
+<rect x="-95.00" y="170.00" width="230" height="90" rx="10" ry="10" fill="rgba(143,143,143,0.18)" stroke="#8f8f8f" stroke-width="2.5"/>
+<text x="20.00" y="215.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Sitio de avisos</text>
+</g>
+<g id="node-2">
+<rect x="225.00" y="170.00" width="230" height="90" rx="10" ry="10" fill="rgba(106,159,181,0.18)" stroke="#6a9fb5" stroke-width="2.5"/>
+<text x="340.00" y="215.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Scraper de detalle</text>
+</g>
+<g id="node-3">
+<path d="M 225.00 406.00 L 225.00 474.00 A 115.00 16.00 0 0 0 455.00 474.00 L 455.00 406.00 A 115.00 16.00 0 0 0 225.00 406.00 Z" fill="rgba(91,176,160,0.18)" stroke="#5bb0a0" stroke-width="2.5"/>
+<path d="M 455.00 406.00 A 115.00 16.00 0 0 1 225.00 406.00" fill="none" stroke="#5bb0a0" stroke-width="2.5"/>
+<text x="340.00" y="446.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Landing (staging)</text>
+</g>
+<g id="node-4">
+<path d="M 595.00 166.00 L 595.00 244.00 A 105.00 16.00 0 0 0 805.00 244.00 L 805.00 166.00 A 105.00 16.00 0 0 0 595.00 166.00 Z" fill="rgba(201,143,91,0.18)" stroke="#c98f5b" stroke-width="2.5"/>
+<path d="M 805.00 166.00 A 105.00 16.00 0 0 1 595.00 166.00" fill="none" stroke="#c98f5b" stroke-width="2.5"/>
+<text x="700.00" y="211.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Bronce</text>
+</g>
+<g id="node-5">
+<path d="M 935.00 166.00 L 935.00 244.00 A 105.00 16.00 0 0 0 1145.00 244.00 L 1145.00 166.00 A 105.00 16.00 0 0 0 935.00 166.00 Z" fill="rgba(127,166,107,0.18)" stroke="#7fa66b" stroke-width="2.5"/>
+<path d="M 1145.00 166.00 A 105.00 16.00 0 0 1 935.00 166.00" fill="none" stroke="#7fa66b" stroke-width="2.5"/>
+<text x="1040.00" y="211.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Silver</text>
+</g>
+<g id="node-6">
+<rect x="815.00" y="400.00" width="190" height="80" rx="10" ry="10" fill="rgba(143,143,143,0.18)" stroke="#8f8f8f" stroke-width="2.5"/>
+<text x="910.00" y="440.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">UF y dólar</text>
+</g>
+<g id="node-7">
+<rect x="1055.00" y="400.00" width="150" height="80" rx="10" ry="10" fill="rgba(143,143,143,0.18)" stroke="#8f8f8f" stroke-width="2.5"/>
+<text x="1130.00" y="440.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">IGVUST</text>
+</g>
+<g id="node-8">
+<path d="M 1275.00 166.00 L 1275.00 244.00 A 105.00 16.00 0 0 0 1485.00 244.00 L 1485.00 166.00 A 105.00 16.00 0 0 0 1275.00 166.00 Z" fill="rgba(127,166,107,0.18)" stroke="#7fa66b" stroke-width="2.5"/>
+<path d="M 1485.00 166.00 A 105.00 16.00 0 0 1 1275.00 166.00" fill="none" stroke="#7fa66b" stroke-width="2.5"/>
+<text x="1380.00" y="211.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Gold</text>
+</g>
+<g id="node-9">
+<rect x="1265.00" y="355.00" width="230" height="90" rx="10" ry="10" fill="rgba(155,127,181,0.18)" stroke="#9b7fb5" stroke-width="2.5"/>
+<text x="1380.00" y="400.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Modelo de ML</text>
+</g>
+<g id="node-10">
+<path d="M 1265.00 526.00 L 1265.00 594.00 A 115.00 16.00 0 0 0 1495.00 594.00 L 1495.00 526.00 A 115.00 16.00 0 0 0 1265.00 526.00 Z" fill="rgba(123,184,91,0.18)" stroke="#7bb85b" stroke-width="2.5"/>
+<path d="M 1495.00 526.00 A 115.00 16.00 0 0 1 1265.00 526.00" fill="none" stroke="#7bb85b" stroke-width="2.5"/>
+<text x="1380.00" y="566.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">gold.predicciones</text>
+</g>
+<g id="node-11">
+<rect x="925.00" y="530.00" width="230" height="90" rx="10" ry="10" fill="rgba(123,184,91,0.18)" stroke="#7bb85b" stroke-width="2.5"/>
+<text x="1040.00" y="575.00" font-family="Georgia, serif" font-size="22.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Mapa web</text>
+</g>
+<g id="node-12">
+<rect x="-132.50" y="53.50" width="265" height="73" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="0.00" y="79.38" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Un aviso nuevo</text>
+<text x="0.00" y="100.63" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">en el sitio</text>
+</g>
+<g id="node-13">
+<rect x="153.00" y="53.50" width="334" height="73" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="320.00" y="79.38" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Lo visita con pausas</text>
+<text x="320.00" y="100.63" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">y extrae sus campos</text>
+</g>
+<g id="node-14">
+<rect x="143.00" y="533.50" width="334" height="73" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="310.00" y="559.38" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">HTML crudo, comprimido,</text>
+<text x="310.00" y="580.63" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">local y fuera de git</text>
+</g>
+<g id="node-15">
+<rect x="536.00" y="43.50" width="288" height="73" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="680.00" y="69.38" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Fila nueva solo si</text>
+<text x="680.00" y="90.63" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">cambió (hash)</text>
+</g>
+<g id="node-16">
+<rect x="876.00" y="43.50" width="288" height="73" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="1020.00" y="69.38" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Estado, UF a pesos</text>
+<text x="1020.00" y="90.63" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">y banderas de calidad</text>
+</g>
+<g id="node-17">
+<rect x="1216.00" y="43.50" width="288" height="73" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="1360.00" y="69.38" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Antigüedad completa</text>
+<text x="1360.00" y="90.63" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">y motivos de exclusión</text>
+</g>
+<g id="node-18">
+<rect x="843.00" y="653.50" width="334" height="73" rx="10" ry="10" fill="none" stroke="#8f8f8f" stroke-width="2.5" stroke-dasharray="9 7"/>
+<text x="1010.00" y="679.38" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">Lee Gold y las</text>
+<text x="1010.00" y="700.63" font-family="Georgia, serif" font-size="17.0" fill="#111111" text-anchor="middle" dominant-baseline="middle">predicciones</text>
+</g>
+</svg>

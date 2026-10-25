@@ -16,7 +16,8 @@ inadvertido durante 17 días (ver `docs/01_antecedentes_concepcion_y_databricks.
 Hechos con [Fluyo](https://fluyo.space). Cada diagrama es un `.svg` (la vista estática que se ve aquí) y un `.fluyo.json` en
 `docs/diagramas/`; ese archivo se abre con el botón **Abrir** de fluyo.space para reproducir sus **Historias** (el orden en el
 tiempo de un proceso, animado) y exportar un GIF. Los scripts que los generan están en `docs/diagramas/herramientas/` (ver su
-`LEEME.md`). Van en el orden del proceso: la arquitectura general, la grilla, la cola del detalle, el orquestador, Silver y Gold.
+`LEEME.md`). Van en el orden del proceso: la arquitectura general, la grilla, la cola del detalle, el orquestador, Silver, Gold y el recorrido de
+un aviso.
 
 ### 1. Arquitectura del ELT
 
@@ -148,6 +149,22 @@ Historias: *Un aviso normal, de Bronce a Silver* y *Un aviso con precio por m² 
   `ml_scoring` (escribe) y `vis_lectura` (lee) si existen.
 
 Historias: *Un aviso apto llega al modelo*, *Un aviso con superficie absurda queda fuera* y *Cada cambio queda con su vigencia*.
+
+### 7. Recorrido de un aviso
+
+![Recorrido de un aviso](docs/diagramas/elt-recorrido-aviso.svg)
+
+Un solo aviso, de la página del sitio al mapa. Es la versión pensada para compartir: no nombra el portal.
+
+- **Landing (staging).** El scraper de detalle visita el aviso y guarda su HTML crudo y comprimido (local, fuera de git), para
+  poder volver a leerlo sin pedir otra vez la página.
+- **Bronce.** Los campos extraídos entran como una fila nueva solo si cambiaron (hash del contenido).
+- **Silver.** Tipa lo de Bronce, convierte UF y dólar a pesos con el valor del día, cruza la unidad vecinal (IGVUST) y marca las
+  banderas de calidad.
+- **Gold.** Completa la antigüedad faltante y deja el aviso apto (o con sus motivos de exclusión).
+- **Consumo.** El modelo lee Gold y escribe `gold.predicciones`; el mapa lee Gold y las predicciones.
+
+Historia: *Un aviso, de la página al mapa*.
 
 ## Estado actual
 
