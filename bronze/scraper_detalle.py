@@ -465,6 +465,14 @@ def visitas_ultimas_24h(con) -> int:
         return cur.fetchone()[0]
 
 
+def es_baja_esperada(item: dict, r: dict) -> bool:
+    """Un aviso 'desaparecido' (ya no sale en la grilla) que responde 200 en su misma URL sin ser el aviso es, casi siempre,
+    un aviso dado de baja: no debe contar para la regla de fallos seguidos (P-30). Un muro de verificación redirige a otra
+    URL, y los errores de red o de páginas incompletas siguen contando."""
+    return (item.get("motivo") == "desaparecido" and r.get("resultado") == "no_encontrado"
+            and r.get("http_status") == 200 and item["id_aviso"] in (r.get("url_final") or ""))
+
+
 def registrar_intento(con, run_id, id_aviso, motivo, r: dict) -> None:
     with con, con.cursor() as cur:
         cur.execute(
@@ -565,7 +573,8 @@ def ejecutar(db: ConexionResiliente, limite: int, motivos: list[str], comunas: l
                     fallos_seguidos = 0  # respuesta válida del sitio: no es señal de bloqueo
                     log.info("%s es un proyecto inmobiliario (%s)", item["id_aviso"], r["detalle"])
                 else:
-                    fallos_seguidos += 1
+                    if not es_baja_esperada(item, r):
+                        fallos_seguidos += 1
                     fallidas += 1
                     log.warning("%s: %s (%s)", item["id_aviso"], r["resultado"], r["detalle"])
                     # Varios fallos seguidos suelen ser el sitio bloqueándonos, no avisos eliminados.

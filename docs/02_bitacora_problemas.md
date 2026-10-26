@@ -440,6 +440,17 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
   frase de fecha de esa plantilla (`RE_FECHA_PLANTILLA`; los avisos sin la frase dan el mismo hash que antes).
 - **Estado:** resuelto; revisar en unos días que la cola de rotación se vacíe y el rendimiento real por visita.
 
+## P-30 · Avisos dados de baja frenaban la corrida como si fuera un bloqueo
+
+- **Síntoma:** el 26-oct, con 191 avisos `desaparecido` en cola, hubo 3 "bloqueos" por 8 fallos consecutivos (15:39, 16:10 y
+  16:43), sin ningún 429: ~1,5 h de esperas y pausas al doble y al cuádruple sin necesidad.
+- **Causa:** un aviso dado de baja responde 200 en su misma URL con una página que no es el aviso (`no_encontrado`, "la página
+  no corresponde al aviso"), y esos resultados contaban para la regla de fallos seguidos. Los 162 `no_encontrado` de los
+  últimos 3 días eran todos así: motivo `desaparecido`, status 200, misma URL.
+- **Resolución:** `es_baja_esperada()` excluye ese caso de la regla. Siguen contando los errores de red, las páginas sin datos
+  (P-25) y cualquier `no_encontrado` de otros motivos o que redirija a otra URL (como lo haría un muro de verificación).
+- **Estado:** resuelto.
+
 ---
 
 ## Cómo agregar una entrada

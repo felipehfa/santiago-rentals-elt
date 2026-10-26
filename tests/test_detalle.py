@@ -55,6 +55,18 @@ def test_hash_ignora_campos_volatiles():
     assert d.hash_observacion(a) != d.hash_observacion({"precio": "460.000"})
 
 
+def test_baja_esperada_solo_para_desaparecido_en_su_misma_url():
+    url = "https://www.portalinmobiliario.com/MLC-123-depto-_JM"
+    baja = {"resultado": "no_encontrado", "http_status": 200, "url_final": url}
+    assert d.es_baja_esperada({"id_aviso": "MLC-123", "motivo": "desaparecido"}, baja)
+    # en otro motivo, o si redirige a otra página (posible muro), o si es error de red, sí cuenta como fallo
+    assert not d.es_baja_esperada({"id_aviso": "MLC-123", "motivo": "rotacion"}, baja)
+    assert not d.es_baja_esperada({"id_aviso": "MLC-123", "motivo": "desaparecido"},
+                                  {**baja, "url_final": "https://www.portalinmobiliario.com/otra-cosa"})
+    assert not d.es_baja_esperada({"id_aviso": "MLC-123", "motivo": "desaparecido"},
+                                  {"resultado": "error", "http_status": None, "url_final": None})
+
+
 def test_hash_ignora_fecha_de_plantilla_en_descripcion():
     a = {"descripcion": "Linda propiedad. Sigue disponible, fue publicada el 19 de Octubre. Si te interesa, escribe."}
     b = {"descripcion": "Linda propiedad. Sigue disponible, fue publicada el 24 de Octubre. Si te interesa, escribe."}
