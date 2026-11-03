@@ -59,8 +59,11 @@ def test_baja_esperada_solo_para_desaparecido_en_su_misma_url():
     url = "https://www.portalinmobiliario.com/MLC-123-depto-_JM"
     baja = {"resultado": "no_encontrado", "http_status": 200, "url_final": url}
     assert d.es_baja_esperada({"id_aviso": "MLC-123", "motivo": "desaparecido"}, baja)
+    assert d.es_baja_esperada({"id_aviso": "MLC-123", "motivo": "rotacion"}, baja)
     # en otro motivo, o si redirige a otra página (posible muro), o si es error de red, sí cuenta como fallo
-    assert not d.es_baja_esperada({"id_aviso": "MLC-123", "motivo": "rotacion"}, baja)
+    assert not d.es_baja_esperada({"id_aviso": "MLC-123", "motivo": "nuevo"}, baja)
+    assert not d.es_baja_esperada({"id_aviso": "MLC-123", "motivo": "rotacion"},
+                                  {**baja, "url_final": "https://www.portalinmobiliario.com/otra-cosa"})
     assert not d.es_baja_esperada({"id_aviso": "MLC-123", "motivo": "desaparecido"},
                                   {**baja, "url_final": "https://www.portalinmobiliario.com/otra-cosa"})
     assert not d.es_baja_esperada({"id_aviso": "MLC-123", "motivo": "desaparecido"},

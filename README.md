@@ -273,7 +273,7 @@ pausado o finalizado se decide en Silver.
 
 - El muro de verificación de cuenta se detecta por la URL final y aborta la corrida sin tocar ningún aviso.
 - Un aviso solo se considera inalcanzable tras varios fallos entre corridas, nunca por uno solo.
-- 8 fallos seguidos en una corrida se tratan como un bloqueo (espera y baja el ritmo). No cuenta un aviso `desaparecido`
+- 8 fallos seguidos en una corrida se tratan como un bloqueo (espera y baja el ritmo). No cuenta un aviso `desaparecido` o de `rotacion`
   que responde 200 en su misma URL sin ser el aviso: es la página de un aviso dado de baja (P-30).
 - Si la base corta la conexión (por ejemplo, al suspender el equipo), el scraper **reconecta y repite la
   operación** (`common/db.py::ConexionResiliente`, con esperas de 5 a 180 s) en vez de abortar. Si no logra

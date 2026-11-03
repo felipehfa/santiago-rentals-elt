@@ -449,6 +449,9 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
   últimos 3 días eran todos así: motivo `desaparecido`, status 200, misma URL.
 - **Resolución:** `es_baja_esperada()` excluye ese caso de la regla. Siguen contando los errores de red, las páginas sin datos
   (P-25) y cualquier `no_encontrado` de otros motivos o que redirija a otra URL (como lo haría un muro de verificación).
+- **Ampliación (1-nov):** el 31-oct volvieron 3 bloqueos falsos en una tanda casi toda de `rotacion` (27 `no_encontrado`,
+  todos 200 y en su misma URL; el mismo caso, con otro motivo), y las pausas quedaron en x8. La excepción ahora cubre
+  también `rotacion`.
 - **Estado:** resuelto.
 
 ---
