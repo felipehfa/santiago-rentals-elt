@@ -5,11 +5,12 @@ Ciclo:  tanda de detalle -> (si toca, grilla) -> tanda de detalle -> ...
   - Detalle: recorre su cola (nuevos, desaparecidos, tarjeta cambiada, rotación) dentro del presupuesto de 24 h. Ante un
     429 espera y baja el ritmo por su cuenta; solo termina bloqueado si varios bloqueos seguidos no lo dejan avanzar.
     Si queda bloqueado, el orquestador espera (la espera crece en cada intento) y vuelve a lanzarlo.
-  - Grilla: busca avisos nuevos y cambios en las comunas de config.COMUNAS_RM. Si el sitio la bloquea a mitad de camino,
+  - Grilla: busca avisos nuevos y cambios en las comunas de config.COMUNAS_ACTIVAS (todas las de COMUNAS_RM, salvo
+    durante un foco temporal en algunas). Si el sitio la bloquea a mitad de camino,
     espera y reanuda solo con las comunas que faltaban en esa corrida, sin repetir las ya completas.
   - Silver y Gold: cada `--silver-gold-cada-horas` (1 por defecto) se reconstruyen desde Bronce, entre tandas y también
     mientras corre una tanda de detalle (que puede pasar horas esperando por 429); nunca durante una grilla. Si fallan, se reintenta a los 30 minutos. Estado: `logs/silver_gold.json`.
-  - La grilla corre como máximo cada `--grilla-cada-horas`, para no cargar el sitio con ~230 páginas seguidas.
+  - La grilla corre como máximo cada `--grilla-cada-horas` (por defecto config.GRILLA_CADA_HORAS), para no cargar el sitio con ~230 páginas seguidas.
   - Si el presupuesto de visitas se agota, espera a que se libere.
 
 Presupuesto: `--presupuesto-dia` (5.000 por defecto: el primer 429 del sitio llegó con ~7.500 visitas en 24 h, y no se busca más ese límite).
@@ -152,7 +153,7 @@ def paso_detalle(pausa, presupuesto: int, factor: float, tanda: int, silver_gold
 
 def paso_grilla(db, pausa) -> str:
     """Corre la grilla; si el sitio la bloquea, reanuda solo con las comunas que faltaban. 'listo' | 'fallo' | 'parar'."""
-    pendientes = list(config.COMUNAS_RM)
+    pendientes = list(config.COMUNAS_ACTIVAS)
     for intento in range(MAX_REINTENTOS_GRILLA + 1):
         codigo = correr("scraper_grilla.py", "--comunas", *pendientes, pausa=pausa)
         corrida = ultima_grilla(db)
@@ -216,7 +217,8 @@ def paso_silver_gold() -> bool:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--grilla-cada-horas", type=float, default=6.0, help="separación mínima entre dos grillas")
+    ap.add_argument("--grilla-cada-horas", type=float, default=config.GRILLA_CADA_HORAS,
+                    help="separación mínima entre dos grillas")
     ap.add_argument("--silver-gold-cada-horas", type=float, default=1.0, help="separación entre reconstrucciones de Silver y Gold")
     ap.add_argument("--presupuesto-dia", type=int, default=5000, help="visitas de detalle por ventana móvil de 24 h")
     ap.add_argument("--factor-pausa", type=float, default=1.0,
@@ -233,7 +235,8 @@ def main() -> int:
     db = ConexionResiliente("BD_STRING_SCRAPER")
     ciclos = 0
     try:
-        log.info("INICIO orquestador | %d comunas | pausas %.0f-%.0f s | grilla cada %.0f h", len(config.COMUNAS_RM),
+        log.info("INICIO orquestador | %d comunas (%s) | pausas %.0f-%.0f s | grilla cada %.0f h",
+                 len(config.COMUNAS_ACTIVAS), ", ".join(c.removesuffix("-metropolitana") for c in config.COMUNAS_ACTIVAS),
                  *pausa, args.grilla_cada_horas)
         while not hay_orden_de_parar():
             resultado = paso_detalle(pausa, args.presupuesto_dia, args.factor_pausa, args.tanda, args.silver_gold_cada_horas)

@@ -41,6 +41,8 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
 | P-24 | 19-oct | GitHub Actions no puede scrapear el portal | confirmado (19-oct) |
 | P-25 | 22-oct | Con el User-Agent identificado el portal sirve una página sin precio ni estado | abierto (scraper detenido) |
 | P-26 | 22-oct | Silver se detuvo porque la API de UF y dólar no respondió | resuelto |
+| P-31 | 18-nov | Foco temporal en Santiago y Ñuñoa; la grilla de ambas no queda completa y `desaparecido` no corre | mitigado |
+| P-32 | 18-nov | El portal cambió el cierre del JSON de la página y todas las visitas quedaron "sin appProps" | resuelto |
 
 ---
 
@@ -452,6 +454,38 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
 - **Ampliación (1-nov):** el 31-oct volvieron 3 bloqueos falsos en una tanda casi toda de `rotacion` (27 `no_encontrado`,
   todos 200 y en su misma URL; el mismo caso, con otro motivo), y las pausas quedaron en x8. La excepción ahora cubre
   también `rotacion`.
+- **Estado:** resuelto.
+
+## P-31 · Foco temporal en Santiago y Ñuñoa; la grilla de ambas no queda completa y `desaparecido` no corre
+
+- **Síntoma:** el usuario busca arriendo cerca del metro Irarrázaval (límite Santiago-Ñuñoa) y pidió concentrar el scraping
+  ahí: capturar pronto los avisos nuevos y marcar los que se retiran. Al revisarlo apareció que la grilla de Santiago nunca
+  queda `completa` (~88 % de lo declarado: 1 dormitorio declara 2.307 y el sitio solo muestra 2.016; el robots.txt no deja
+  partir por precio) y la de Ñuñoa no lo está desde el 6-nov (93-95 %).
+- **Causa:** el motivo `desaparecido` solo corre contra la última grilla `completa` de cada comuna, así que en esas dos los
+  avisos retirados solo se detectaban por la rotación (cada 2 a 30 días).
+- **Resolución (temporal):** `config.COMUNAS_ACTIVAS` (Santiago y Ñuñoa) limita la grilla y la cola del orquestador; la
+  grilla pasa a cada 2 h (`GRILLA_CADA_HORAS`, ~149 páginas y 18 min por pasada, ~1.800 páginas al día). En la cola, los
+  avisos a 1,5 km o menos del metro (`ZONA_FOCO`, -33.4524, -70.6290; ~1.670 avisos) rotan a diario y van primero dentro de
+  cada motivo; el resto de las dos comunas (~5.100) rota cada 2 a 7 días (`DIAS_ROTACION_FOCO`): ~3.000 visitas diarias,
+  bajo el tope de 5.000. `COMUNAS_RM` no cambia, así que las otras 10 comunas quedan congeladas pero dentro de Silver, Gold,
+  el modelo y el mapa. Nuevo `scripts/radar.py` (solo lee Gold) para la búsqueda. Al activarlo la cola tenía 3.165 avisos
+  atrasados de rotación.
+- **Pendiente:** al terminar el foco, volver a los valores normales (comentario en `config.py`); habrá varios días de
+  revisitas atrasadas en las 10 comunas congeladas. La grilla incompleta de Santiago sigue abierta para cuando no haya foco.
+- **Estado:** mitigado (foco activo).
+
+## P-32 · El portal cambió el cierre del JSON de la página y todas las visitas quedaron "sin appProps"
+
+- **Síntoma:** desde el 18-nov a las 03:16 casi todas las visitas de detalle fallaron con "página sin datos del aviso (sin
+  appProps)", y cada 8 seguidas contaban como bloqueo (más de 10 ese día, pausas hasta x8). Un descanso de casi 2 horas no
+  cambió nada: no era un bloqueo.
+- **Causa:** el estado de la aplicación sigue en `_n.ctx.r={...}` con la misma estructura (39 componentes en una página de
+  prueba), pero ahora lo sigue `;_n.ctx.r.assets={manifest:` en vez de `;_n.ctx.r.assets.manifest=`, y `RE_JSON_ESTADO`
+  exigía ese texto exacto para cerrar la captura.
+- **Resolución:** `extraer_json_pagina()` busca el inicio `_n.ctx.r=` y lee el objeto con `json.JSONDecoder().raw_decode`,
+  sin depender de lo que venga después. Test nuevo con el formato actual. Los avisos que fallaron esperan 12 h
+  (`HORAS_ENTRE_REINTENTOS`) antes de volver a la cola.
 - **Estado:** resuelto.
 
 ---

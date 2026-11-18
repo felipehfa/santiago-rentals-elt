@@ -6,6 +6,8 @@ Arma una cola de avisos a visitar, derivada con SQL de las tablas de la grilla y
   2. desaparecido   dejó de aparecer en la última grilla exitosa: ¿pausado, finalizado o eliminado?
   3. tarjeta_cambio su tarjeta de la grilla cambió desde la última visita (probable cambio de precio)
   4. rotacion       activo sin revisar hace más de su intervalo (DIAS_ROTACION_TRAMOS, según su antigüedad)
+Durante un foco temporal (config.ZONA_FOCO y DIAS_ROTACION_FOCO), los avisos de la zona se revisan a diario y van primero
+dentro de cada motivo; el resto usa los tramos del foco.
 
 Cada visita queda en bronze.detalle_intentos. Solo si lo observado cambió se agrega una fila a
 bronze.detalle_avisos, con la evidencia cruda de estado y precio (la interpretación es de Silver).
@@ -79,7 +81,10 @@ RUTAS_MURO_VERIFICACION = ("/gz/account-verification", "/jms/mlc/lgz/login", "/r
 # Canonical de un proyecto: .../arriendo/departamento/<comuna>/888888359-lofty-nva. El ID numérico puede ser
 # corto (12072-edificio-porvenir-nva) y el separador doble (11473--imu-san-cristobal-nva).
 RE_CANONICAL_PROYECTO = re.compile(r"/arriendo/[^/]+/[^/]+/\d+-+[^/]+/?$")
-RE_JSON_ESTADO = re.compile(r"_n\.ctx\.r=(\{.*?\});_n\.ctx\.r\.assets\.manifest=", re.DOTALL)
+# Inicio del estado de la aplicación en la página. El JSON se lee con raw_decode hasta donde cierra, sin depender de lo que
+# venga después: el 18-nov-2026 el portal cambió el cierre de ";_n.ctx.r.assets.manifest=" a ";_n.ctx.r.assets={manifest:"
+# y todas las visitas quedaron como "sin appProps" (bitácora P-32).
+INICIO_JSON_ESTADO = "_n.ctx.r="
 RE_FECHA_PUBLICACION = re.compile(r"Publicado (hoy|esta semana|hace [^\n\|]+)", re.IGNORECASE)
 RE_SUPERFICIE_TOTAL = re.compile(r"Superficie total\s*([\d.,]+)\s*m", re.IGNORECASE)
 RE_SUPERFICIE_UTIL = re.compile(r"Superficie útil\s*([\d.,]+)\s*m", re.IGNORECASE)
@@ -141,13 +146,14 @@ def _sin_tildes(texto: str) -> str:
 
 
 def extraer_json_pagina(html: str) -> Optional[dict]:
-    m = RE_JSON_ESTADO.search(html)
-    if not m:
+    i = html.find(INICIO_JSON_ESTADO)
+    if i < 0:
         return None
     try:
-        return json.loads(m.group(1))
+        estado, _ = json.JSONDecoder().raw_decode(html, i + len(INICIO_JSON_ESTADO))
     except json.JSONDecodeError:
         return None
+    return estado if isinstance(estado, dict) else None
 
 
 def _componentes(estado: Optional[dict]) -> dict:
@@ -364,8 +370,15 @@ fallos AS (SELECT i.id_aviso, count(*) AS n, max(i.scraped_at) AS ult_fallo
            WHERE i.resultado IN ('error', 'no_encontrado') AND (ok.ult_ok IS NULL OR i.scraped_at > ok.ult_ok)
            GROUP BY i.id_aviso),
 det AS (SELECT DISTINCT ON (id_aviso) id_aviso, estado_texto, precio_valor, scraped_at AS det_en,
-               payload->>'fecha_publicacion_texto' AS txt_pub
+               payload->>'fecha_publicacion_texto' AS txt_pub,
+               (payload->>'latitud')::numeric AS lat, (payload->>'longitud')::numeric AS lon
         FROM bronze.detalle_avisos ORDER BY id_aviso, scraped_at DESC),
+-- Zona de foco (config.ZONA_FOCO): avisos a menos del radio (km, haversine) del punto. Sin zona, el radio llega negativo.
+zona AS (SELECT id_aviso,
+                COALESCE(2 * 6371 * asin(sqrt(power(sin(radians(lat - %(z_lat)s) / 2), 2)
+                         + cos(radians(lat)) * cos(radians(%(z_lat)s)) * power(sin(radians(lon - %(z_lon)s) / 2), 2)))
+                         <= %(z_radio)s, false) AS en_zona
+         FROM det),
 -- Edad de la publicación hoy: lo que decía el texto ("hace 13 días", "hace 2 meses", "esta semana", "hoy") cuando se
 -- observó, más los días transcurridos desde esa observación.
 edad AS (SELECT id_aviso,
@@ -376,14 +389,15 @@ edad AS (SELECT id_aviso,
                      WHEN txt_pub ~ '^hace [0-9]+ a' THEN substring(txt_pub from '[0-9]+')::int * 365
                 END + floor(extract(epoch FROM now() - det_en) / 86400)::int AS dias
          FROM det),
-tramo AS (SELECT id_aviso,
-                 CASE WHEN dias IS NULL OR dias <= 14 THEN %(r0)s WHEN dias <= 30 THEN %(r1)s
+tramo AS (SELECT edad.id_aviso,
+                 CASE WHEN zona.en_zona THEN 1  -- la zona de foco se revisa a diario
+                      WHEN dias IS NULL OR dias <= 14 THEN %(r0)s WHEN dias <= 30 THEN %(r1)s
                       WHEN dias <= 60 THEN %(r2)s WHEN dias <= 120 THEN %(r3)s ELSE %(r4)s END AS interv
-          FROM edad),
+          FROM edad JOIN zona USING (id_aviso)),
 card AS (SELECT DISTINCT ON (id_aviso) id_aviso, comuna, tipo_propiedad, payload->>'url' AS url,
                 scraped_at AS ult_card FROM bronze.grilla_avisos ORDER BY id_aviso, scraped_at DESC),
 cola AS (
-  SELECT gv.id_aviso, card.url, card.comuna, card.tipo_propiedad, ok.ult_ok,
+  SELECT gv.id_aviso, card.url, card.comuna, card.tipo_propiedad, ok.ult_ok, COALESCE(zona.en_zona, false) AS en_zona,
          extract(epoch FROM now() - ok.ult_ok) / 86400.0 / tr.interv AS vencido,
          CASE
            WHEN ok.ult_ok IS NULL THEN 'nuevo'
@@ -404,6 +418,7 @@ cola AS (
   LEFT JOIN fallos f ON f.id_aviso = gv.id_aviso
   LEFT JOIN det ON det.id_aviso = gv.id_aviso
   LEFT JOIN tramo tr ON tr.id_aviso = gv.id_aviso
+  LEFT JOIN zona ON zona.id_aviso = gv.id_aviso
   WHERE card.url IS NOT NULL
     AND card.comuna = ANY(%(comunas)s)
     -- 'finalizado' es terminal: no se vuelve a visitar. Pausado sí, porque puede volver a publicarse.
@@ -416,6 +431,7 @@ cola AS (
 SELECT id_aviso, url, comuna, tipo_propiedad, motivo FROM cola
 WHERE motivo = ANY(%(motivos)s)
 ORDER BY CASE motivo WHEN 'nuevo' THEN 1 WHEN 'sin_precio' THEN 2 WHEN 'desaparecido' THEN 3 WHEN 'tarjeta_cambio' THEN 4 ELSE 5 END,
+         CASE WHEN en_zona THEN 0 ELSE 1 END,  -- dentro de cada motivo, primero la zona de foco
          CASE WHEN motivo = 'rotacion' THEN -vencido ELSE 0 END,  -- en la rotación, primero el más atrasado respecto de su intervalo
          ult_ok NULLS FIRST, id_aviso DESC
 LIMIT %(limite)s
@@ -425,7 +441,9 @@ LIMIT %(limite)s
 def obtener_cola(con, limite: int, motivos: list[str], comunas: list[str]) -> list[dict]:
     with con.cursor() as cur:
         cur.execute(SQL_COLA, {"dias_desap": DIAS_ENTRE_VISITAS_DESAPARECIDO,
-                               **{f"r{i}": d for i, d in enumerate(DIAS_ROTACION_TRAMOS)},
+                               **{f"r{i}": d for i, d in enumerate(config.DIAS_ROTACION_FOCO or DIAS_ROTACION_TRAMOS)},
+                               "z_lat": (config.ZONA_FOCO or (0, 0, -1))[0], "z_lon": (config.ZONA_FOCO or (0, 0, -1))[1],
+                               "z_radio": (config.ZONA_FOCO or (0, 0, -1))[2],
                                "sp_desde": SIN_PRECIO_DESDE, "sp_hasta": SIN_PRECIO_HASTA,
                                "max_fallos": MAX_FALLOS_POR_AVISO, "horas_reint": HORAS_ENTRE_REINTENTOS,
                                "motivos": motivos, "comunas": comunas, "limite": limite})
@@ -630,7 +648,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--limite", type=int, default=300, help="máximo de avisos a visitar en esta corrida")
     ap.add_argument("--motivos", nargs="+", default=["nuevo", "sin_precio", "desaparecido", "tarjeta_cambio", "rotacion"])
-    ap.add_argument("--comunas", nargs="+", default=config.COMUNAS_RM, help="solo avisos de estas comunas")
+    ap.add_argument("--comunas", nargs="+", default=config.COMUNAS_ACTIVAS, help="solo avisos de estas comunas")
     ap.add_argument("--factor-pausa", type=float, default=1.0,
                     help="multiplicador inicial de las pausas; baja solo tras visitas buenas seguidas")
     ap.add_argument("--presupuesto-dia", type=int, default=PRESUPUESTO_24H,

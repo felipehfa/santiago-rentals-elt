@@ -11,11 +11,11 @@ await construir({
   nodos: [
     { key: "orq", shape: "rect", label: "Orquestador", color: "Config", x: 20, y: 270, w: 220, h: 100 },
     { key: "detalle", shape: "rect", label: "Detalle (tandas)", color: "Servicio", x: 340, y: 120, w: 250, h: 90 },
-    { key: "grilla", shape: "rect", label: "Grilla (cada 6 h)", color: "Servicio", x: 340, y: 440, w: 250, h: 90 },
+    { key: "grilla", shape: "rect", label: "Grilla (cada 2 a 6 h)", color: "Servicio", x: 340, y: 440, w: 250, h: 90 },
     { key: "portal", shape: "rect", label: "Portal Inmobiliario", color: "Externo", x: 720, y: 280, w: 240, h: 90 },
     { key: "espera", shape: "rect", label: "Espera 30 min", color: "Alerta", x: 720, y: 20, w: 240, h: 80 },
     { key: "bronce", shape: "cylinder", label: "Bronce", color: "Almacén", x: 1100, y: 270, w: 210, h: 110 },
-    nota("n_orq", 10, 420, 300, 88, "Alterna tandas de 400\nvisitas; la grilla entra\ncada 6 h"),
+    nota("n_orq", 10, 420, 300, 88, "Alterna tandas de 400\nvisitas; la grilla entra\ncada 6 h (2 en el foco)"),
     { key: "sg", shape: "rect", label: "Silver y Gold (cada hora)", color: "Servicio", x: 1530, y: 275, w: 270, h: 90 },
     nota("n_sg", 1500, 410, 330, 88, "Entre dos tandas; si falla,\nreintenta a los 30 min"),
     nota("n_detalle", 320, 20, 330, 66, "Presupuesto: 5.000 visitas\npor 24 h"),

@@ -83,8 +83,15 @@ Historias: *Un aviso nuevo se visita primero*, *Un aviso desaparecido resulta se
 
 Cómo se mantienen activos los dos scrapers sin intervención y qué hacen cuando el sitio los frena:
 
-- **Orquestador.** Alterna *tandas* de 400 visitas del detalle y, cada 6 horas, la grilla, que entra a su hora aunque la cola
-  del detalle sea larga. Si no hay nada que visitar, espera hasta 30 minutos y vuelve a mirar.
+- **Foco temporal (desde el 18-nov-2026).** Para una búsqueda personal de arriendo cerca del metro Irarrázaval, el orquestador
+  solo scrapea `config.COMUNAS_ACTIVAS` (Santiago y Ñuñoa) y la grilla corre cada 2 horas (`config.GRILLA_CADA_HORAS`). En el
+  detalle, los avisos a 1,5 km o menos del metro (`config.ZONA_FOCO`) se revisan a diario y van primero dentro de cada motivo;
+  el resto de esas dos comunas rota cada 2 a 7 días (`config.DIAS_ROTACION_FOCO`). Las otras 10 comunas quedan congeladas
+  (siguen en `COMUNAS_RM`, así que Silver, Gold, el modelo y el mapa las conservan). `python scripts/radar.py` lista los
+  avisos activos de la zona del más barato al más caro respecto de la predicción (`--horas 24` para los nuevos). Para volver a
+  lo normal, ver el comentario en `config.py` (bitácora P-31).
+- **Orquestador.** Alterna *tandas* de 400 visitas del detalle y, cada 6 horas (2 durante el foco), la grilla, que entra a su
+  hora aunque la cola del detalle sea larga. Si no hay nada que visitar, espera hasta 30 minutos y vuelve a mirar.
 - **Detalle.** Recorre su cola con un presupuesto de visitas por ventana móvil de 24 horas y pausas aleatorias entre visitas
   (configurables; hoy de 3 a 6 s).
 - **Silver y Gold.** Cada hora reconstruye Silver y luego Gold desde Bronce, entre tandas y también mientras corre una tanda
@@ -294,7 +301,8 @@ pausado o finalizado se decide en Silver.
 - **Presupuesto de visitas:** `--presupuesto-dia` (1.500 por defecto) limita las visitas de una ventana móvil de 24 h,
   contando todas las corridas. La rotación recorre primero lo visitado hace más tiempo, así que con presupuesto
   limitado el ciclo completo se reparte sin dejar avisos sin revisar.
-- **Solo las comunas de `config.COMUNAS_RM`:** la cola excluye avisos de otras comunas (`--comunas` cambia la lista).
+- **Solo las comunas de `config.COMUNAS_ACTIVAS`** (todas las de `COMUNAS_RM` salvo durante un foco temporal): la cola
+  excluye avisos de otras comunas (`--comunas` cambia la lista).
 - **Log de avance:** además de la pantalla, cada corrida agrega sus líneas a `logs/detalle.log` (fuera de git).
   Cada 50 visitas escribe una línea `Avance: 150/1322 (11 %) | 8,3 visitas/min | observaciones nuevas 148 |
   sin leer 4 | resta ~2 h 20 min`. También quedan la cola inicial, cada aviso que no se pudo leer, las
@@ -341,6 +349,7 @@ santiago-rentals-elt/
 ├── tests/                     # HTML sintético, sin red ni base de datos (CI en .github/workflows/ci.yml)
 ├── scripts/
 │   ├── aplicar_ddl.py         # aplica los .sql en orden (idempotente)
+│   ├── radar.py               # foco temporal: avisos activos cerca del metro Irarrázaval vs. la predicción
 │   ├── vigilar_orquestador.ps1       # lanza el orquestador si no está corriendo (nunca dos)
 │   ├── instalar_tarea_windows.ps1    # registra la tarea programada que llama al anterior
 │   ├── spike_slugs.py         # verificó los slugs de las 23 comunas
@@ -386,7 +395,7 @@ abusar del sitio:
 
 **Todo el ciclo, sin intervención:** `python bronze/orquestador.py` alterna detalle y grilla (detalle, grilla, detalle…),
 con un presupuesto de 5.000 visitas de detalle por 24 h (`--presupuesto-dia`).
-El detalle trabaja en tandas de 400 visitas (`--tanda`) y, entre tandas, el orquestador revisa si ya toca la grilla, que corre como máximo cada 6 horas (`--grilla-cada-horas`) aunque la cola del detalle sea larga. Si el detalle termina bloqueado, espera 30, 60 y luego
+El detalle trabaja en tandas de 400 visitas (`--tanda`) y, entre tandas, el orquestador revisa si ya toca la grilla, que corre como máximo cada 6 horas (`--grilla-cada-horas`; por defecto `config.GRILLA_CADA_HORAS`, 2 durante el foco) aunque la cola del detalle sea larga. Si el detalle termina bloqueado, espera 30, 60 y luego
 120 minutos y lo relanza; si la grilla es bloqueada, espera igual y reanuda solo con las comunas que faltaban. Si se agota
 el presupuesto de 24 h, espera a que se libere. Las pausas entre peticiones son de 6 a 12 s (`--pausa-min/--pausa-max`).
 Cada hora (`--silver-gold-cada-horas`) reconstruye Silver y Gold, también durante una tanda de detalle; si falla, reintenta
@@ -408,9 +417,10 @@ python bronze/scraper_grilla.py --sin-bd                   # solo landing, sin e
 
 python bronze/scraper_detalle.py --limite 300              # visita hasta 300 avisos de la cola
 python bronze/scraper_detalle.py --limite 20 --motivos nuevo
-python bronze/scraper_detalle.py --comunas nunoa-metropolitana   # solo esas comunas (por defecto, config.COMUNAS_RM)
+python bronze/scraper_detalle.py --comunas nunoa-metropolitana   # solo esas comunas (por defecto, config.COMUNAS_ACTIVAS)
 python bronze/scraper_detalle.py --limite 20000 --presupuesto-dia 1200   # el presupuesto manda sobre el límite
 
+python scripts/radar.py --horas 24                         # foco: avisos nuevos cerca del metro Irarrázaval
 python bronze/cargar_igvust.py                             # una vez (o al actualizar el shapefile)
 python silver/construir_silver.py                          # reconstruye Silver desde Bronce
 python gold/construir_gold.py                              # reconstruye Gold desde Silver

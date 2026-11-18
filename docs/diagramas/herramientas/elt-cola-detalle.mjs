@@ -13,7 +13,7 @@ await construir({
     { key: "nuevo", shape: "rect", label: "1. Nuevo\nnunca visitado", color: "Servicio", x: 340, y: 20, w: 270, h: 90 },
     { key: "desaparecido", shape: "rect", label: "2. Desaparecido\nya no sale en la grilla", color: "Servicio", x: 340, y: 180, w: 270, h: 90 },
     { key: "tarjeta", shape: "rect", label: "3. Tarjeta cambiada\nsu tarjeta cambió", color: "Servicio", x: 340, y: 340, w: 270, h: 90 },
-    { key: "rotacion", shape: "rect", label: "4. Rotación\ncada 1 a 14 días", color: "Servicio", x: 340, y: 500, w: 270, h: 90 },
+    { key: "rotacion", shape: "rect", label: "4. Rotación\ncada 2 a 30 días\n(foco: 1 a 7)", color: "Servicio", x: 340, y: 500, w: 270, h: 90 },
     { key: "visita", shape: "rect", label: "Visita", color: "Config", x: 770, y: 255, w: 190, h: 100 },
     { key: "obs", shape: "cylinder", label: "Observación", color: "Almacén", x: 1120, y: 10, w: 250, h: 110 },
     { key: "proyecto", shape: "rect", label: "Proyecto: se excluye", color: "Externo", x: 1120, y: 180, w: 290, h: 90 },

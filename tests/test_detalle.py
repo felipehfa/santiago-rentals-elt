@@ -37,6 +37,9 @@ def test_json_de_la_pagina_valido_e_invalido():
     assert d.extraer_json_pagina(ok) == {"appProps": {"a": 1}}
     assert d.extraer_json_pagina("sin estado") is None
     assert d.extraer_json_pagina("_n.ctx.r={roto};_n.ctx.r.assets.manifest=") is None
+    # Formato desde el 18-nov-2026 (P-32): el cierre cambió y el JSON se sigue leyendo igual.
+    nuevo = 'x _n.ctx.r={"appProps":{"a":1}};_n.ctx.r.assets={manifest:new Map([])} y'
+    assert d.extraer_json_pagina(nuevo) == {"appProps": {"a": 1}}
 
 
 def test_precio_y_estado_del_json():
