@@ -43,6 +43,7 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
 | P-26 | 22-oct | Silver se detuvo porque la API de UF y dólar no respondió | resuelto |
 | P-31 | 18-nov | Foco temporal en Santiago y Ñuñoa; la grilla de ambas no queda completa y `desaparecido` no corre | mitigado |
 | P-32 | 18-nov | El portal cambió el cierre del JSON de la página y todas las visitas quedaron "sin appProps" | resuelto |
+| P-33 | 18-nov | GitHub posterga el cron del scoring y los avisos nuevos pasaban hasta 8 h sin predicción | resuelto |
 
 ---
 
@@ -487,6 +488,25 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
   sin depender de lo que venga después. Test nuevo con el formato actual. Los avisos que fallaron esperan 12 h
   (`HORAS_ENTRE_REINTENTOS`) antes de volver a la cola.
 - **Estado:** resuelto.
+
+---
+
+## P-33 · GitHub posterga el cron del scoring y los avisos nuevos pasaban hasta 8 h sin predicción
+
+- **Síntoma:** el 18-nov a las 15:52 el radar mostraba 134 avisos nuevos en la zona del foco, pero solo 50 con predicción
+  (84 sin ella, 74 de ellos aptos).
+- **Causa:** `scoring.yml` (repo de ML) está programado a los :07 y :37 de cada hora, pero GitHub posterga los cron: en los
+  últimos días corrió unas 3 veces al día (~22:00, ~06:00 y ~15:00 de Chile). La corrida de las 14:57 encontró "0 por
+  predecir" porque Gold aún no tenía los avisos de la tarde. No es un fallo del modelo ni del scoring.
+- **Resolución:** con `config.SCORING_TRAS_GOLD = True` (parte del foco, P-31), `bronze/orquestador.py` lanza
+  `gh workflow run scoring.yml --repo config.REPO_ML` después de cada reconstrucción de Gold que termina bien. Un fallo de `gh`
+  solo se anota en el log. El workflow tiene `concurrency: scoring`, así que no hay dos corridas a la vez. `como_va.py` y
+  `radar.py` separan los avisos que esperan el scoring (aptos) de los no aptos, que nunca tienen predicción.
+- **Estado:** resuelto; al terminar el foco se puede volver a `False` o dejarlo.
+- **Actualización (18-nov, 16:30):** la publicación del mapa (`publicar.yml`, repo VIS, cron a los :17 y :47) tiene el mismo
+  problema: corre ~4 veces al día y a las 16:20 el mapa era de las 08:43. Tras lanzar el scoring, el orquestador deja un proceso
+  aparte que espera `config.MAPA_TRAS_SCORING_MIN` (10) minutos y lanza `gh workflow run publicar.yml --repo config.REPO_VIS`;
+  el scoring tarda ~2 min, así que el mapa publica las predicciones nuevas. `None` lo desactiva.
 
 ---
 

@@ -21,7 +21,7 @@ from common.db import conectar  # noqa: E402
 SQL = """
 WITH base AS (
   SELECT a.id_aviso, a.comuna, a.dormitorios, a.banos, a.superficie_util_m2, a.costo_total_clp, a.primera_vez_visto,
-         a.fecha_publicacion_aprox, a.url, p.costo_total_predicho_clp, p.etiqueta,
+         a.fecha_publicacion_aprox, a.url, a.apto_entrenamiento, p.costo_total_predicho_clp, p.etiqueta,
          1000 * 2 * 6371 * asin(sqrt(power(sin(radians(a.latitud - %(lat)s) / 2), 2)
              + cos(radians(a.latitud)) * cos(radians(%(lat)s)) * power(sin(radians(a.longitud - %(lon)s) / 2), 2))) AS dist_m
   FROM gold.aviso_entrenamiento a
@@ -66,12 +66,16 @@ def main() -> int:
     finally:
         con.close()
 
+    esperan = sum(1 for f in filas if f["costo_total_predicho_clp"] is None and f["apto_entrenamiento"])
     print(f"{len(filas)} avisos activos a {args.radio:g} km o menos del foco"
-          + (f", nuevos en {args.horas} h" if args.horas < 24 * 365 else ""))
+          + (f", nuevos en {args.horas} h" if args.horas < 24 * 365 else "")
+          + (f" ({esperan} esperan el scoring: dif = esp)" if esperan else ""))
     print(f"{'comuna':<12}{'dorm':>5}{'baños':>6}{'m2':>6}{'costo':>10}{'modelo':>10}{'dif':>6}  {'dist':>6}  url")
     for f in filas[:args.limite]:
         costo, pred = f["costo_total_clp"], f["costo_total_predicho_clp"]
-        dif = f"{(costo / pred - 1) * 100:+.0f}%" if costo and pred else "-"
+        # Sin predicción: "esp" = apto, espera el próximo scoring; "n/a" = no apto, el modelo no lo evalúa.
+        dif = (f"{(costo / pred - 1) * 100:+.0f}%" if costo and pred
+               else "esp" if f["apto_entrenamiento"] else "n/a")
         def n(x, ancho):
             return f"{x:>{ancho},.0f}".replace(",", ".") if x is not None else f"{'-':>{ancho}}"
         print(f"{f['comuna'].removesuffix('-metropolitana'):<12}{n(f['dormitorios'], 5)}{n(f['banos'], 6)}"

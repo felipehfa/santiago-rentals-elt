@@ -229,7 +229,9 @@ def pie(cur) -> list[str]:
         r = consultar(cur, f"""
             SELECT count(*) AS n,
                    count(*) FILTER (WHERE p.costo_total_predicho_clp > 0
-                                    AND a.costo_total_clp < p.costo_total_predicho_clp) AS bajo
+                                    AND a.costo_total_clp < p.costo_total_predicho_clp) AS bajo,
+                   count(*) FILTER (WHERE p.costo_total_predicho_clp IS NULL AND a.apto_entrenamiento) AS pendientes,
+                   count(*) FILTER (WHERE p.costo_total_predicho_clp IS NULL AND NOT a.apto_entrenamiento) AS no_aptos
             FROM gold.aviso_entrenamiento a
             -- Misma regla que gold.predicciones_vigentes, pero solo para los avisos filtrados: la vista ordena
             -- todo el historial (~940 mil filas, ~45 s) y aquí bastan unas decenas de búsquedas por índice.
@@ -237,8 +239,11 @@ def pie(cur) -> list[str]:
                                ORDER BY modelo_version DESC, predicho_en DESC LIMIT 1) p ON true
             WHERE a.estado_publicacion = 'activo' AND a.primera_vez_visto >= now() - interval '24 hours'
               AND {SQL_ZONA.format(lat='a.latitud', lon='a.longitud')}""", zona_params())[0]
-        lineas.append(f"Radar: {r['n']} avisos nuevos en la zona en 24 h, {r['bajo']} bajo la predicción "
-                      f"(python scripts/radar.py --horas 24)")
+        # Sin predicción puede ser "aún no" (apto, espera al próximo scoring) o "nunca" (no apto para el modelo).
+        sin = [t for t in (f"{r['pendientes']} esperan el scoring" if r["pendientes"] else "",
+                           f"{r['no_aptos']} no aptos" if r["no_aptos"] else "") if t]
+        lineas.append(f"Radar: {r['n']} avisos nuevos en la zona en 24 h, {r['bajo']} bajo la predicción"
+                      + (f" ({', '.join(sin)})" if sin else "") + " · python scripts/radar.py --horas 24")
     return lineas
 
 

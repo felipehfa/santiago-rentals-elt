@@ -26,6 +26,7 @@ import argparse
 import json
 import logging
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -212,7 +213,41 @@ def paso_silver_gold() -> bool:
             return False
     RUTA_SILVER_GOLD.write_text(json.dumps({"ok": datetime.now().isoformat(timespec="seconds")}), encoding="utf-8")
     log.info("Silver y Gold reconstruidos")
+    if config.SCORING_TRAS_GOLD:
+        lanzar_scoring()
     return True
+
+
+def lanzar_scoring() -> None:
+    """Pide a GitHub que corra el scoring del repo de ML sobre el Gold recién construido y, unos minutos después, la
+    publicación del mapa. Sus cron existen, pero GitHub los posterga horas (P-33). Un fallo acá solo se anota: el scraping
+    no depende de esto."""
+    gh = shutil.which("gh") or r"C:\Program Files\GitHub CLI\gh.exe"
+    comando = [gh, "workflow", "run", "scoring.yml", "--repo", config.REPO_ML]
+    try:
+        r = subprocess.run(comando, cwd=RAIZ, capture_output=True, text=True, timeout=60, check=False)
+    except (OSError, subprocess.TimeoutExpired) as e:
+        log.warning("No se pudo lanzar el scoring (%s)", type(e).__name__)
+        return
+    if r.returncode != 0:
+        log.warning("gh workflow run falló (código %d): %s", r.returncode, (r.stderr or "").strip()[:200])
+        return
+    log.info("Scoring lanzado en GitHub Actions")
+    if config.MAPA_TRAS_SCORING_MIN is None:
+        return
+    # El orquestador no puede esperar esos minutos (puede estar en medio de una tanda), así que la espera la hace un proceso
+    # aparte que no queda ligado a él. Su línea de comando no menciona orquestador.py, así el vigilante no lo confunde.
+    publicar = [gh, "workflow", "run", "publicar.yml", "--repo", config.REPO_VIS]
+    codigo = (f"import subprocess, time; time.sleep({config.MAPA_TRAS_SCORING_MIN * 60}); "
+              f"subprocess.run({publicar!r}, capture_output=True, timeout=60)")
+    try:
+        subprocess.Popen([sys.executable, "-c", codigo], cwd=RAIZ, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                         stderr=subprocess.DEVNULL,
+                         creationflags=getattr(subprocess, "DETACHED_PROCESS", 0)
+                         | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0))
+        log.info("Publicación del mapa programada en %d min", config.MAPA_TRAS_SCORING_MIN)
+    except OSError as e:
+        log.warning("No se pudo programar la publicación del mapa (%s)", type(e).__name__)
 
 
 def main() -> int:

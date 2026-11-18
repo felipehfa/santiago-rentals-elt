@@ -89,7 +89,9 @@ Cómo se mantienen activos los dos scrapers sin intervención y qué hacen cuand
   el resto de esas dos comunas rota cada 2 a 7 días (`config.DIAS_ROTACION_FOCO`). Las otras 10 comunas quedan congeladas
   (siguen en `COMUNAS_RM`, así que Silver, Gold, el modelo y el mapa las conservan). `python scripts/radar.py` lista los
   avisos activos de la zona del más barato al más caro respecto de la predicción (`--horas 24` para los nuevos). Para volver a
-  lo normal, ver el comentario en `config.py` (bitácora P-31).
+  lo normal, ver el comentario en `config.py` (bitácora P-31). Mientras dure el foco, tras cada Gold el orquestador lanza el
+  scoring del repo de ML con `gh workflow run` (`config.SCORING_TRAS_GOLD`) y, 10 minutos después, la publicación del mapa
+  (`config.MAPA_TRAS_SCORING_MIN`), porque GitHub posterga sus cron horas (P-33).
 - **Orquestador.** Alterna *tandas* de 400 visitas del detalle y, cada 6 horas (2 durante el foco), la grilla, que entra a su
   hora aunque la cola del detalle sea larga. Si no hay nada que visitar, espera hasta 30 minutos y vuelve a mirar.
 - **Detalle.** Recorre su cola con un presupuesto de visitas por ventana móvil de 24 horas y pausas aleatorias entre visitas

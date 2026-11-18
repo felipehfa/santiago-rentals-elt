@@ -37,12 +37,21 @@ COD_COM_ALCANCE = sorted(CODIGOS_COMUNA[c] for c in COMUNAS_RM)
 # Foco temporal (desde 2026-11-18): el usuario busca arriendo cerca del metro Irarrázaval, en el límite Santiago-Ñuñoa.
 # El orquestador solo scrapea COMUNAS_ACTIVAS (grilla y detalle); las demás de COMUNAS_RM quedan congeladas, sin borrarse
 # y dentro del alcance de Silver, Gold, el modelo y el mapa. Para volver a lo normal:
-#   COMUNAS_ACTIVAS = list(COMUNAS_RM), GRILLA_CADA_HORAS = 6.0, ZONA_FOCO = None, DIAS_ROTACION_FOCO = None
+#   COMUNAS_ACTIVAS = list(COMUNAS_RM), GRILLA_CADA_HORAS = 6.0, ZONA_FOCO = None, DIAS_ROTACION_FOCO = None,
+#   SCORING_TRAS_GOLD = False, MAPA_TRAS_SCORING_MIN = None
 # y reiniciar el orquestador.
 COMUNAS_ACTIVAS = ["santiago-metropolitana", "nunoa-metropolitana"]
 GRILLA_CADA_HORAS = 2.0            # separación mínima entre grillas (6 h con las 12 comunas)
 ZONA_FOCO = (-33.4524, -70.6290, 1.5)  # (latitud, longitud, radio km) del metro Irarrázaval: revisita diaria y va primero
 DIAS_ROTACION_FOCO = (2, 3, 4, 5, 7)   # rotación fuera de la zona mientras dure el foco (None = la normal del detalle)
+# GitHub posterga el cron del scoring (cada 30 min en el papel, ~3 veces al día en la práctica), así que los avisos nuevos
+# pasaban hasta 8 h sin predicción. Con esto el orquestador lanza el workflow (gh workflow run) tras cada Gold (bitácora P-33).
+SCORING_TRAS_GOLD = True
+REPO_ML = "felipehfa/santiago-rentals-ml"
+# Lo mismo pasa con la publicación del mapa (repo VIS, ~4 veces al día). Se lanza unos minutos después del scoring, que
+# tarda ~2 min, para que publique las predicciones nuevas (None = no lanzarla). Al terminar el foco: MAPA_TRAS_SCORING_MIN = None.
+MAPA_TRAS_SCORING_MIN = 10
+REPO_VIS = "felipehfa/santiago-rentals-vis"
 assert set(COMUNAS_ACTIVAS) <= set(COMUNAS_RM), "COMUNAS_ACTIVAS debe ser parte de COMUNAS_RM"
 
 # Pausa entre peticiones (s). El orquestador la sube con estas variables de entorno para no cargar el sitio.
