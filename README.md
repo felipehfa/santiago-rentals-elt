@@ -349,6 +349,7 @@ santiago-rentals-elt/
 ├── tests/                     # HTML sintético, sin red ni base de datos (CI en .github/workflows/ci.yml)
 ├── scripts/
 │   ├── aplicar_ddl.py         # aplica los .sql en orden (idempotente)
+│   ├── como_va.py             # estado en una pantalla: tanda en curso (grilla o detalle), últimas 24 h, presupuesto y radar
 │   ├── radar.py               # foco temporal: avisos activos cerca del metro Irarrázaval vs. la predicción
 │   ├── vigilar_orquestador.ps1       # lanza el orquestador si no está corriendo (nunca dos)
 │   ├── instalar_tarea_windows.ps1    # registra la tarea programada que llama al anterior
@@ -420,6 +421,7 @@ python bronze/scraper_detalle.py --limite 20 --motivos nuevo
 python bronze/scraper_detalle.py --comunas nunoa-metropolitana   # solo esas comunas (por defecto, config.COMUNAS_ACTIVAS)
 python bronze/scraper_detalle.py --limite 20000 --presupuesto-dia 1200   # el presupuesto manda sobre el límite
 
+python scripts/como_va.py                                  # "¿cómo va?": tanda en curso, últimas 24 h y presupuesto (solo lee)
 python scripts/radar.py --horas 24                         # foco: avisos nuevos cerca del metro Irarrázaval
 python bronze/cargar_igvust.py                             # una vez (o al actualizar el shapefile)
 python silver/construir_silver.py                          # reconstruye Silver desde Bronce

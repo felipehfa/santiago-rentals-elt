@@ -25,7 +25,9 @@ WITH base AS (
          1000 * 2 * 6371 * asin(sqrt(power(sin(radians(a.latitud - %(lat)s) / 2), 2)
              + cos(radians(a.latitud)) * cos(radians(%(lat)s)) * power(sin(radians(a.longitud - %(lon)s) / 2), 2))) AS dist_m
   FROM gold.aviso_entrenamiento a
-  LEFT JOIN gold.predicciones_vigentes p USING (id_aviso)
+  -- Misma regla que gold.predicciones_vigentes, pero solo para los avisos filtrados (la vista ordena todo el historial).
+  LEFT JOIN LATERAL (SELECT costo_total_predicho_clp, etiqueta FROM gold.predicciones p WHERE p.id_aviso = a.id_aviso
+                     ORDER BY modelo_version DESC, predicho_en DESC LIMIT 1) p ON true
   WHERE a.estado_publicacion = 'activo' AND a.latitud IS NOT NULL
     AND a.primera_vez_visto >= now() - make_interval(hours => %(horas)s)
 )
