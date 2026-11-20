@@ -44,6 +44,7 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
 | P-31 | 18-nov | Foco temporal en Santiago y Ñuñoa; la grilla de ambas no queda completa y `desaparecido` no corre | mitigado |
 | P-32 | 18-nov | El portal cambió el cierre del JSON de la página y todas las visitas quedaron "sin appProps" | resuelto |
 | P-33 | 18-nov | GitHub posterga el cron del scoring y los avisos nuevos pasaban hasta 8 h sin predicción | resuelto |
+| P-34 | 20-nov | Supabase rechaza las conexiones; el proyecto queda en pausa | abierto |
 
 ---
 
@@ -507,6 +508,20 @@ Contexto de las decisiones de diseño en `01_antecedentes_concepcion_y_databrick
   problema: corre ~4 veces al día y a las 16:20 el mapa era de las 08:43. Tras lanzar el scoring, el orquestador deja un proceso
   aparte que espera `config.MAPA_TRAS_SCORING_MIN` (10) minutos y lanza `gh workflow run publicar.yml --repo config.REPO_VIS`;
   el scoring tarda ~2 min, así que el mapa publica las predicciones nuevas. `None` lo desactiva.
+
+---
+
+## P-34 · Supabase rechaza las conexiones; el proyecto queda en pausa
+
+- **Síntoma:** el 20-nov a las 02:49 falló la reconstrucción de Silver y el detalle terminó con error; desde las 04:30 el
+  orquestador no pudo reconectarse (5 intentos) y, al relanzarlo, la tarea programada moría antes de escribir en el log
+  (`ConexionResiliente` falla al construirse). La última tanda útil terminó a las 04:27.
+- **Causa:** desconocida. Desde el PC, DNS y TCP al pooler responden, pero Postgres rechaza la conexión con los dos roles
+  (dueño y `scraper_local`). La página de estado de Supabase no mostraba incidentes. Se sospecha del proyecto mismo (pausado,
+  restringido por cuota o reiniciándose); falta revisarlo en el panel.
+- **Resolución:** el usuario pidió pausar todo: `logs/orquestador.stop` y los workflows programados desactivados
+  (`entrenar`, `scoring` y `vigilante` en ML; `publicar` y `vigilante` en VIS). Aviso de pausa en los tres README.
+- **Estado:** abierto.
 
 ---
 

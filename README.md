@@ -1,5 +1,13 @@
 # santiago-rentals-elt
 
+> **⏸ Proyecto en pausa desde el 20-nov-2026.** La base de Supabase dejó de aceptar conexiones el 20-nov a las 02:49
+> (hora de Chile) y se detuvo todo el pipeline: el orquestador local está detenido con `logs/orquestador.stop` (el vigilante no lo
+> relanza mientras exista).
+> Los workflows programados quedaron desactivados: `entrenar`, `scoring` y `vigilante` en `santiago-rentals-ml`, y
+> `publicar` y `vigilante` en `santiago-rentals-vis`. El detalle está en la bitácora (P-34).
+> Para reanudar: comprobar que la base acepta conexiones, reactivar esos workflows (`gh workflow enable`) y borrar
+> `logs/orquestador.stop` (la tarea programada lo relanza en menos de 10 minutos).
+
 Repo del **ELT** (scrapers, Bronce, Silver y Gold). El modelo vive en el repo hermano
 `santiago-rentals-ml`; el único punto de contacto es `gold.aviso_entrenamiento` en Supabase.
 
