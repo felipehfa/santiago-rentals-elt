@@ -212,7 +212,7 @@ def resumen_grilla_24h(cur) -> list[str]:
 
 # ------------------------------------------------------------------ pie
 
-def pie(cur) -> list[str]:
+def pie(cur, grilla_en_curso: bool = False) -> list[str]:
     usadas = consultar(cur, """SELECT count(*) AS n FROM bronze.detalle_intentos
                                WHERE scraped_at > now() - interval '24 hours' AND resultado <> 'bloqueado'""")[0]["n"]
     lineas = [f"Presupuesto 24 h: {miles(usadas)} de {miles(PRESUPUESTO_24H)} · quedan {miles(PRESUPUESTO_24H - usadas)}"]
@@ -220,7 +220,7 @@ def pie(cur) -> list[str]:
                             WHERE fuente = 'grilla' AND estado IN ('success', 'parcial')""")[0]["ini"]
     if ult:
         prox = ult + timedelta(hours=config.GRILLA_CADA_HORAS)
-        cuando = (f"próxima desde ~{hora(prox)}" if prox > datetime.now(prox.tzinfo)
+        cuando = ("en curso" if grilla_en_curso else f"próxima desde ~{hora(prox)}" if prox > datetime.now(prox.tzinfo)
                   else "atrasada: entra al terminar la tanda en curso")
         lineas.append(f"Grilla: última {ult.astimezone().strftime('%d-%m %H:%M')} · {cuando} "
                       f"(cada {config.GRILLA_CADA_HORAS:g} h)")
@@ -273,7 +273,7 @@ def main() -> int:
             salida += resumen_detalle(cur, None, False)
             salida += resumen_grilla_24h(cur)
             salida.append("")
-            salida += pie(cur)
+            salida += pie(cur, en_curso and ultimo["fuente"] == "grilla")
         con.rollback()
     finally:
         con.close()
